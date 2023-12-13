@@ -1,4 +1,4 @@
-import glassBall from "./images/glassBall.png";
+import glassBall from "../images/glassBall.png";
 
 export const BALL_SIZE = 250;
 

@@ -1,13 +1,13 @@
 import "./style.css";
 import { FaceDetection } from "./face";
-import initSocket from "./utils/socket";
+import Socket from "./socket";
 
 import {
   GlassBallImageHelper,
   WebCamHelper,
   resizeCanvas,
   sleep,
-} from "./helpers";
+} from "./utils/helpers";
 // import { startCheetah } from "./transcribe";
 
 class Main {
@@ -18,7 +18,7 @@ class Main {
   private glassBallImageHelper: GlassBallImageHelper;
 
   private faceDetection: FaceDetection;
-  private Socket: undefined;
+  private socket: Socket;
 
   constructor() {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -28,6 +28,7 @@ class Main {
     this.glassBallImageHelper = new GlassBallImageHelper();
 
     this.faceDetection = new FaceDetection();
+    this.socket = new Socket();
 
     resizeCanvas(this.canvas);
     this.addEventListeners();
@@ -36,7 +37,6 @@ class Main {
   handleStart = async () => {
     this.webCamHelper.start();
     await this.faceDetection.init();
-    initSocket();
 
     this.draw();
 
