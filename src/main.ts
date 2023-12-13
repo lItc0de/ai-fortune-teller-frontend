@@ -9,6 +9,7 @@ import {
   sleep,
 } from "./utils/helpers";
 import { Dimensions } from "./types";
+import State from "./state";
 // import { startCheetah } from "./transcribe";
 
 class Main {
@@ -20,6 +21,8 @@ class Main {
 
   private faceDetection: FaceDetection;
   private socket: Socket;
+
+  private state: State;
 
   private dimensions: Dimensions;
 
@@ -35,11 +38,14 @@ class Main {
     this.glassBallImageHelper = new GlassBallImageHelper(this.ctx);
 
     this.faceDetection = new FaceDetection();
-    this.socket = new Socket();
+    this.state = new State();
+    this.socket = new Socket(this.state);
 
     this.addEventListeners();
-
     this.draw();
+
+    this.state.newSession("Person1");
+    this.socket.init();
   }
 
   handleStart = async () => {
