@@ -8,6 +8,7 @@ import {
   resizeCanvas,
   sleep,
 } from "./utils/helpers";
+import { Dimensions } from "./types";
 // import { startCheetah } from "./transcribe";
 
 class Main {
@@ -20,34 +21,40 @@ class Main {
   private faceDetection: FaceDetection;
   private socket: Socket;
 
+  private dimensions: Dimensions;
+
+  private started = false;
+
   constructor() {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
+    this.dimensions = resizeCanvas(this.canvas);
+
     this.webCamHelper = new WebCamHelper();
-    this.glassBallImageHelper = new GlassBallImageHelper();
+    this.glassBallImageHelper = new GlassBallImageHelper(this.ctx);
 
     this.faceDetection = new FaceDetection();
     this.socket = new Socket();
 
-    resizeCanvas(this.canvas);
     this.addEventListeners();
+
+    this.draw();
   }
 
   handleStart = async () => {
     this.webCamHelper.start();
     await this.faceDetection.init();
 
-    this.draw();
-
     // startCheetah();
+    this.started = true;
   };
 
   async draw() {
     do {
-      this.glassBallImageHelper.draw(this.ctx);
+      this.glassBallImageHelper.draw(this.dimensions);
 
-      if (this.webCamHelper.streaming) {
+      if (this.started && this.webCamHelper.streaming) {
         const detectedFace = await this.faceDetection.detect();
         if (detectedFace) this.faceDetection.draw(detectedFace.detection.box);
       }
@@ -56,6 +63,10 @@ class Main {
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     } while (true);
   }
+
+  resize = () => {
+    this.dimensions = resizeCanvas(this.canvas);
+  };
 
   addEventListeners() {
     this.addEventListenerResize();
@@ -68,7 +79,7 @@ class Main {
   }
 
   addEventListenerResize() {
-    window.addEventListener("resize", () => resizeCanvas(this.canvas));
+    window.addEventListener("resize", this.resize);
   }
 }
 
