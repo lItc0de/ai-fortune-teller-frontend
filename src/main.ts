@@ -10,7 +10,8 @@ import {
 } from "./utils/helpers";
 import { Dimensions } from "./types";
 import State from "./state";
-// import { startCheetah } from "./transcribe";
+import Transcribe from "./transcribe";
+import InOutHelper from "./utils/inOutHelper";
 
 class Main {
   private canvas: HTMLCanvasElement;
@@ -21,8 +22,9 @@ class Main {
 
   private faceDetection: FaceDetection;
   private socket: Socket;
-
   private state: State;
+  private transcribe: Transcribe;
+  private inOutHelper: InOutHelper;
 
   private dimensions: Dimensions;
 
@@ -38,21 +40,25 @@ class Main {
     this.glassBallImageHelper = new GlassBallImageHelper(this.ctx);
 
     this.faceDetection = new FaceDetection();
+
+    this.inOutHelper = new InOutHelper();
     this.state = new State();
-    this.socket = new Socket(this.state);
+    this.socket = new Socket(this.state, this.inOutHelper);
 
     this.addEventListeners();
     this.draw();
 
     this.state.newSession("Person1");
     this.socket.init();
+
+    this.transcribe = new Transcribe(this.inOutHelper.writeFromTranscript);
   }
 
   handleStart = async () => {
     this.webCamHelper.start();
     await this.faceDetection.init();
 
-    // startCheetah();
+    if (import.meta.env.PROD) await this.transcribe.start();
     this.started = true;
   };
 

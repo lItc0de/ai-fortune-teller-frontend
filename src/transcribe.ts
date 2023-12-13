@@ -5,37 +5,47 @@ declare global {
 import { type CheetahTranscript, CheetahWorker } from "@picovoice/cheetah-web";
 import { WebVoiceProcessor } from "@picovoice/web-voice-processor";
 
-let cheetah: CheetahWorker | null = null;
-let fullTranscript = "";
+class Transcribe {
+  private cheetah?: CheetahWorker;
+  private transcript: string = "";
+  private writeCallback: (transcript: string) => void;
 
-function transcriptCallback(cheetahTranscript: CheetahTranscript) {
-  fullTranscript += cheetahTranscript.transcript;
-  if (cheetahTranscript.isEndpoint) {
-    fullTranscript += "\n";
+  constructor(writeCallback: (transcript: string) => void) {
+    this.writeCallback = writeCallback;
   }
 
-  console.log(fullTranscript);
-}
-
-async function initCheetah() {
-  console.log("starting");
-
-  cheetah = await CheetahWorker.create(
-    import.meta.env.VITE_ACCESS_KEY || "",
-    transcriptCallback,
-    { base64: modelParams },
-    { enableAutomaticPunctuation: true }
-  );
-}
-
-export async function startCheetah() {
-  if (!cheetah) {
-    await initCheetah();
+  async init() {
+    this.cheetah = await CheetahWorker.create(
+      import.meta.env.VITE_ACCESS_KEY || "",
+      this.transcriptCallback,
+      { base64: modelParams },
+      { enableAutomaticPunctuation: true }
+    );
   }
 
-  if (cheetah) await WebVoiceProcessor.subscribe(cheetah);
+  async start() {
+    if (!this.cheetah) {
+      await this.init();
+    }
+
+    console.log("Transcribing started");
+
+    if (this.cheetah) await WebVoiceProcessor.subscribe(this.cheetah);
+  }
+
+  async stop() {
+    if (this.cheetah) await WebVoiceProcessor.unsubscribe(this.cheetah);
+  }
+
+  private transcriptCallback = (cheetahTranscript: CheetahTranscript) => {
+    this.transcript += cheetahTranscript.transcript;
+
+    if (!cheetahTranscript.isEndpoint) return;
+
+    this.writeCallback(this.transcript);
+
+    this.transcript = "";
+  };
 }
 
-export async function stopCheetah() {
-  if (cheetah) await WebVoiceProcessor.unsubscribe(cheetah);
-}
+export default Transcribe;

@@ -6,6 +6,7 @@ class Messages {
 
   add(msg: string, user: User) {
     this.messages.push(new Message(msg, user));
+    this.messages = this.messages.slice(-2);
   }
 
   toString(): string {

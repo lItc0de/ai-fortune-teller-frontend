@@ -20,6 +20,11 @@ class InOutHelper {
     this.addEventListener();
   }
 
+  writeFromTranscript = (transcript: string) => {
+    this.input.value = transcript;
+    this.sendAndClearInput();
+  };
+
   private addEventListener() {
     this.form.addEventListener("submit", this.submitHandler);
   }
@@ -31,10 +36,14 @@ class InOutHelper {
   private submitHandler = (ev: any) => {
     ev.preventDefault();
 
+    this.sendAndClearInput();
+  };
+
+  private sendAndClearInput() {
     const msg = this.input.value;
     if (this.inputHandler) this.inputHandler(msg);
     this.input.value = "";
-  };
+  }
 }
 
 export default InOutHelper;

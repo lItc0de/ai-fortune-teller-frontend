@@ -1,6 +1,7 @@
+import SpeechSynthesis from "./speechSynthesis";
 import State from "./state";
 import User from "./user";
-import InOutHelper from "./utils/inOutHelper";
+import type InOutHelper from "./utils/inOutHelper";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -10,12 +11,14 @@ class Socket {
   private inOutHelper: InOutHelper;
   private connected = false;
   private botUser: User;
+  private speechSynthesis: SpeechSynthesis;
 
-  constructor(state: State) {
+  constructor(state: State, inOutHelper: InOutHelper) {
     this.webSocket = new WebSocket(BACKEND_URL);
     this.state = state;
-    this.inOutHelper = new InOutHelper();
+    this.inOutHelper = inOutHelper;
     this.botUser = new User("bot111", "bot");
+    this.speechSynthesis = new SpeechSynthesis();
 
     this.addEventListeners();
     this.inOutHelper.registerInputHandler(this.userMessageHandler);
@@ -41,6 +44,7 @@ class Socket {
 
   private messageHandler = (msg: MessageEvent) => {
     this.state.session?.messages.add(msg.data, this.botUser);
+    this.speechSynthesis.speak(msg.data);
     this.writeMessage();
   };
 
@@ -51,9 +55,13 @@ class Socket {
 
   private closeErrorHandler = (event?: Event) => {
     this.connected = false;
-    console.log("disconnected");
 
-    if (event?.type === "error") console.error(event);
+    if (event?.type === "error") {
+      console.error("Error connecting Websocket");
+      return;
+    }
+
+    console.log("disconnected");
   };
 
   private writeMessage() {
