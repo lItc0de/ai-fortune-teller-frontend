@@ -7,6 +7,11 @@ export const BACKGROUND_DIMENSIONS = { width: 1280, height: 720 };
 export const sleep = () =>
   new Promise((resolve) => window.requestAnimationFrame(resolve));
 
+export const sleepMs = (ms: number = 0) =>
+  new Promise((resolve) =>
+    setTimeout(() => window.requestAnimationFrame(resolve), ms)
+  );
+
 export const resizeCanvas = (canvas: HTMLCanvasElement): Dimensions => {
   const backgroundRatio =
     BACKGROUND_DIMENSIONS.height / BACKGROUND_DIMENSIONS.width;

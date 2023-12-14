@@ -21,7 +21,6 @@ class Main {
   private glassBallImageHelper: GlassBallImageHelper;
 
   private faceDetection: FaceDetection;
-  private socket: Socket;
   private state: State;
   private transcribe: Transcribe;
   private inOutHelper: InOutHelper;
@@ -39,18 +38,12 @@ class Main {
     this.webCamHelper = new WebCamHelper();
     this.glassBallImageHelper = new GlassBallImageHelper(this.ctx);
 
-    this.faceDetection = new FaceDetection();
-
     this.inOutHelper = new InOutHelper();
-    this.state = new State();
-    this.socket = new Socket(this.state, this.inOutHelper);
+    this.state = new State(this.inOutHelper);
 
     this.addEventListeners();
-    this.draw();
 
-    this.state.newSession("Person1");
-    this.socket.init();
-
+    this.faceDetection = new FaceDetection(this.state.newSession);
     this.transcribe = new Transcribe(this.inOutHelper.writeFromTranscript);
   }
 
@@ -60,20 +53,17 @@ class Main {
 
     if (import.meta.env.PROD) await this.transcribe.start();
     this.started = true;
+    this.draw();
   };
 
   async draw() {
     do {
       this.glassBallImageHelper.draw(this.dimensions);
-
-      if (this.started && this.webCamHelper.streaming) {
-        const detectedFace = await this.faceDetection.detect();
-        if (detectedFace) this.faceDetection.draw(detectedFace.detection.box);
-      }
+      this.faceDetection.draw();
 
       await sleep();
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    } while (true);
+    } while (this.started);
   }
 
   resize = () => {

@@ -92,3 +92,7 @@ h1 {
   color: #fff;
   outline: none;
 }
+
+#mainInput:disabled {
+  background-color: rgba(20, 20, 20, 0.87);
+}

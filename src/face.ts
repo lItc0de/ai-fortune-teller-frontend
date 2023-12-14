@@ -1,4 +1,6 @@
 import * as faceapi from "face-api.js";
+import FaceDescriptors from "./utils/faceDescriptors";
+import { sleepMs } from "./utils/helpers";
 
 const CANVAS_WIDTH = 250;
 const CANVAS_HEIGHT = 250;
@@ -10,71 +12,42 @@ export class FaceDetection {
   private faceCanvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private lastBoxes: faceapi.Box[] = [];
+  private faceDescriptors: FaceDescriptors;
+  private started = false;
+  private lastDetectionIds: string[] = [];
+  private currentDetectionId: string = "undefined";
+  private newUserCallback: (userId: string) => void;
 
-  private results: faceapi.WithFaceDescriptor<
-    faceapi.WithFaceLandmarks<
-      {
-        detection: faceapi.FaceDetection;
-      },
-      faceapi.FaceLandmarks68
-    >
-  >[] = [];
-
-  constructor() {
+  constructor(newUserCallback: (userId: string) => void) {
     this.video = document.getElementById("video") as HTMLVideoElement;
     this.detectionOptions = new faceapi.TinyFaceDetectorOptions();
     this.faceCanvas = document.getElementById(
       "faceCanvas"
     ) as HTMLCanvasElement;
     this.ctx = this.faceCanvas.getContext("2d") as CanvasRenderingContext2D;
+    this.faceDescriptors = new FaceDescriptors();
+    this.newUserCallback = newUserCallback;
   }
 
   async init() {
     await faceapi.nets.tinyFaceDetector.loadFromUri("models");
     await faceapi.nets.faceLandmark68Net.loadFromUri("models");
     await faceapi.nets.faceRecognitionNet.loadFromUri("models");
+
+    this.start();
   }
 
-  async detect(): Promise<
-    | faceapi.WithFaceDescriptor<
-        faceapi.WithFaceLandmarks<
-          {
-            detection: faceapi.FaceDetection;
-          },
-          faceapi.FaceLandmarks68
-        >
-      >
-    | undefined
-  > {
-    const detection = await faceapi
-      .detectSingleFace(this.video, this.detectionOptions)
-      .withFaceLandmarks()
-      .withFaceDescriptor();
-
-    // const displaySize = { width: video.videoWidth, height: video.videoHeight };
-    // resize the overlay canvas to the input dimensions
-    // faceapi.matchDimensions(canvas, displaySize);
-    // const resizedDetections = faceapi.resizeResults(detections, displaySize);
-
-    // faceapi.draw.drawDetections(canvas, resizedDetections);
-
-    if (detection) {
-      if (this.results.length === 0) this.results.push(detection);
-
-      const faceMatcher = new faceapi.FaceMatcher(this.results);
-      const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-
-      if (bestMatch.toString(false) === "unknown") this.results.push(detection);
-      else {
-        // console.log(bestMatch.toString(), bestMatch.label, bestMatch.distance);
-      }
-    }
-
-    return detection;
+  async start() {
+    this.started = true;
+    this.loop();
   }
 
-  draw(faceBox: faceapi.Box) {
-    const averageBox = this.calculateAverageBox(faceBox);
+  async stop() {
+    this.started = false;
+  }
+
+  draw() {
+    const averageBox = this.calculateAverageBox();
 
     this.faceCanvas.width = CANVAS_WIDTH;
     this.faceCanvas.height = CANVAS_HEIGHT;
@@ -98,8 +71,68 @@ export class FaceDetection {
     );
   }
 
-  private calculateAverageBox(faceBox: faceapi.Box): faceapi.Box {
-    this.lastBoxes.push(faceBox);
+  private async detect() {
+    const detection = await faceapi
+      .detectSingleFace(this.video, this.detectionOptions)
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+
+    if (!detection) {
+      this.lastDetectionIds.push("undefined");
+      return;
+    }
+
+    if (this.faceDescriptors.length === 0)
+      this.faceDescriptors.add(detection.descriptor);
+
+    const faceMatcher = new faceapi.FaceMatcher(
+      this.faceDescriptors.desctiptors
+    );
+    const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+
+    if (bestMatch.toString(false) === "unknown") {
+      this.lastDetectionIds.push(
+        this.faceDescriptors.add(detection.descriptor)
+      );
+    } else {
+      this.lastDetectionIds.push(bestMatch.label);
+    }
+
+    this.lastBoxes.push(detection.detection.box);
+  }
+
+  private getAverageId(): string {
+    if (this.lastDetectionIds.length < 30) return "undefined";
+
+    this.lastDetectionIds = this.lastDetectionIds.slice(-100);
+
+    const weightedIds = this.lastDetectionIds.reduce(
+      (map: { [key: string]: number }, val) => {
+        map[val] = (Number(map[val]) || 0) + 1;
+        return map;
+      },
+      {}
+    );
+
+    return Object.keys(weightedIds).reduce((prev, curr) => {
+      return weightedIds[curr] > (weightedIds[prev] || 0) ? curr : prev;
+    }, "undefined");
+  }
+
+  private async loop() {
+    do {
+      this.detect();
+      const detectionId = this.getAverageId();
+      if (this.currentDetectionId !== detectionId) {
+        this.currentDetectionId = detectionId;
+        this.newUserCallback(this.currentDetectionId);
+      }
+
+      await sleepMs(100);
+    } while (this.started);
+  }
+
+  private calculateAverageBox(): faceapi.Box {
     const sumBox = this.lastBoxes.reduce(
       (prev, curr) => {
         return {
@@ -121,7 +154,7 @@ export class FaceDetection {
 
     this.lastBoxes = this.lastBoxes.slice(-3);
 
-    const newFaceBox = { ...faceBox, ...averageBox } as faceapi.Box;
+    const newFaceBox = averageBox as faceapi.Box;
 
     return newFaceBox;
   }

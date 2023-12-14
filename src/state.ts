@@ -1,13 +1,29 @@
 import Session from "./session";
+import Socket from "./socket";
+import InOutHelper from "./utils/inOutHelper";
 
 class State {
   waiting = false;
   session: Session | undefined;
 
-  newSession(userId: string) {
-    this.session = new Session(userId);
-    this.waiting = false;
+  private inOutHelper: InOutHelper;
+  private socket: Socket;
+
+  constructor(inOutHelper: InOutHelper) {
+    this.inOutHelper = inOutHelper;
+    this.socket = new Socket(this.inOutHelper);
+
+    this.newSession("defaultUser");
   }
+
+  newSession = (userId: string) => {
+    // tbd handle no user
+    if (userId === "undefined") return;
+
+    this.session = new Session(userId);
+    this.socket.newSession(this.session);
+    this.waiting = false;
+  };
 }
 
 export default State;

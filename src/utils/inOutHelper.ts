@@ -25,6 +25,14 @@ class InOutHelper {
     this.sendAndClearInput();
   };
 
+  toggleWaitingForBot(waitingForBot: boolean) {
+    if (waitingForBot) this.input.disabled = true;
+    else {
+      this.input.disabled = false;
+      this.input.focus();
+    }
+  }
+
   private addEventListener() {
     this.form.addEventListener("submit", this.submitHandler);
   }
