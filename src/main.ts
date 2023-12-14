@@ -1,6 +1,5 @@
 import "./style.css";
 import { FaceDetection } from "./face";
-import Socket from "./socket";
 
 import {
   GlassBallImageHelper,

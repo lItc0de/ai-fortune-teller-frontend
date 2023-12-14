@@ -3,7 +3,6 @@ import Socket from "./socket";
 import InOutHelper from "./utils/inOutHelper";
 
 class State {
-  waiting = false;
   session: Session | undefined;
 
   private inOutHelper: InOutHelper;
@@ -22,7 +21,6 @@ class State {
 
     this.session = new Session(userId);
     this.socket.newSession(this.session);
-    this.waiting = false;
   };
 }
 

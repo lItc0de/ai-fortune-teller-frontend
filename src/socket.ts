@@ -18,7 +18,7 @@ class Socket {
     this.webSocket = new WebSocket(BACKEND_URL);
     this.inOutHelper = inOutHelper;
     this.botUser = new User("bot111", "bot");
-    this.speechSynthesis = new SpeechSynthesis();
+    this.speechSynthesis = new SpeechSynthesis(this.handleSpeechSnthesisEnd);
 
     this.addEventListeners();
     this.inOutHelper.registerInputHandler(this.userMessageHandler);
@@ -54,7 +54,6 @@ class Socket {
     this.session?.messages.add(msg.data, this.botUser);
     this.speechSynthesis.speak(msg.data);
     this.writeMessage();
-    this.stopWaitingForBot();
   };
 
   private openHandler = () => {
@@ -87,6 +86,10 @@ class Socket {
     this.waitingForBot = false;
     this.inOutHelper.toggleWaitingForBot(this.waitingForBot);
   }
+
+  private handleSpeechSnthesisEnd = () => {
+    this.stopWaitingForBot();
+  };
 }
 
 export default Socket;
