@@ -1,18 +1,17 @@
-import Session from "./session";
 import Socket from "./socket";
 import User from "./user";
 import InOutHelper from "./utils/inOutHelper";
 
 class FortuneTeller {
   private inOutHelper: InOutHelper;
-  private session: Session;
+  private user: User;
   private botUser: User;
   private socket: Socket;
   private active = true;
 
-  constructor(session: Session, socket: Socket, botUser: User) {
+  constructor(user: User, socket: Socket, botUser: User) {
     this.inOutHelper = new InOutHelper();
-    this.session = session;
+    this.user = user;
     this.socket = socket;
     this.botUser = botUser;
   }
@@ -30,7 +29,7 @@ class FortuneTeller {
     if (!this.active) return;
 
     const question = await this.inOutHelper.waitForUserInput();
-    this.inOutHelper.write(question, this.session.user);
+    this.inOutHelper.write(question, this.user);
     const answer = await this.socket.send(question);
     this.inOutHelper.writeWithSynthesis(answer, this.botUser);
 

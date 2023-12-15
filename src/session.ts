@@ -1,13 +1,13 @@
-import User from "./user";
-import Messages from "./utils/messages";
-
 class Session {
-  user: User;
-  messages: Messages;
+  startedAt: number;
+  endedAt?: number;
 
-  constructor(userId: string) {
-    this.user = new User(userId, "person");
-    this.messages = new Messages();
+  constructor() {
+    this.startedAt = Date.now();
+  }
+
+  end() {
+    this.endedAt = Date.now();
   }
 }
 

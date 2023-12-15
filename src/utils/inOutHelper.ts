@@ -16,12 +16,14 @@ class InOutHelper {
 
   constructor() {
     this.output = document.getElementById("aiOutput") as HTMLOutputElement;
-    this.input = document.getElementById("mainInput") as HTMLInputElement;
+    this.form = document.getElementById("mainForm") as HTMLFormElement;
+    this.form.replaceWith(this.form.cloneNode(true));
     this.form = document.getElementById("mainForm") as HTMLFormElement;
 
-    this.speechSynthesis = new SpeechSynthesis();
-
+    this.input = document.getElementById("mainInput") as HTMLInputElement;
     this.input.disabled = true;
+
+    this.speechSynthesis = new SpeechSynthesis();
   }
 
   async writeWithSynthesis(msg: string, user?: User) {
