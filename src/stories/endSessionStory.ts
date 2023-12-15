@@ -13,11 +13,19 @@ class EndSessionStory {
   }
 
   async sayGoodbye() {
-    await this.inOutHelper.writeWithSynthesis(
-      `Goodbyes ${this.user.name}!
-      Was nice talking to you.`,
-      this.botUser
-    );
+    if (this.user.name) {
+      await this.inOutHelper.writeWithSynthesis(
+        `Goodbye ${this.user.name}!
+        Was nice talking to you.`,
+        this.botUser
+      );
+    } else {
+      await this.inOutHelper.writeWithSynthesis(
+        `Goodbye Human!
+        Was nice talking to you.`,
+        this.botUser
+      );
+    }
   }
 }
 

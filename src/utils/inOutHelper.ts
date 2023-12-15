@@ -23,6 +23,9 @@ class InOutHelper {
     this.input = document.getElementById("mainInput") as HTMLInputElement;
     this.input.disabled = true;
 
+    this.output.style.display = "block";
+    this.input.style.display = "block";
+
     this.speechSynthesis = new SpeechSynthesis();
   }
 
@@ -65,6 +68,13 @@ class InOutHelper {
 
   private newMessage(msg: string, user: User): Message {
     return new Message(msg, user);
+  }
+
+  static hideElements() {
+    const output = document.getElementById("aiOutput") as HTMLOutputElement;
+    output.style.display = "none";
+    const input = document.getElementById("mainInput") as HTMLInputElement;
+    input.style.display = "none";
   }
 }
 

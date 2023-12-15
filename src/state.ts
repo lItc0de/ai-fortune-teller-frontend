@@ -5,8 +5,11 @@ import FortuneTeller from "./FortuneTeller";
 import Users from "./users";
 import OldUserStory from "./stories/oldUser";
 import EndSessionStory from "./stories/endSessionStory";
+import FortuneTellerNewSessionDrawer from "./utils/fortuneTellerNewSessionDrawer";
+import InOutHelper from "./utils/inOutHelper";
+import GlassBallHelper from "./utils/glassBallHelper";
 
-enum States {
+export enum States {
   NO_SESSION,
   NEW_SESSION,
   WELCOME_OLD_USER,
@@ -15,23 +18,30 @@ enum States {
 }
 
 class State {
-  private currentState: States = States.NO_SESSION;
   private socket: Socket;
   private botUser: User;
   private users: Users;
   private currentUser?: User;
+  private newSessionDrawer: FortuneTellerNewSessionDrawer;
+  private glassBallHelper: GlassBallHelper;
+  currentState: States = States.NO_SESSION;
 
-  constructor() {
+  constructor(glassBallHelper: GlassBallHelper) {
     this.botUser = new User("bot111", "bot");
     this.socket = new Socket();
     this.users = new Users();
+    this.newSessionDrawer = new FortuneTellerNewSessionDrawer();
+    this.glassBallHelper = glassBallHelper;
 
     // only for testing
-    this.newSession("defaultUser");
+    // this.newSession("defaultUser");
   }
 
   newSession = async (userId: string) => {
     if (userId === "undefined") {
+      this.currentState = States.NO_SESSION;
+      this.newSessionDrawer.hideVideo();
+
       if (this.currentUser) {
         const endSessionStory = new EndSessionStory(
           this.currentUser,
@@ -41,17 +51,19 @@ class State {
       }
     }
 
-    this.currentState = States.NO_SESSION;
     this.currentUser?.endSession();
     this.currentUser = undefined;
+    InOutHelper.hideElements();
 
     if (userId === "undefined") return;
 
     this.currentState = States.NEW_SESSION;
 
+    await this.newSessionDrawer.drawNewSessionAnimation(this.glassBallHelper);
+
     let user = this.users.find(userId);
 
-    if (user) {
+    if (user && user.name) {
       this.currentUser = user;
       this.currentUser.newSession();
       this.welcomeOldUser();

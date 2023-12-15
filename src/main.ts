@@ -2,23 +2,27 @@ import "./style.css";
 import { FaceDetection } from "./face";
 
 import {
-  GlassBallImageHelper,
   WebCamHelper,
+  getDimensions,
   resizeCanvas,
   sleep,
 } from "./utils/helpers";
 import { Dimensions } from "./types";
-import State from "./state";
+import State, { States } from "./state";
+import GlassBallHelper from "./utils/glassBallHelper";
+import FortuneTellerIdleDrawer from "./utils/fortuneTellerIdleDrawer";
 
-globalThis.speechSynthesisEnabled = false;
+globalThis.speechSynthesisEnabled = true;
 globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private startBtn: HTMLButtonElement;
 
   private webCamHelper: WebCamHelper;
-  private glassBallImageHelper: GlassBallImageHelper;
+  private glassBallHelper: GlassBallHelper;
+  private fortuneTellerIdleDrawer: FortuneTellerIdleDrawer;
 
   private faceDetection: FaceDetection;
   private state: State;
@@ -29,12 +33,16 @@ class Main {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    this.dimensions = resizeCanvas(this.canvas);
+    this.startBtn = document.getElementById("startBtn") as HTMLButtonElement;
+
+    resizeCanvas(this.canvas);
+    this.dimensions = getDimensions();
 
     this.webCamHelper = new WebCamHelper();
-    this.glassBallImageHelper = new GlassBallImageHelper(this.ctx);
+    this.glassBallHelper = new GlassBallHelper(this.ctx);
+    this.fortuneTellerIdleDrawer = new FortuneTellerIdleDrawer(this.ctx);
 
-    this.state = new State();
+    this.state = new State(this.glassBallHelper);
 
     this.addEventListeners();
 
@@ -42,6 +50,7 @@ class Main {
   }
 
   handleStart = async () => {
+    this.startBtn.style.display = "none";
     this.webCamHelper.start();
     await this.faceDetection.init();
     this.draw();
@@ -49,8 +58,34 @@ class Main {
 
   async draw() {
     do {
-      this.glassBallImageHelper.draw(this.dimensions);
-      this.faceDetection.draw();
+      switch (this.state.currentState) {
+        case States.NO_SESSION:
+          this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
+          break;
+
+        case States.NEW_SESSION:
+          this.faceDetection.draw();
+          break;
+
+        case States.NAME_FINDING:
+          this.faceDetection.draw();
+          this.glassBallHelper.draw(this.dimensions);
+          break;
+
+        case States.WELCOME_OLD_USER:
+          this.faceDetection.draw();
+          this.glassBallHelper.draw(this.dimensions);
+          break;
+
+        case States.FORTUNE_TELLER:
+          this.faceDetection.draw();
+          this.glassBallHelper.draw(this.dimensions);
+          break;
+
+        default:
+          this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
+          break;
+      }
 
       await sleep();
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -58,7 +93,8 @@ class Main {
   }
 
   resize = () => {
-    this.dimensions = resizeCanvas(this.canvas);
+    resizeCanvas(this.canvas);
+    this.dimensions = getDimensions();
   };
 
   addEventListeners() {
@@ -67,8 +103,7 @@ class Main {
   }
 
   addEventListenerStartBtn() {
-    const startBtn = document.getElementById("startBtn");
-    startBtn?.addEventListener("click", this.handleStart);
+    this.startBtn.addEventListener("click", this.handleStart);
   }
 
   addEventListenerResize() {
