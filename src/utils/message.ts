@@ -12,7 +12,7 @@ class Message {
   private getUser(): string {
     if (this.user.type === "bot") return "Fortune Teller:";
 
-    return this.user.id ? `${this.user.id}:` : "User:";
+    return this.user.name ? `${this.user.name}:` : "User:";
   }
 
   toString(): string {

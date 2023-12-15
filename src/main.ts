@@ -9,8 +9,9 @@ import {
 } from "./utils/helpers";
 import { Dimensions } from "./types";
 import State from "./state";
-import Transcribe from "./transcribe";
-import InOutHelper from "./utils/inOutHelper";
+
+globalThis.speechSynthesisEnabled = false;
+globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
   private canvas: HTMLCanvasElement;
@@ -21,12 +22,8 @@ class Main {
 
   private faceDetection: FaceDetection;
   private state: State;
-  private transcribe: Transcribe;
-  private inOutHelper: InOutHelper;
 
   private dimensions: Dimensions;
-
-  private started = false;
 
   constructor() {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -37,21 +34,16 @@ class Main {
     this.webCamHelper = new WebCamHelper();
     this.glassBallImageHelper = new GlassBallImageHelper(this.ctx);
 
-    this.inOutHelper = new InOutHelper();
-    this.state = new State(this.inOutHelper);
+    this.state = new State();
 
     this.addEventListeners();
 
     this.faceDetection = new FaceDetection(this.state.newSession);
-    this.transcribe = new Transcribe(this.inOutHelper.writeFromTranscript);
   }
 
   handleStart = async () => {
     this.webCamHelper.start();
     await this.faceDetection.init();
-
-    if (import.meta.env.PROD) await this.transcribe.start();
-    this.started = true;
     this.draw();
   };
 
@@ -62,7 +54,7 @@ class Main {
 
       await sleep();
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    } while (this.started);
+    } while (true);
   }
 
   resize = () => {

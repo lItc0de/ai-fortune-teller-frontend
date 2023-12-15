@@ -24,6 +24,8 @@ class Transcribe {
   }
 
   async start() {
+    if (!import.meta.env.PROD) return;
+
     if (!this.cheetah) {
       await this.init();
     }
@@ -34,6 +36,7 @@ class Transcribe {
   }
 
   async stop() {
+    console.log("Transcribing stopped");
     if (this.cheetah) await WebVoiceProcessor.unsubscribe(this.cheetah);
   }
 

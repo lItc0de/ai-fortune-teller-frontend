@@ -1,60 +1,32 @@
-import Session from "./session";
-import SpeechSynthesis from "./speechSynthesis";
-import User from "./user";
-import type InOutHelper from "./utils/inOutHelper";
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 class Socket {
   private webSocket: WebSocket;
-  private inOutHelper: InOutHelper;
   private connected = false;
-  private botUser: User;
-  private speechSynthesis: SpeechSynthesis;
-  private session?: Session;
-  private waitingForBot = false;
 
-  constructor(inOutHelper: InOutHelper) {
+  constructor() {
     this.webSocket = new WebSocket(BACKEND_URL);
-    this.inOutHelper = inOutHelper;
-    this.botUser = new User("bot111", "bot");
-    this.speechSynthesis = new SpeechSynthesis(this.handleSpeechSnthesisEnd);
-
     this.addEventListeners();
-    this.inOutHelper.registerInputHandler(this.userMessageHandler);
   }
 
-  // needs to be called everytime there is a new session
-  newSession(session: Session) {
-    console.log("newSession called:", session.user.id);
+  send = (msg: string): Promise<string> =>
+    new Promise((resolve, reject) => {
+      if (!this.connected) return reject("Not connected");
 
-    this.session = session;
-    this.webSocket.removeEventListener("message", this.messageHandler);
-    this.webSocket.addEventListener("message", this.messageHandler);
-  }
+      const handleResponse = (response: MessageEvent) => {
+        this.webSocket.removeEventListener("message", handleResponse);
+        return resolve(response.data);
+      };
 
-  userMessageHandler = (msg: string) => {
-    if (this.waitingForBot) return;
-
-    this.startWaitingForBot();
-    if (this.connected) this.webSocket.send(msg);
-    this.session?.messages.add(msg, this.session.user);
-    this.writeMessage();
-  };
+      this.webSocket.addEventListener("message", handleResponse);
+      this.webSocket.send(msg);
+    });
 
   private addEventListeners() {
     this.webSocket.addEventListener("open", this.openHandler);
     this.webSocket.addEventListener("close", this.closeErrorHandler);
     this.webSocket.addEventListener("error", this.closeErrorHandler);
   }
-
-  private messageHandler = (msg: MessageEvent) => {
-    if (!this.waitingForBot) return;
-
-    this.session?.messages.add(msg.data, this.botUser);
-    this.speechSynthesis.speak(msg.data);
-    this.writeMessage();
-  };
 
   private openHandler = () => {
     this.connected = true;
@@ -70,25 +42,6 @@ class Socket {
     }
 
     console.log("disconnected");
-  };
-
-  private writeMessage() {
-    const output = this.session?.messages.toString();
-    if (output) this.inOutHelper.write(output);
-  }
-
-  private startWaitingForBot() {
-    this.waitingForBot = true;
-    this.inOutHelper.toggleWaitingForBot(this.waitingForBot);
-  }
-
-  private stopWaitingForBot() {
-    this.waitingForBot = false;
-    this.inOutHelper.toggleWaitingForBot(this.waitingForBot);
-  }
-
-  private handleSpeechSnthesisEnd = () => {
-    this.stopWaitingForBot();
   };
 }
 

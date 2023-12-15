@@ -1,21 +1,20 @@
 class SpeechSynthesis {
   private synth: globalThis.SpeechSynthesis;
   private voice: SpeechSynthesisVoice;
-  private endCallback: () => void;
 
-  constructor(endCallback: () => void) {
+  constructor() {
     this.synth = window.speechSynthesis;
     this.voice = this.synth.getVoices()[0];
-    this.endCallback = endCallback;
   }
 
-  speak(text: string) {
-    const utterThis = new SpeechSynthesisUtterance(text);
-    utterThis.voice = this.voice;
-    utterThis.addEventListener("end", this.endCallback);
+  speak = (text: string): Promise<void> =>
+    new Promise((reslove) => {
+      const utterThis = new SpeechSynthesisUtterance(text);
+      utterThis.voice = this.voice;
+      utterThis.addEventListener("end", () => reslove());
 
-    this.synth.speak(utterThis);
-  }
+      this.synth.speak(utterThis);
+    });
 }
 
 export default SpeechSynthesis;
