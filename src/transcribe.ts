@@ -8,13 +8,10 @@ import { WebVoiceProcessor } from "@picovoice/web-voice-processor";
 class Transcribe {
   private cheetah?: CheetahWorker;
   private transcript: string = "";
-  private writeCallback: (transcript: string) => void;
-
-  constructor(writeCallback: (transcript: string) => void) {
-    this.writeCallback = writeCallback;
-  }
 
   async init() {
+    if (!globalThis.cheetahEnabled) return;
+
     this.cheetah = await CheetahWorker.create(
       import.meta.env.VITE_ACCESS_KEY || "",
       this.transcriptCallback,
@@ -24,15 +21,10 @@ class Transcribe {
   }
 
   async start() {
-    if (!import.meta.env.PROD) return;
+    if (!globalThis.cheetahEnabled) return;
+    if (!this.cheetah) return;
 
-    if (!this.cheetah) {
-      await this.init();
-    }
-
-    console.log("Transcribing started");
-
-    if (this.cheetah) await WebVoiceProcessor.subscribe(this.cheetah);
+    await WebVoiceProcessor.subscribe(this.cheetah);
   }
 
   async stop() {
@@ -45,7 +37,7 @@ class Transcribe {
 
     if (!cheetahTranscript.isEndpoint) return;
 
-    this.writeCallback(this.transcript);
+    // this.writeCallback(this.transcript);
 
     this.transcript = "";
   };

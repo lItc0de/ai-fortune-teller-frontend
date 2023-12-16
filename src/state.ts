@@ -8,6 +8,7 @@ import EndSessionStory from "./stories/endSessionStory";
 import FortuneTellerNewSessionDrawer from "./utils/fortuneTellerNewSessionDrawer";
 import InOutHelper from "./utils/inOutHelper";
 import GlassBallHelper from "./utils/glassBallHelper";
+// import Transcribe from "./transcribe";
 
 export enum States {
   NO_SESSION,
@@ -19,16 +20,20 @@ export enum States {
 
 class State {
   private socket: Socket;
+  // private transcribe: Transcribe;
   private botUser: User;
   private users: Users;
   private currentUser?: User;
+
   private newSessionDrawer: FortuneTellerNewSessionDrawer;
   private glassBallHelper: GlassBallHelper;
+
   currentState: States = States.NO_SESSION;
 
   constructor(glassBallHelper: GlassBallHelper) {
     this.botUser = new User("bot111", "bot");
     this.socket = new Socket();
+    // this.transcribe = new Transcribe();
     this.users = new Users();
     this.newSessionDrawer = new FortuneTellerNewSessionDrawer();
     this.glassBallHelper = glassBallHelper;
