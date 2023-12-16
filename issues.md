@@ -1,2 +1,4 @@
 - new session while asking for name
 - loosing session too fast
+- better language model
+- edit texts
