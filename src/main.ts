@@ -1,4 +1,5 @@
 import "./style.css";
+// import "./test.ts";
 import FaceDetection from "./faceDetection";
 
 import {
@@ -8,11 +9,12 @@ import {
   sleep,
 } from "./utils/helpers";
 import { Dimensions } from "./types";
-import State, { States } from "./state";
+import State from "./state";
 import GlassBallDrawer from "./drawers/glassBallDrawer";
 import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
+import { StoryIds } from "./utils/storyState";
 
-globalThis.speechSynthesisEnabled = true;
+globalThis.speechSynthesisEnabled = false;
 globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
@@ -58,26 +60,26 @@ class Main {
 
   async draw() {
     do {
-      switch (this.state.currentState) {
-        case States.NO_SESSION:
+      switch (this.state.storyState.storyId) {
+        case StoryIds.NO_SESSION:
           this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
           break;
 
-        case States.NEW_SESSION:
+        case StoryIds.NEW_SESSION:
           this.faceDetection.draw();
           break;
 
-        case States.NAME_FINDING:
-          this.faceDetection.draw();
-          this.glassBallDrawer.draw(this.dimensions);
-          break;
-
-        case States.WELCOME_OLD_USER:
+        case StoryIds.NAME_FINDING:
           this.faceDetection.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
-        case States.FORTUNE_TELLER:
+        case StoryIds.WELCOME_OLD_USER:
+          this.faceDetection.draw();
+          this.glassBallDrawer.draw(this.dimensions);
+          break;
+
+        case StoryIds.FORTUNE_TELLER:
           this.faceDetection.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;

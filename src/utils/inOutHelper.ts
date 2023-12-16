@@ -1,6 +1,7 @@
 import SpeechSynthesis from "../speechSynthesis";
 import User from "./user";
 import Message from "./message";
+import Transcribe from "../transcribe";
 
 declare global {
   var cheetahEnabled: boolean;
@@ -13,20 +14,18 @@ class InOutHelper {
   private form: HTMLFormElement;
 
   private speechSynthesis: SpeechSynthesis;
+  private transcribe: Transcribe;
 
   constructor() {
     this.output = document.getElementById("aiOutput") as HTMLOutputElement;
-    this.form = document.getElementById("mainForm") as HTMLFormElement;
-    this.form.replaceWith(this.form.cloneNode(true));
     this.form = document.getElementById("mainForm") as HTMLFormElement;
 
     this.input = document.getElementById("mainInput") as HTMLInputElement;
     this.input.disabled = true;
 
-    this.output.style.display = "block";
-    this.input.style.display = "block";
-
     this.speechSynthesis = new SpeechSynthesis();
+    this.transcribe = new Transcribe(this.transcribeCallback);
+    this.transcribe.init();
   }
 
   async writeWithSynthesis(msg: string, user?: User) {
@@ -56,7 +55,29 @@ class InOutHelper {
       };
       this.form.addEventListener("submit", handleSubmit);
       this.toggleDisabled(false);
+      this.transcribe.start();
     });
+
+  showElements() {
+    this.output.style.display = "block";
+    this.input.style.display = "block";
+  }
+
+  hideElements() {
+    this.output.style.display = "none";
+    this.input.style.display = "none";
+  }
+
+  removeEventListeners() {
+    this.form.replaceWith(this.form.cloneNode(true));
+    this.form = document.getElementById("mainForm") as HTMLFormElement;
+    this.input = document.getElementById("mainInput") as HTMLInputElement;
+  }
+
+  private transcribeCallback = (transcript: string) => {
+    this.input.value = transcript;
+    (document.getElementById("submitBtn") as HTMLButtonElement).click();
+  };
 
   private handleSubmit = (ev: any) => {
     ev.preventDefault();
@@ -68,13 +89,6 @@ class InOutHelper {
 
   private newMessage(msg: string, user: User): Message {
     return new Message(msg, user);
-  }
-
-  static hideElements() {
-    const output = document.getElementById("aiOutput") as HTMLOutputElement;
-    output.style.display = "none";
-    const input = document.getElementById("mainInput") as HTMLInputElement;
-    input.style.display = "none";
   }
 }
 

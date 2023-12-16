@@ -1,23 +1,20 @@
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
+import BaseStory from "./baseStory";
+import StoryState, { StoryIds } from "../utils/storyState";
 
-class OldUserStory {
-  private inOutHelper: InOutHelper;
-  private botUser: User;
-  private user: User;
-
-  constructor(user: User, botUser: User) {
-    this.inOutHelper = new InOutHelper();
-    this.botUser = botUser;
-    this.user = user;
+class OldUserStory extends BaseStory {
+  constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
+    super(user, botUser, inOutHelper);
   }
 
-  async greetOldUser() {
+  async *tell() {
     await this.inOutHelper.writeWithSynthesis(
       `Welcome back ${this.user.name}!
       What can I do for you?`,
       this.botUser
     );
+    yield new StoryState(StoryIds.WELCOME_OLD_USER, undefined, true);
   }
 }
 

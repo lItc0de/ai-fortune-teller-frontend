@@ -1,39 +1,43 @@
 import Socket from "../socket";
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
+import BaseStory from "./baseStory";
+import StoryState, { StoryIds } from "../utils/storyState";
 
-class FortuneTellerStory {
-  private inOutHelper: InOutHelper;
-  private user: User;
-  private botUser: User;
+class FortuneTellerStory extends BaseStory {
   private socket: Socket;
-  private active = true;
 
-  constructor(user: User, socket: Socket, botUser: User) {
-    this.inOutHelper = new InOutHelper();
-    this.user = user;
+  constructor(
+    user: User,
+    botUser: User,
+    inOutHelper: InOutHelper,
+    socket: Socket
+  ) {
+    super(user, botUser, inOutHelper);
     this.socket = socket;
-    this.botUser = botUser;
   }
 
-  async start() {
+  async *tell() {
+    yield new StoryState(StoryIds.FORTUNE_TELLER);
+
     await this.inOutHelper.writeWithSynthesis(
       "Please ask me anything you like.",
       this.botUser
     );
 
-    await this.fortuneTelling();
-  }
+    yield new StoryState(StoryIds.FORTUNE_TELLER);
 
-  async fortuneTelling() {
-    if (!this.active) return;
+    while (true) {
+      const question = await this.inOutHelper.waitForUserInput();
+      this.inOutHelper.write(question, this.user);
 
-    const question = await this.inOutHelper.waitForUserInput();
-    this.inOutHelper.write(question, this.user);
-    const answer = await this.socket.send(question);
-    this.inOutHelper.writeWithSynthesis(answer, this.botUser);
+      yield new StoryState(StoryIds.FORTUNE_TELLER);
 
-    await this.fortuneTelling();
+      const answer = await this.socket.send(question);
+      await this.inOutHelper.writeWithSynthesis(answer, this.botUser);
+
+      yield new StoryState(StoryIds.FORTUNE_TELLER);
+    }
   }
 }
 

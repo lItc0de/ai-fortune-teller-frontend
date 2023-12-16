@@ -1,18 +1,16 @@
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
+import BaseStory from "./baseStory";
+import StoryState, { StoryIds } from "../utils/storyState";
 
-class EndSessionStory {
-  private inOutHelper: InOutHelper;
-  private botUser: User;
-  private user: User;
-
-  constructor(user: User, botUser: User) {
-    this.inOutHelper = new InOutHelper();
-    this.botUser = botUser;
-    this.user = user;
+class EndSessionStory extends BaseStory {
+  constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
+    super(user, botUser, inOutHelper);
   }
 
-  async sayGoodbye() {
+  async *tell() {
+    yield new StoryState(StoryIds.END_SESSION);
+
     if (this.user.name) {
       await this.inOutHelper.writeWithSynthesis(
         `Goodbye ${this.user.name}!
@@ -26,6 +24,8 @@ class EndSessionStory {
         this.botUser
       );
     }
+
+    yield new StoryState(StoryIds.END_SESSION, undefined, true);
   }
 }
 
