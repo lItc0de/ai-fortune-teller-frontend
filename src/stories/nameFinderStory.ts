@@ -1,7 +1,7 @@
-import User from "./user";
-import InOutHelper from "./utils/inOutHelper";
+import User from "../utils/user";
+import InOutHelper from "../utils/inOutHelper";
 
-class NameFinder {
+class NameFinderStory {
   private inOutHelper: InOutHelper;
   private botUser: User;
 
@@ -77,4 +77,4 @@ class NameFinder {
   }
 }
 
-export default NameFinder;
+export default NameFinderStory;

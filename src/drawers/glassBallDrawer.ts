@@ -1,10 +1,10 @@
 import glassBall from "../media/glassBall.png";
 import { Dimensions } from "../types";
-import { getDimensions, sleep } from "./helpers";
+import { getDimensions, sleep } from "../utils/helpers";
 
 export const BALL_SIZE = 184;
 
-class GlassBallHelper {
+class GlassBallDrawer {
   private faceCanvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
 
@@ -87,4 +87,4 @@ class GlassBallHelper {
   }
 }
 
-export default GlassBallHelper;
+export default GlassBallDrawer;

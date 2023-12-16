@@ -1,13 +1,13 @@
 import Socket from "./socket";
-import User from "./user";
-import NameFinder from "./NameFinder";
-import FortuneTeller from "./FortuneTeller";
-import Users from "./users";
-import OldUserStory from "./stories/oldUser";
+import User from "./utils/user";
+import NameFinderStory from "./stories/nameFinderStory";
+import FortuneTellerStory from "./stories/fortuneTellerStory";
+import Users from "./utils/users";
+import OldUserStory from "./stories/oldUserStory";
 import EndSessionStory from "./stories/endSessionStory";
-import FortuneTellerNewSessionDrawer from "./utils/fortuneTellerNewSessionDrawer";
+import FortuneTellerNewSessionDrawer from "./drawers/fortuneTellerNewSessionDrawer";
 import InOutHelper from "./utils/inOutHelper";
-import GlassBallHelper from "./utils/glassBallHelper";
+import GlassBallDrawer from "./drawers/glassBallDrawer";
 // import Transcribe from "./transcribe";
 
 export enum States {
@@ -26,17 +26,17 @@ class State {
   private currentUser?: User;
 
   private newSessionDrawer: FortuneTellerNewSessionDrawer;
-  private glassBallHelper: GlassBallHelper;
+  private glassBallDrawer: GlassBallDrawer;
 
   currentState: States = States.NO_SESSION;
 
-  constructor(glassBallHelper: GlassBallHelper) {
+  constructor(GlassBallDrawer: GlassBallDrawer) {
     this.botUser = new User("bot111", "bot");
     this.socket = new Socket();
     // this.transcribe = new Transcribe();
     this.users = new Users();
     this.newSessionDrawer = new FortuneTellerNewSessionDrawer();
-    this.glassBallHelper = glassBallHelper;
+    this.glassBallDrawer = GlassBallDrawer;
 
     // only for testing
     // this.newSession("defaultUser");
@@ -64,7 +64,7 @@ class State {
 
     this.currentState = States.NEW_SESSION;
 
-    await this.newSessionDrawer.drawNewSessionAnimation(this.glassBallHelper);
+    await this.newSessionDrawer.drawNewSessionAnimation(this.glassBallDrawer);
 
     let user = this.users.find(userId);
 
@@ -99,8 +99,8 @@ class State {
 
     this.currentState = States.NAME_FINDING;
 
-    const nameFinder = new NameFinder(this.botUser);
-    const name = await nameFinder.findName();
+    const nameFinderStory = new NameFinderStory(this.botUser);
+    const name = await nameFinderStory.findName();
 
     this.currentUser.name = name;
 
@@ -122,12 +122,12 @@ class State {
 
     this.currentState = States.FORTUNE_TELLER;
 
-    const fortuneTeller = new FortuneTeller(
+    const fortuneTellerStory = new FortuneTellerStory(
       this.currentUser,
       this.socket,
       this.botUser
     );
-    fortuneTeller.start();
+    fortuneTellerStory.start();
   }
 }
 

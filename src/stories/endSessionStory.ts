@@ -1,4 +1,4 @@
-import User from "../user";
+import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
 
 class EndSessionStory {

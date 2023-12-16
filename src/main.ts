@@ -1,5 +1,5 @@
 import "./style.css";
-import { FaceDetection } from "./face";
+import FaceDetection from "./faceDetection";
 
 import {
   WebCamHelper,
@@ -9,8 +9,8 @@ import {
 } from "./utils/helpers";
 import { Dimensions } from "./types";
 import State, { States } from "./state";
-import GlassBallHelper from "./utils/glassBallHelper";
-import FortuneTellerIdleDrawer from "./utils/fortuneTellerIdleDrawer";
+import GlassBallDrawer from "./drawers/glassBallDrawer";
+import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
 
 globalThis.speechSynthesisEnabled = true;
 globalThis.cheetahEnabled = import.meta.env.PROD;
@@ -21,7 +21,7 @@ class Main {
   private startBtn: HTMLButtonElement;
 
   private webCamHelper: WebCamHelper;
-  private glassBallHelper: GlassBallHelper;
+  private glassBallDrawer: GlassBallDrawer;
   private fortuneTellerIdleDrawer: FortuneTellerIdleDrawer;
 
   private faceDetection: FaceDetection;
@@ -39,10 +39,10 @@ class Main {
     this.dimensions = getDimensions();
 
     this.webCamHelper = new WebCamHelper();
-    this.glassBallHelper = new GlassBallHelper(this.ctx);
+    this.glassBallDrawer = new GlassBallDrawer(this.ctx);
     this.fortuneTellerIdleDrawer = new FortuneTellerIdleDrawer(this.ctx);
 
-    this.state = new State(this.glassBallHelper);
+    this.state = new State(this.glassBallDrawer);
 
     this.addEventListeners();
 
@@ -69,17 +69,17 @@ class Main {
 
         case States.NAME_FINDING:
           this.faceDetection.draw();
-          this.glassBallHelper.draw(this.dimensions);
+          this.glassBallDrawer.draw(this.dimensions);
           break;
 
         case States.WELCOME_OLD_USER:
           this.faceDetection.draw();
-          this.glassBallHelper.draw(this.dimensions);
+          this.glassBallDrawer.draw(this.dimensions);
           break;
 
         case States.FORTUNE_TELLER:
           this.faceDetection.draw();
-          this.glassBallHelper.draw(this.dimensions);
+          this.glassBallDrawer.draw(this.dimensions);
           break;
 
         default:

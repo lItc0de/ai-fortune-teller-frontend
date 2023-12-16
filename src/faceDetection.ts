@@ -5,7 +5,7 @@ import { sleepMs } from "./utils/helpers";
 const CANVAS_WIDTH = 250;
 const CANVAS_HEIGHT = 250;
 
-export class FaceDetection {
+class FaceDetection {
   private video: HTMLVideoElement;
   private detectionOptions: faceapi.TinyFaceDetectorOptions;
 
@@ -159,3 +159,5 @@ export class FaceDetection {
     return newFaceBox;
   }
 }
+
+export default FaceDetection;

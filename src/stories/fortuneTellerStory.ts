@@ -1,8 +1,8 @@
-import Socket from "./socket";
-import User from "./user";
-import InOutHelper from "./utils/inOutHelper";
+import Socket from "../socket";
+import User from "../utils/user";
+import InOutHelper from "../utils/inOutHelper";
 
-class FortuneTeller {
+class FortuneTellerStory {
   private inOutHelper: InOutHelper;
   private user: User;
   private botUser: User;
@@ -37,4 +37,4 @@ class FortuneTeller {
   }
 }
 
-export default FortuneTeller;
+export default FortuneTellerStory;

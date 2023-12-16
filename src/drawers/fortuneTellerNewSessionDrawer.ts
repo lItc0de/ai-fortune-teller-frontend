@@ -1,5 +1,5 @@
 import newSession1Video from "../media/newSession1.mp4";
-import GlassBallHelper from "./glassBallHelper";
+import GlassBallDrawer from "./glassBallDrawer";
 
 class FortuneTellerNewSessionDrawer {
   private newSession1Video: HTMLVideoElement;
@@ -16,9 +16,9 @@ class FortuneTellerNewSessionDrawer {
     this.newSession1Video.src = newSession1Video;
   }
 
-  async drawNewSessionAnimation(glassBallHelper: GlassBallHelper) {
+  async drawNewSessionAnimation(GlassBallDrawer: GlassBallDrawer) {
     await this.playVideo();
-    await glassBallHelper.flyIn();
+    await GlassBallDrawer.flyIn();
   }
 
   hideVideo() {
