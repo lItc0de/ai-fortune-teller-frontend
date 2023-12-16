@@ -1,5 +1,7 @@
 export enum StoryIds {
   NO_SESSION,
+  INTRO1,
+  INTRO2,
   NEW_SESSION,
   WELCOME_OLD_USER,
   NAME_FINDING,

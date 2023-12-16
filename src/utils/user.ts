@@ -1,28 +1,18 @@
-import Session from "./session";
-
-type UserType = "bot" | "person";
+export enum UserType {
+  BOT,
+  PERSON,
+}
 
 class User {
   id: string;
   type: UserType;
   name?: string;
-  sessions: Session[] = [];
-  currentSession?: Session;
+  lastVisits: number[] = [];
 
   constructor(id: string, type: UserType) {
     this.id = id;
     this.type = type;
-  }
-
-  newSession() {
-    const session = new Session();
-    this.sessions.push(session);
-    this.currentSession = session;
-  }
-
-  endSession() {
-    this.currentSession?.end();
-    this.currentSession = undefined;
+    this.lastVisits.push(Date.now());
   }
 }
 

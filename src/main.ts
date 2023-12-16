@@ -14,7 +14,7 @@ import GlassBallDrawer from "./drawers/glassBallDrawer";
 import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
 import { StoryIds } from "./utils/storyState";
 
-globalThis.speechSynthesisEnabled = false;
+globalThis.speechSynthesisEnabled = true;
 globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
@@ -65,13 +65,17 @@ class Main {
           this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
           break;
 
-        case StoryIds.NEW_SESSION:
+        case StoryIds.INTRO1:
           this.faceDetection.draw();
           break;
 
-        case StoryIds.NAME_FINDING:
+        case StoryIds.INTRO2:
           this.faceDetection.draw();
           this.glassBallDrawer.draw(this.dimensions);
+          break;
+
+        case StoryIds.NEW_SESSION:
+          this.faceDetection.draw();
           break;
 
         case StoryIds.WELCOME_OLD_USER:
@@ -79,9 +83,18 @@ class Main {
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
+        case StoryIds.NAME_FINDING:
+          this.faceDetection.draw();
+          this.glassBallDrawer.draw(this.dimensions);
+          break;
+
         case StoryIds.FORTUNE_TELLER:
           this.faceDetection.draw();
           this.glassBallDrawer.draw(this.dimensions);
+          break;
+
+        case StoryIds.END_SESSION:
+          this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
           break;
 
         default:

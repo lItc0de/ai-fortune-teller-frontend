@@ -46,7 +46,7 @@ class GlassBallDrawer {
     const { ratio } = dimensions;
 
     let i = 0;
-    const frames = 50;
+    const frames = 60;
 
     const x = 536 * ratio;
     const finalY = 413 * ratio;

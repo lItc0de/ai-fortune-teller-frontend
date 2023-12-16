@@ -1,4 +1,4 @@
-import User from "./user";
+import User, { UserType } from "./user";
 
 class Users {
   private users: User[] = [];
@@ -11,7 +11,7 @@ class Users {
     const oldUser = this.find(userId);
     if (oldUser) return oldUser;
 
-    const user = new User(userId, "person");
+    const user = new User(userId, UserType.PERSON);
     this.users.push(user);
 
     return user;

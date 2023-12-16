@@ -1,4 +1,4 @@
-import User from "./user";
+import User, { UserType } from "./user";
 
 class Message {
   user: User;
@@ -10,7 +10,7 @@ class Message {
   }
 
   private getUser(): string {
-    if (this.user.type === "bot") return "Fortune Teller:";
+    if (this.user.type === UserType.BOT) return "Fortune Teller:";
 
     return this.user.name ? `${this.user.name}:` : "User:";
   }

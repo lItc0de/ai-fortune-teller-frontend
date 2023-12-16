@@ -111,7 +111,10 @@ h1 {
   background-color: rgba(20, 20, 20, 0.87);
 }
 
-#newSession1 {
+#newSession1,
+#newSession2,
+#newSession3,
+#newSession4 {
   position: fixed;
   display: none;
   width: 100%;

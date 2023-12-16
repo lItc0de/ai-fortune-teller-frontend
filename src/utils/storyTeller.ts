@@ -67,7 +67,7 @@ class StoryTeller {
     console.log("Init StoryTeller", this.id);
   }
 
-  async goodbye() {
+  async end() {
     console.log("Good bye StoryTeller", this.id);
 
     const endSessionStoryIterator = this.endSessionStory.tell();

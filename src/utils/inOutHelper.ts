@@ -36,6 +36,7 @@ class InOutHelper {
   }
 
   write(msg: string, user?: User) {
+    this.showElements();
     let message = msg;
     if (user) message = this.newMessage(msg, user).toString();
     this.output.innerHTML = message;
