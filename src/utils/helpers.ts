@@ -11,6 +11,9 @@ export const sleepMs = (ms: number = 0) =>
     setTimeout(() => window.requestAnimationFrame(resolve), ms)
   );
 
+export const pause = (ms: number = 1000) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 export const getDimensions = (): Dimensions => {
   const backgroundRatio =
     BACKGROUND_DIMENSIONS.height / BACKGROUND_DIMENSIONS.width;
@@ -67,3 +70,12 @@ export class WebCamHelper {
       });
   }
 }
+
+export const countWords = (str: string) => {
+  return str.trim().split(/\s+/).length;
+};
+
+export const getSentences = (str: string) => {
+  const regexp = new RegExp("(?!\\s).+?[.?!](?=\\s)?", "g");
+  return str.trim().match(regexp);
+};

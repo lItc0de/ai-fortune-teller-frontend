@@ -1,22 +1,24 @@
 import User, { UserType } from "./user";
 
 class Message {
-  user: User;
+  user?: User;
   text: string;
 
-  constructor(text: string, user: User) {
+  constructor(text: string, user?: User) {
     this.text = text;
     this.user = user;
   }
 
   private getUser(): string {
-    if (this.user.type === UserType.BOT) return "Fortune Teller:";
+    if (!this.user) return "";
 
-    return this.user.name ? `${this.user.name}:` : "User:";
+    if (this.user.type === UserType.BOT) return "Fortune Teller: ";
+
+    return this.user.name ? `${this.user.name}: ` : "User: ";
   }
 
   toString(): string {
-    return `${this.getUser()} ${this.text}<br>`;
+    return [this.getUser(), this.text, "<br>"].join("");
   }
 }
 

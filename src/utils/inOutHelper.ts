@@ -2,6 +2,7 @@ import SpeechSynthesis from "../speechSynthesis";
 import User from "./user";
 import Message from "./message";
 import Transcribe from "../transcribe";
+import { countWords, getDimensions, getSentences, pause } from "./helpers";
 
 declare global {
   var cheetahEnabled: boolean;
@@ -16,6 +17,8 @@ class InOutHelper {
   private speechSynthesis: SpeechSynthesis;
   private transcribe: Transcribe;
 
+  private messages: Message[] = [];
+
   constructor() {
     this.output = document.getElementById("aiOutput") as HTMLOutputElement;
     this.form = document.getElementById("mainForm") as HTMLFormElement;
@@ -26,20 +29,41 @@ class InOutHelper {
     this.speechSynthesis = new SpeechSynthesis();
     this.transcribe = new Transcribe(this.transcribeCallback);
     this.transcribe.init();
+
+    window.addEventListener("resize", this.resize);
+    this.resize();
   }
 
-  async writeWithSynthesis(msg: string, user?: User) {
-    this.write(msg, user);
-    if (!speechSynthesisEnabled) return;
+  resize = () => {
+    const dimenstions = getDimensions();
+    this.output.style.width = `${400 * dimenstions.ratio}px`;
+    this.output.style.height = `${500 * dimenstions.ratio}px`;
+    this.output.style.right = `${
+      (window.innerWidth - dimenstions.width) / 2 + 50
+    }px`;
+  };
 
-    await this.speechSynthesis.speak(msg);
+  async writeWithSynthesis(msg: string, user?: User) {
+    const sentences = getSentences(msg);
+
+    if (sentences === null) {
+      await this.writeWithSynthesisHelper(msg, user);
+      return;
+    }
+
+    for (let i = 0; i < sentences.length; i++) {
+      await this.writeWithSynthesisHelper(sentences[i], user);
+    }
   }
 
   write(msg: string, user?: User) {
     this.showElements();
-    let message = msg;
-    if (user) message = this.newMessage(msg, user).toString();
-    this.output.innerHTML = message;
+    const message = new Message(msg, user);
+    this.messages.push(message);
+    this.messages = this.messages.slice(-2);
+    this.output.innerHTML = this.messages
+      .map((message) => message.toString())
+      .join("");
   }
 
   toggleDisabled(disabled: boolean) {
@@ -75,6 +99,17 @@ class InOutHelper {
     this.input = document.getElementById("mainInput") as HTMLInputElement;
   }
 
+  private async writeWithSynthesisHelper(sentence: string, user?: User) {
+    this.write(sentence, user);
+    if (!speechSynthesisEnabled) {
+      const wordCount = countWords(sentence);
+      await pause(1500 * Math.ceil(wordCount / 5));
+      return;
+    }
+
+    await this.speechSynthesis.speak(sentence);
+  }
+
   private transcribeCallback = (transcript: string) => {
     this.input.value = transcript;
     (document.getElementById("submitBtn") as HTMLButtonElement).click();
@@ -87,10 +122,6 @@ class InOutHelper {
     this.input.value = "";
     return value;
   };
-
-  private newMessage(msg: string, user: User): Message {
-    return new Message(msg, user);
-  }
 }
 
 export default InOutHelper;

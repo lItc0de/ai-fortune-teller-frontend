@@ -122,7 +122,6 @@ class FortuneTellerNewSessionDrawer {
       videoEl.style.display = "block";
       videoEl.addEventListener("ended", resolve);
       videoEl.play();
-      console.log("play", videoEl.src);
     });
 
   hideAll() {
