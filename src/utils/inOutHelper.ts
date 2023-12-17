@@ -2,7 +2,13 @@ import SpeechSynthesis from "../speechSynthesis";
 import User from "./user";
 import Message from "./message";
 import Transcribe from "../transcribe";
-import { countWords, getDimensions, getSentences, pause } from "./helpers";
+import {
+  BACKGROUND_DIMENSIONS,
+  countWords,
+  getDimensions,
+  getSentences,
+  pause,
+} from "./helpers";
 
 declare global {
   var cheetahEnabled: boolean;
@@ -10,17 +16,17 @@ declare global {
 }
 
 class InOutHelper {
-  private output: HTMLOutputElement;
+  private outputArea: HTMLDivElement;
   private input: HTMLInputElement;
   private form: HTMLFormElement;
 
   private speechSynthesis: SpeechSynthesis;
   private transcribe: Transcribe;
 
-  private messages: Message[] = [];
+  // private messages: Message[] = [];
 
   constructor() {
-    this.output = document.getElementById("aiOutput") as HTMLOutputElement;
+    this.outputArea = document.getElementById("outputArea") as HTMLDivElement;
     this.form = document.getElementById("mainForm") as HTMLFormElement;
 
     this.input = document.getElementById("mainInput") as HTMLInputElement;
@@ -36,11 +42,13 @@ class InOutHelper {
 
   resize = () => {
     const dimenstions = getDimensions();
-    this.output.style.width = `${400 * dimenstions.ratio}px`;
-    this.output.style.height = `${500 * dimenstions.ratio}px`;
-    this.output.style.right = `${
-      (window.innerWidth - dimenstions.width) / 2 + 50
-    }px`;
+    this.outputArea.style.width = `${Math.round(400 * dimenstions.ratio)}px`;
+    this.outputArea.style.height = `${Math.round(
+      BACKGROUND_DIMENSIONS.height * dimenstions.ratio
+    )}px`;
+    this.outputArea.style.right = `${Math.round(
+      (window.innerWidth - dimenstions.width) / 2 + 3 * 16
+    )}px`;
   };
 
   async writeWithSynthesis(msg: string, user?: User) {
@@ -56,14 +64,11 @@ class InOutHelper {
     }
   }
 
-  write(msg: string, user?: User) {
+  async write(msg: string, user?: User) {
     this.showElements();
     const message = new Message(msg, user);
-    this.messages.push(message);
-    this.messages = this.messages.slice(-2);
-    this.output.innerHTML = this.messages
-      .map((message) => message.toString())
-      .join("");
+    this.pushMessage(message);
+    await pause(1000);
   }
 
   toggleDisabled(disabled: boolean) {
@@ -84,12 +89,10 @@ class InOutHelper {
     });
 
   showElements() {
-    this.output.style.display = "block";
     this.input.style.display = "block";
   }
 
   hideElements() {
-    this.output.style.display = "none";
     this.input.style.display = "none";
   }
 
@@ -122,6 +125,30 @@ class InOutHelper {
     this.input.value = "";
     return value;
   };
+
+  private pushMessage(message: Message) {
+    const fadeOutAnimation = [
+      { opacity: "1" },
+      { transform: "translateY(-100px)", opacity: "0" },
+    ];
+
+    const messageElements = this.outputArea.children;
+    const numOfMessages = messageElements.length;
+    const firstNElements = ([...messageElements] as HTMLDivElement[]).slice(
+      numOfMessages - 1
+    );
+
+    firstNElements.forEach((messageElement) => {
+      messageElement.style.position = "absolute";
+
+      const animation = messageElement.animate(fadeOutAnimation, 200);
+      animation.addEventListener("finish", () => {
+        messageElement.remove();
+      });
+    });
+
+    this.outputArea.appendChild(message.toHtml());
+  }
 }
 
 export default InOutHelper;

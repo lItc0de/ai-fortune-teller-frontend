@@ -24,6 +24,7 @@ class NameFinderStory extends BaseStory {
         name = (await this.inOutHelper.waitForUserInput())
           .trim()
           .replace(".", "");
+        await this.inOutHelper.write(name, this.user);
         yield new StoryState(StoryIds.NAME_FINDING);
 
         if (countWords(name) !== 1) {
@@ -50,6 +51,7 @@ class NameFinderStory extends BaseStory {
           .trim()
           .toLowerCase()
           .replace(".", "");
+        await this.inOutHelper.write(answer, this.user);
 
         yield new StoryState(StoryIds.NAME_FINDING);
 
@@ -78,8 +80,6 @@ class NameFinderStory extends BaseStory {
       `Hello ${name}, nice to meet you.`,
       this.botUser
     );
-
-    console.log({ name });
 
     this.user.name = name;
     yield new StoryState(StoryIds.NAME_FINDING, name, true);

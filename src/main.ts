@@ -14,7 +14,7 @@ import GlassBallDrawer from "./drawers/glassBallDrawer";
 import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
 import { StoryIds } from "./utils/storyState";
 
-globalThis.speechSynthesisEnabled = false;
+globalThis.speechSynthesisEnabled = true;
 globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
