@@ -1,4 +1,7 @@
-- new session while asking for name
 - loosing session too fast
-- better language model
-- edit texts
+- try other language model
+- tell backend username
+- don't play animation if reoccuring user (only full vidoe in faster and no text)
+- speech synthesis in chrome (different voice)
+- greeting text need to be different
+- fix session switching

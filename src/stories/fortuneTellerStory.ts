@@ -3,6 +3,7 @@ import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
 import BaseStory from "./baseStory";
 import StoryState, { StoryIds } from "../utils/storyState";
+import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 
 class FortuneTellerStory extends BaseStory {
   private socket: Socket;
@@ -33,8 +34,15 @@ class FortuneTellerStory extends BaseStory {
 
       yield new StoryState(StoryIds.FORTUNE_TELLER);
 
-      const answer = await this.socket.send(question);
-      await this.inOutHelper.writeWithSynthesis(answer, this.botUser);
+      const response = await this.socket.send(
+        new SocketMessage(SocketMessageType.PROMPT, question)
+      );
+      if (response.type === SocketMessageType.BOT && response.prompt) {
+        await this.inOutHelper.writeWithSynthesis(
+          response.prompt,
+          this.botUser
+        );
+      }
 
       yield new StoryState(StoryIds.FORTUNE_TELLER);
     }

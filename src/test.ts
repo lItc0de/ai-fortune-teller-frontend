@@ -55,6 +55,5 @@ const animation = test.animate(
 );
 
 animation.addEventListener("finish", function () {
-  console.log("yay");
   test.remove();
 });

@@ -40,6 +40,8 @@ class InOutHelper {
     this.resize();
   }
 
+  abort() {}
+
   resize = () => {
     const dimenstions = getDimensions();
     this.outputArea.style.width = `${Math.round(400 * dimenstions.ratio)}px`;

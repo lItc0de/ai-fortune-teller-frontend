@@ -1,3 +1,5 @@
+import SocketMessage from "./utils/socketMessage";
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 class Socket {
@@ -9,17 +11,19 @@ class Socket {
     this.addEventListeners();
   }
 
-  send = (msg: string): Promise<string> =>
+  send = (message: SocketMessage): Promise<SocketMessage> =>
     new Promise((resolve, reject) => {
       if (!this.connected) return reject("Not connected");
 
       const handleResponse = (response: MessageEvent) => {
         this.webSocket.removeEventListener("message", handleResponse);
-        return resolve(response.data);
+        const responseMessage = SocketMessage.createfromJSON(response.data);
+
+        return resolve(responseMessage);
       };
 
       this.webSocket.addEventListener("message", handleResponse);
-      this.webSocket.send(msg);
+      this.webSocket.send(message.toJSON());
     });
 
   private addEventListeners() {

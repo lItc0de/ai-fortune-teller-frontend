@@ -6,6 +6,8 @@ import InOutHelper from "./utils/inOutHelper";
 import GlassBallDrawer from "./drawers/glassBallDrawer";
 import StoryState, { StoryIds } from "./utils/storyState";
 import StoryTeller from "./utils/storyTeller";
+import { pause } from "./utils/helpers";
+import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
 
 class State {
   private socket: Socket;
@@ -46,28 +48,21 @@ class State {
   }
 
   newSession = async (userId: string) => {
+    await this.abortOldSession();
+
     // no User, no Session
-    if (userId === "undefined" && this.currentStoryTeller === undefined) {
-      this.resetSession();
-      return;
-    }
+    if (userId === "undefined" && this.currentStoryTeller === undefined) return;
 
     // no User, old Session
     if (userId === "undefined" && this.currentStoryTeller !== undefined) {
-      this.currentStoryTeller.abort();
-      this.newSessionDrawer.abort();
       await this.currentStoryTeller.end();
       this.currentStoryTeller = undefined;
-      this.resetSession();
       return;
     }
 
     // new User, old Session
     if (userId !== "undefined" && this.currentStoryTeller !== undefined) {
-      this.currentStoryTeller.abort();
-      this.newSessionDrawer.abort();
       this.currentStoryTeller = undefined;
-      this.resetSession();
     }
 
     // new User, no Session
@@ -85,20 +80,39 @@ class State {
 
     this.storyId++;
 
-    await this.newSessionDrawer.draw(this.glassBallDrawer);
-    await this.currentStoryTeller.tell();
-  };
+    // Previous user
+    if (this.currentUser.name) {
+      this.socket.send(
+        new SocketMessage(
+          SocketMessageType.OLD_SESSION,
+          undefined,
+          this.currentUser.name
+        )
+      );
+    } else {
+      this.socket.send(new SocketMessage(SocketMessageType.NEW_SESSION));
+      await this.newSessionDrawer.draw(this.glassBallDrawer);
+    }
 
-  private resetSession = () => {
-    this.newSessionDrawer.hideAll();
-    this.inOutHelper.hideElements();
-    this.storyState = new StoryState(StoryIds.NO_SESSION);
+    await this.currentStoryTeller.tell();
   };
 
   private changeStateCallback = (storyState: StoryState) => {
     this.storyState = storyState;
-    // console.log("Fired", this.storyState.storyId);
+    if (storyState.storyId === StoryIds.NAME_FINDING && storyState.isEnd) {
+      if (storyState.returnValue)
+        this.socket.send(
+          new SocketMessage(SocketMessageType.USERNAME, storyState.returnValue)
+        );
+    }
   };
+
+  private async abortOldSession() {
+    this.storyState = new StoryState(StoryIds.NO_SESSION);
+    this.newSessionDrawer.abort();
+    this.currentStoryTeller?.abort();
+    await pause(3000);
+  }
 }
 
 export default State;

@@ -31,7 +31,9 @@ class SpeechSynthesis {
   private getVoice(): SpeechSynthesisVoice {
     const voices = this.synth.getVoices();
     const foundVoice = voices.find((voice) => {
-      return voice.name === "Sandy (English (US))";
+      const option1 = voice.name === "Sandy (English (US))";
+      const option2 = voice.name === "Sandy (English (United States))";
+      return option1 || option2;
     });
 
     return foundVoice || voices[0];

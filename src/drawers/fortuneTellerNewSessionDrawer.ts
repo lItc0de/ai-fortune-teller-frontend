@@ -46,7 +46,8 @@ class FortuneTellerNewSessionDrawer {
 
   abort() {
     this.needsAbort = true;
-    this.hideAll();
+    this.stopAndHideVideos();
+    this.inOutHelper.abort();
   }
 
   private loadVideos() {
@@ -120,26 +121,16 @@ class FortuneTellerNewSessionDrawer {
   private playVideo = (videoEl: HTMLVideoElement) =>
     new Promise((resolve) => {
       videoEl.style.display = "block";
+
       videoEl.addEventListener("ended", resolve);
       videoEl.play();
     });
 
-  hideAll() {
+  stopAndHideVideos() {
     this.newSession1Video.style.display = "none";
-    this.newSession1Video.pause();
-    this.newSession1Video.currentTime = 0;
-
     this.newSession2Video.style.display = "none";
-    this.newSession2Video.pause();
-    this.newSession2Video.currentTime = 0;
-
     this.newSession3Video.style.display = "none";
-    this.newSession3Video.pause();
-    this.newSession3Video.currentTime = 0;
-
     this.newSession4Video.style.display = "none";
-    this.newSession4Video.pause();
-    this.newSession4Video.currentTime = 0;
   }
 }
 

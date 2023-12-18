@@ -14,6 +14,9 @@
   -moz-osx-font-smoothing: grayscale;
 
   box-sizing: border-box;
+
+  --primary-color: rgba(55, 31, 54, 1);
+  --secondary-color: rgba(175, 165, 174, 1);
 }
 
 @keyframes fadeIn {
@@ -72,10 +75,11 @@ body {
   display: block;
   position: fixed;
   padding: 0.5rem 1rem;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 0.2rem;
-  border: 1px solid #fff;
   font-size: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid #fff;
 
   z-index: 900;
 }
@@ -144,32 +148,37 @@ body {
 .outputWrapper {
   display: flex;
   flex-direction: column;
-  border: 1px solid #fff;
+  /* border: 1px solid #fff; */
   border-radius: 0.2rem;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
   animation-name: fadeIn;
   animation-duration: 200ms;
   width: 100%;
   box-sizing: border-box;
+  backdrop-filter: blur(10px);
 }
 
 .outputWrapper > .outputLabel {
-  border: 1px solid #fff;
-  border-radius: 0.2rem 0 0.2rem 0;
+  /* border: 1px solid #fff; */
+  border-radius: 0.2rem 0;
   align-self: flex-start;
   padding: 0.1rem 2rem 0.1rem 0.5rem;
-  margin: -1px;
+  /* margin: -1px; */
   font-size: 0.7rem;
   font-weight: bold;
-  background-color: #fff;
-  color: #000;
+  background-color: rgba(255, 255, 255, 0.1);
+  /* color: var(--primary-color); */
+  /* width: 100%; */
+  box-sizing: border-box;
+  color: var(--secondary-color);
 }
 
 .outputWrapper > .output {
   padding: 0.5rem;
+  color: #fff;
 }
 
-#test {
+/* #test {
   position: fixed;
   top: 3rem;
-}
+} */
