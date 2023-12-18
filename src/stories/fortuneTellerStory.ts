@@ -4,6 +4,7 @@ import InOutHelper from "../utils/inOutHelper";
 import BaseStory from "./baseStory";
 import StoryState, { StoryIds } from "../utils/storyState";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
+import AFTEvent from "../messageQueue/aftEvent";
 
 class FortuneTellerStory extends BaseStory {
   private socket: Socket;
@@ -18,11 +19,20 @@ class FortuneTellerStory extends BaseStory {
     this.socket = socket;
   }
 
+  abort = () => {
+    this.inOutHelper.abort();
+    this.socket.abort();
+  };
+
+  getAFTEvent() {
+    return new AFTEvent(this.tell.bind(this), this.abort);
+  }
+
   async *tell() {
     yield new StoryState(StoryIds.FORTUNE_TELLER);
 
     await this.inOutHelper.writeWithSynthesis(
-      "Please ask me anything you like.",
+      "I'm ready to to look into my glassball to tell you everything you whish to know. So go ahead!",
       this.botUser
     );
 
@@ -35,13 +45,15 @@ class FortuneTellerStory extends BaseStory {
       yield new StoryState(StoryIds.FORTUNE_TELLER);
 
       const response = await this.socket.send(
-        new SocketMessage(SocketMessageType.PROMPT, question)
+        new SocketMessage(SocketMessageType.PROMPT, question, this.user.name)
       );
       if (response.type === SocketMessageType.BOT && response.prompt) {
         await this.inOutHelper.writeWithSynthesis(
           response.prompt,
           this.botUser
         );
+      } else {
+        console.log(response);
       }
 
       yield new StoryState(StoryIds.FORTUNE_TELLER);

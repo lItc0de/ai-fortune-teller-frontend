@@ -103,10 +103,12 @@ body {
   background-color: rgba(20, 20, 20, 0.87);
 }
 
+#newSession0,
 #newSession1,
 #newSession2,
 #newSession3,
-#newSession4 {
+#newSession4,
+#fortuneTellerImg {
   position: fixed;
   display: none;
   width: 100%;

@@ -95,7 +95,7 @@ class StoryTeller {
   abort() {
     this.needsAbort = true;
     console.log("Abort", this.id);
-    this.inOutHelper.removeEventListeners();
+    this.inOutHelper.abort();
   }
 
   private async *runStories(

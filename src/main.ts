@@ -13,8 +13,9 @@ import State from "./state";
 import GlassBallDrawer from "./drawers/glassBallDrawer";
 import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
 import { StoryIds } from "./utils/storyState";
+import EventLoop from "./messageQueue/eventLoop";
 
-globalThis.speechSynthesisEnabled = true;
+globalThis.speechSynthesisEnabled = false;
 globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
@@ -28,6 +29,7 @@ class Main {
 
   private faceDetection: FaceDetection;
   private state: State;
+  private eventLoop: EventLoop;
 
   private dimensions: Dimensions;
 
@@ -44,7 +46,8 @@ class Main {
     this.glassBallDrawer = new GlassBallDrawer(this.ctx);
     this.fortuneTellerIdleDrawer = new FortuneTellerIdleDrawer(this.ctx);
 
-    this.state = new State(this.glassBallDrawer);
+    this.eventLoop = new EventLoop();
+    this.state = new State(this.eventLoop, this.glassBallDrawer);
 
     this.addEventListeners();
 
@@ -53,8 +56,11 @@ class Main {
 
   handleStart = async () => {
     this.startBtn.style.display = "none";
+
+    this.eventLoop.start();
     this.webCamHelper.start();
     await this.faceDetection.init();
+
     this.draw();
   };
 
@@ -80,7 +86,6 @@ class Main {
 
         case StoryIds.WELCOME_OLD_USER:
           this.faceDetection.draw();
-          this.glassBallDrawer.draw(this.dimensions);
           break;
 
         case StoryIds.NAME_FINDING:
@@ -107,21 +112,21 @@ class Main {
     } while (true);
   }
 
-  resize = () => {
+  private resize = () => {
     resizeCanvas(this.canvas);
     this.dimensions = getDimensions();
   };
 
-  addEventListeners() {
+  private addEventListeners() {
     this.addEventListenerResize();
     this.addEventListenerStartBtn();
   }
 
-  addEventListenerStartBtn() {
+  private addEventListenerStartBtn() {
     this.startBtn.addEventListener("click", this.handleStart);
   }
 
-  addEventListenerResize() {
+  private addEventListenerResize() {
     window.addEventListener("resize", this.resize);
   }
 }

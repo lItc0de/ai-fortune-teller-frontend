@@ -4,6 +4,7 @@ export enum SocketMessageType {
   NEW_SESSION,
   OLD_SESSION,
   USERNAME,
+  ABORT,
 }
 
 export interface RawSocketMessage {

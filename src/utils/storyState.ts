@@ -13,11 +13,18 @@ class StoryState {
   private _storyId: StoryIds;
   private _returnValue?: string;
   private _isEnd = false;
+  private _nextStoryId?: StoryIds;
 
-  constructor(storyId: StoryIds, returnValue?: string, isEnd?: boolean) {
+  constructor(
+    storyId: StoryIds,
+    returnValue?: string,
+    isEnd?: boolean,
+    nextStoryId?: StoryIds
+  ) {
     this._storyId = storyId;
     this._returnValue = returnValue;
     if (isEnd !== undefined) this._isEnd = isEnd;
+    this._nextStoryId = nextStoryId;
   }
 
   get storyId() {
@@ -30,6 +37,10 @@ class StoryState {
 
   get isEnd() {
     return this._isEnd;
+  }
+
+  get nextStoryId() {
+    return this._nextStoryId;
   }
 }
 

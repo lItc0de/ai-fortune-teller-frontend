@@ -5,3 +5,5 @@
 - speech synthesis in chrome (different voice)
 - greeting text need to be different
 - fix session switching
+- error callback
+- when in input and abort it should cancel the input

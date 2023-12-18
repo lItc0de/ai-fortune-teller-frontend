@@ -1,23 +1,32 @@
-import SocketMessage from "./utils/socketMessage";
+import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 class Socket {
   private webSocket: WebSocket;
   private connected = false;
+  private aborted = false;
 
   constructor() {
     this.webSocket = new WebSocket(BACKEND_URL);
     this.addEventListeners();
   }
 
+  abort = () => {
+    this.aborted = true;
+  };
+
   send = (message: SocketMessage): Promise<SocketMessage> =>
     new Promise((resolve, reject) => {
       if (!this.connected) return reject("Not connected");
+      this.aborted = false;
 
       const handleResponse = (response: MessageEvent) => {
         this.webSocket.removeEventListener("message", handleResponse);
         const responseMessage = SocketMessage.createfromJSON(response.data);
+
+        if (this.aborted)
+          return resolve(new SocketMessage(SocketMessageType.ABORT));
 
         return resolve(responseMessage);
       };

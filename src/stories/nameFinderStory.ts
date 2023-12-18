@@ -3,15 +3,25 @@ import InOutHelper from "../utils/inOutHelper";
 import BaseStory from "./baseStory";
 import StoryState, { StoryIds } from "../utils/storyState";
 import { countWords } from "../utils/helpers";
+import AFTEvent from "../messageQueue/aftEvent";
 
 class NameFinderStory extends BaseStory {
   constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
     super(user, botUser, inOutHelper);
   }
 
+  abort = () => {
+    this.inOutHelper.abort();
+  };
+
+  getAFTEvent() {
+    return new AFTEvent(this.tell.bind(this), this.abort);
+  }
+
   async *tell() {
+    yield new StoryState(StoryIds.NAME_FINDING);
     await this.inOutHelper.writeWithSynthesis(
-      "Hello there, nice too meet you! Before we begin, can you please tell me your name?",
+      "So now I ask you to speak your name!",
       this.botUser
     );
     yield new StoryState(StoryIds.NAME_FINDING);
@@ -29,7 +39,7 @@ class NameFinderStory extends BaseStory {
 
         if (countWords(name) !== 1) {
           await this.inOutHelper.writeWithSynthesis(
-            "Sorry, but I didn't understand this, pleas just tell me your name in one word.",
+            "Oh dear, unfortunately your name got lost in the void, repeat it for me please!",
             this.botUser
           );
         } else {
@@ -39,7 +49,7 @@ class NameFinderStory extends BaseStory {
       }
 
       await this.inOutHelper.writeWithSynthesis(
-        `So your name is ${name}? Can you please confirm.`,
+        `So your name is ${name}? A short "yes" or "no" is enough.`,
         this.botUser
       );
 
@@ -57,7 +67,7 @@ class NameFinderStory extends BaseStory {
 
         if (answer === "no") {
           await this.inOutHelper.writeWithSynthesis(
-            "Sorry, please tell me your name again.",
+            "Ok, well then tell me your name again.",
             this.botUser
           );
           checkIfName = false;
@@ -68,7 +78,7 @@ class NameFinderStory extends BaseStory {
           yield new StoryState(StoryIds.NAME_FINDING);
         } else {
           await this.inOutHelper.writeWithSynthesis(
-            "Sorry, I couldn't understand your answer. Pleas just say yes or no",
+            'Please my dear, a short "yes" or "no" is enough.',
             this.botUser
           );
           yield new StoryState(StoryIds.NAME_FINDING);
@@ -77,12 +87,17 @@ class NameFinderStory extends BaseStory {
     }
 
     await this.inOutHelper.writeWithSynthesis(
-      `Hello ${name}, nice to meet you.`,
+      `Hello my dear ${name}, a beautiful name that is.`,
       this.botUser
     );
 
     this.user.name = name;
-    yield new StoryState(StoryIds.NAME_FINDING, name, true);
+    yield new StoryState(
+      StoryIds.NAME_FINDING,
+      name,
+      true,
+      StoryIds.FORTUNE_TELLER
+    );
   }
 }
 

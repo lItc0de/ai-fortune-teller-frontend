@@ -4,7 +4,7 @@ import Message from "./message";
 import Transcribe from "../transcribe";
 import {
   BACKGROUND_DIMENSIONS,
-  countWords,
+  // countWords,
   getDimensions,
   getSentences,
   pause,
@@ -38,9 +38,14 @@ class InOutHelper {
 
     window.addEventListener("resize", this.resize);
     this.resize();
+
+    this.form.addEventListener("submit", (ev) => ev.preventDefault());
   }
 
-  abort() {}
+  abort() {
+    this.clearOutputArea();
+    (document.getElementById("submitBtn") as HTMLButtonElement).click();
+  }
 
   resize = () => {
     const dimenstions = getDimensions();
@@ -52,6 +57,20 @@ class InOutHelper {
       (window.innerWidth - dimenstions.width) / 2 + 3 * 16
     )}px`;
   };
+
+  async *writeWithSynthesisIterator(msg: string, user?: User) {
+    const sentences = getSentences(msg);
+
+    if (sentences === null) {
+      await this.writeWithSynthesisHelper(msg, user);
+      yield;
+    } else {
+      for (let i = 0; i < sentences.length; i++) {
+        await this.writeWithSynthesisHelper(sentences[i], user);
+        yield;
+      }
+    }
+  }
 
   async writeWithSynthesis(msg: string, user?: User) {
     const sentences = getSentences(msg);
@@ -98,17 +117,18 @@ class InOutHelper {
     this.input.style.display = "none";
   }
 
-  removeEventListeners() {
-    this.form.replaceWith(this.form.cloneNode(true));
-    this.form = document.getElementById("mainForm") as HTMLFormElement;
-    this.input = document.getElementById("mainInput") as HTMLInputElement;
-  }
+  // removeEventListeners() {
+  //   this.form.replaceWith(this.form.cloneNode(true));
+  //   this.form = document.getElementById("mainForm") as HTMLFormElement;
+  //   this.input = document.getElementById("mainInput") as HTMLInputElement;
+  // }
 
   private async writeWithSynthesisHelper(sentence: string, user?: User) {
     this.write(sentence, user);
     if (!speechSynthesisEnabled) {
-      const wordCount = countWords(sentence);
-      await pause(1500 * Math.ceil(wordCount / 5));
+      // const wordCount = countWords(sentence);
+      // await pause(1500 * Math.ceil(wordCount / 5));
+      await pause(1000);
       return;
     }
 
@@ -150,6 +170,24 @@ class InOutHelper {
     });
 
     this.outputArea.appendChild(message.toHtml());
+  }
+
+  clearOutputArea() {
+    const fadeOutAnimation = [
+      { opacity: "1" },
+      { transform: "translateY(-100px)", opacity: "0" },
+    ];
+
+    const messageElements = this.outputArea.children;
+
+    ([...messageElements] as HTMLDivElement[]).forEach((messageElement) => {
+      messageElement.style.position = "absolute";
+
+      const animation = messageElement.animate(fadeOutAnimation, 200);
+      animation.addEventListener("finish", () => {
+        messageElement.remove();
+      });
+    });
   }
 }
 
