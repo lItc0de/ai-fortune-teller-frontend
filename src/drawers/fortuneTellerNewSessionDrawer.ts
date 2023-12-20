@@ -87,13 +87,6 @@ class FortuneTellerNewSessionDrawer {
       yield new StoryState(StoryIds.INTRO1);
     }
 
-    // await Promise.all([
-    //   this.playVideo(this.newSession1Video),
-    //   this.inOutHelper.writeWithSynthesis(
-    //     "Welcome, welcome. What a pleasure it is to see that fates have crossed our paths as two souls keen on the mystic arts of fortune telling.",
-    //     this.botUser
-    //   ),
-    // ]);
     this.newSession1Video.style.display = "none";
     this.newSession1Video.currentTime = 0;
     yield new StoryState(StoryIds.INTRO1);
@@ -107,13 +100,6 @@ class FortuneTellerNewSessionDrawer {
       yield new StoryState(StoryIds.INTRO1);
     }
 
-    // await Promise.all([
-    //   this.playVideo(this.newSession2Video),
-    //   this.inOutHelper.writeWithSynthesis(
-    //     "That sparkle in your eyes carries the burden of both curiosity and mockery, so let us embark on a journey across the spiritual realms with the help of some… uh… artificial intelligence. Tricky business; looking into that stardust hidden behind the façade of our personalities.",
-    //     this.botUser
-    //   ),
-    // ]);
     this.newSession2Video.style.display = "none";
     this.newSession2Video.currentTime = 0;
     yield new StoryState(StoryIds.INTRO1);
@@ -137,23 +123,6 @@ class FortuneTellerNewSessionDrawer {
     for await (let _write of writeIterator3) {
       yield new StoryState(needsINTRO2 ? StoryIds.INTRO2 : StoryIds.INTRO1);
     }
-
-    // await Promise.all([
-    //   (async (): Promise<void> => {
-    //     await this.playAndHideVideo(this.newSession3Video);
-    //     await Promise.all([
-    //       this.playVideo(this.newSession4Video),
-    //       (async (): Promise<void> => {
-    //         await this.glassBallDrawer.flyIn();
-    //         this.changeStateCallback(new StoryState(StoryIds.INTRO2));
-    //       })(),
-    //     ]);
-    //   })(),
-    //   this.inOutHelper.writeWithSynthesis(
-    //     "Out of millions of stars in the galaxy, one has made you into who you are today; and to foresee how its energy will flow through you in the days and years to come, I will need to see through to your soul and learn your true identity. And, in good old AI fashion, your name should be enough to see right through you. All I ask of you is to speak your name. If fate has misinterpreted it, please feel free to correct my shortcomings with a keyboard. My magic is integrated into a computer, after all. After I have attuned to your star, you may ask me questions as you please. I shall listen to the whispers of the Moirai, hidden across the realms and together, we shall reap the fortunes of your days. Let the mystical divinity unravel before your very eyes and enjoy the ride.",
-    //     this.botUser
-    //   ),
-    // ]);
 
     this.newSession4Video.style.display = "none";
     this.newSession4Video.currentTime = 0;

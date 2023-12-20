@@ -5,8 +5,6 @@ import FortuneTellerNewSessionDrawer from "./drawers/fortuneTellerNewSessionDraw
 import InOutHelper from "./utils/inOutHelper";
 import GlassBallDrawer from "./drawers/glassBallDrawer";
 import StoryState, { StoryIds } from "./utils/storyState";
-// import StoryTeller from "./utils/storyTeller";
-// import { pause } from "./utils/helpers";
 import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
 import EventLoop from "./messageQueue/eventLoop";
 import EndSessionStory from "./stories/endSessionStory";
@@ -24,7 +22,6 @@ class State {
   private botUser: User;
   private users: Users;
   private currentUser?: User;
-  // private currentStoryTeller?: StoryTeller;
 
   private newSessionDrawer: FortuneTellerNewSessionDrawer;
   private newOldSessionDrawer: NewOldSessionDrawer;
@@ -187,64 +184,7 @@ class State {
     }
 
     this.eventLoop.enqueue(this.newSessionDrawer.getAFTEvent());
-
-    // // OLD------------------>
-
-    // await this.abortOldSession();
-
-    // // no User, no Session
-    // if (userId === "undefined" && this.currentStoryTeller === undefined) return;
-
-    // // no User, old Session
-    // if (userId === "undefined" && this.currentStoryTeller !== undefined) {
-    //   await this.currentStoryTeller.end();
-    //   this.currentStoryTeller = undefined;
-    //   return;
-    // }
-
-    // // new User, old Session
-    // if (userId !== "undefined" && this.currentStoryTeller !== undefined) {
-    //   this.currentStoryTeller = undefined;
-    // }
-
-    // // new User, no Session
-    // this.currentUser = this.users.find(userId) || this.users.create(userId);
-    // this.storyState = new StoryState(StoryIds.NEW_SESSION);
-
-    // this.currentStoryTeller = new StoryTeller(
-    //   this.inOutHelper,
-    //   this.socket,
-    //   this.botUser,
-    //   this.currentUser,
-    //   this.changeStateCallback,
-    //   this.storyId
-    // );
-
-    // this.storyId++;
-
-    // // Previous user
-    // if (this.currentUser.name) {
-    //   this.socket.send(
-    //     new SocketMessage(
-    //       SocketMessageType.OLD_SESSION,
-    //       undefined,
-    //       this.currentUser.name
-    //     )
-    //   );
-    // } else {
-    //   this.socket.send(new SocketMessage(SocketMessageType.NEW_SESSION));
-    //   await this.newSessionDrawer.draw(this.glassBallDrawer);
-    // }
-
-    // await this.currentStoryTeller.tell();
   };
-
-  // private async abortOldSession() {
-  //   this.storyState = new StoryState(StoryIds.NO_SESSION);
-  //   this.newSessionDrawer.abort();
-  //   this.currentStoryTeller?.abort();
-  //   await pause(3000);
-  // }
 
   private showFortuneTellerImg() {
     this.fortuneTellerImg.style.display = "block";

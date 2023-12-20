@@ -23,8 +23,6 @@ class InOutHelper {
   private speechSynthesis: SpeechSynthesis;
   private transcribe: Transcribe;
 
-  // private messages: Message[] = [];
-
   constructor() {
     this.outputArea = document.getElementById("outputArea") as HTMLDivElement;
     this.form = document.getElementById("mainForm") as HTMLFormElement;
@@ -117,12 +115,6 @@ class InOutHelper {
   hideElements() {
     this.input.style.display = "none";
   }
-
-  // removeEventListeners() {
-  //   this.form.replaceWith(this.form.cloneNode(true));
-  //   this.form = document.getElementById("mainForm") as HTMLFormElement;
-  //   this.input = document.getElementById("mainInput") as HTMLInputElement;
-  // }
 
   private async writeWithSynthesisHelper(sentence: string, user?: User) {
     this.write(sentence, user);
