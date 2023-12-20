@@ -10,11 +10,11 @@ import {
 } from "./utils/helpers";
 import { Dimensions } from "./types";
 import State, { StateId } from "./state";
-import IdleEvent from "./events/idleEvent";
+import IdleDrawer from "./utils/idleDrawer";
 import EventLoop from "./utils/eventLoop";
 import GlassBallDrawer from "./utils/glassBallDrawer";
 
-globalThis.speechSynthesisEnabled = true;
+globalThis.speechSynthesisEnabled = false;
 globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
@@ -24,7 +24,7 @@ class Main {
 
   private webCamHelper: WebCamHelper;
   private glassBallDrawer: GlassBallDrawer;
-  private fortuneTellerIdleDrawer: IdleEvent;
+  private idleDrawer: IdleDrawer;
 
   private faceDetection: FaceDetection;
   private state: State;
@@ -43,7 +43,7 @@ class Main {
 
     this.webCamHelper = new WebCamHelper();
     this.glassBallDrawer = new GlassBallDrawer(this.ctx);
-    this.fortuneTellerIdleDrawer = new IdleEvent(this.ctx);
+    this.idleDrawer = new IdleDrawer(this.ctx);
 
     this.eventLoop = new EventLoop();
     this.state = new State(this.eventLoop, this.glassBallDrawer);
@@ -67,7 +67,7 @@ class Main {
     do {
       switch (this.state.stateId) {
         case StateId.NO_SESSION:
-          this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
+          this.idleDrawer.drawIdleAnimation(this.dimensions);
           break;
 
         case StateId.INTRO1:
@@ -103,11 +103,11 @@ class Main {
           break;
 
         case StateId.END_SESSION:
-          this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
+          this.idleDrawer.drawIdleAnimation(this.dimensions);
           break;
 
         default:
-          this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
+          this.idleDrawer.drawIdleAnimation(this.dimensions);
           break;
       }
 

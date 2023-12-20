@@ -1,24 +1,23 @@
 import newSessionVideo from "../media/newSession0.webm";
-import AFTEvent from "./aftEvent";
 import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
 import User from "../utils/user";
 import GlassBallDrawer from "../utils/glassBallDrawer";
+import BaseEvent from "./baseEvent";
 
-class NewKnownUserSessionEvent {
+class NewKnownUserSessionEvent extends BaseEvent {
   private newSessionVideo: HTMLVideoElement;
-  private inOutHelper: InOutHelper;
-  private botUser: User;
-  user?: User;
   private glassBallDrawer: GlassBallDrawer;
 
   constructor(
-    inOutHelper: InOutHelper,
+    user: User,
     botUser: User,
-    glassBallDrawer: GlassBallDrawer,
-    user?: User
+    inOutHelper: InOutHelper,
+    glassBallDrawer: GlassBallDrawer
   ) {
+    super(botUser, inOutHelper, user);
+
     this.newSessionVideo = document.getElementById(
       "newSession0"
     ) as HTMLVideoElement;
@@ -30,20 +29,16 @@ class NewKnownUserSessionEvent {
     this.loadVideo();
   }
 
-  abort = () => {
+  async abort() {
     this.stopAndHideVideo();
     this.inOutHelper.abort();
-  };
-
-  getAFTEvent() {
-    return new AFTEvent(this.run.bind(this), this.abort);
   }
 
   private loadVideo() {
     this.newSessionVideo.src = newSessionVideo;
   }
 
-  private async *run(): AsyncGenerator<StateReturn, void, unknown> {
+  async *eventIterator(): AsyncGenerator<StateReturn, void, unknown> {
     yield new StateReturn(StateId.WELCOME_OLD_USER1);
 
     await this.playVideo(this.newSessionVideo);

@@ -3,23 +3,18 @@ import InOutHelper from "../utils/inOutHelper";
 import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
 import { countWords } from "../utils/helpers";
-import AFTEvent from "./aftEvent";
 import { StateId } from "../state";
 
 class NameFindingEvent extends BaseEvent {
   constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
-    super(user, botUser, inOutHelper);
+    super(botUser, inOutHelper, user);
   }
 
-  abort = () => {
+  async abort() {
     this.inOutHelper.abort();
-  };
-
-  getAFTEvent() {
-    return new AFTEvent(this.tell.bind(this), this.abort);
   }
 
-  async *tell() {
+  async *eventIterator() {
     yield new StateReturn(StateId.NAME_FINDING);
     await this.inOutHelper.writeWithSynthesis(
       "So now I ask you to speak your name!",
@@ -92,7 +87,8 @@ class NameFindingEvent extends BaseEvent {
       this.botUser
     );
 
-    this.user.name = name;
+    // TODO: check if this is ok
+    // this.user.name = name;
     yield new StateReturn(
       StateId.NAME_FINDING,
       name,

@@ -1,7 +1,7 @@
 import fortuneTellerIdleImage from "../media/fortunetellerIdle.png";
 import { Dimensions } from "../types";
 
-class IdleEvent {
+class IdleDrawer {
   private ctx: CanvasRenderingContext2D;
   private fortuneTellerIdleImage = new Image();
   private loaded = false;
@@ -37,4 +37,4 @@ class IdleEvent {
   }
 }
 
-export default IdleEvent;
+export default IdleDrawer;

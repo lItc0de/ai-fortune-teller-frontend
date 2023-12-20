@@ -35,10 +35,7 @@ class State {
   private users: Users;
   private currentUser?: User;
 
-  private newSessionDrawer: NewUserSessionEvent;
-  private newOldSessionDrawer: NewKnownUserSessionEvent;
   private glassBallDrawer: GlassBallDrawer;
-
   private fortuneTellerImg: HTMLImageElement;
 
   stateId: StateId = StateId.NO_SESSION;
@@ -56,27 +53,12 @@ class State {
       "fortuneTellerImg"
     ) as HTMLImageElement;
 
-    this.newSessionDrawer = new NewUserSessionEvent(
-      this.inOutHelper,
-      this.botUser,
-      this.glassBallDrawer,
-      this.changeStoryStateCallback
-    );
-
-    this.newOldSessionDrawer = new NewKnownUserSessionEvent(
-      this.inOutHelper,
-      this.botUser,
-      this.glassBallDrawer,
-      this.currentUser
-    );
-
     this.eventLoop.onStoryStateChange = this.changeStoryStateCallback;
+    this.fortuneTellerImg.src = fortuneTellerImg;
 
     // only for testing
     // this.newSession("defaultUser");
     // this.newSession("undefined");
-
-    this.fortuneTellerImg.src = fortuneTellerImg;
   }
 
   private changeStoryStateCallback = (stateReturn: StateReturn) => {
@@ -92,7 +74,7 @@ class State {
           this.botUser,
           this.inOutHelper
         );
-        this.eventLoop.enqueue(nameFinderStory.getAFTEvent());
+        this.eventLoop.enqueue(nameFinderStory);
         break;
 
       case StateId.FORTUNE_TELLER:
@@ -102,7 +84,7 @@ class State {
           this.inOutHelper,
           this.socket
         );
-        this.eventLoop.enqueue(fortuneTellerStory.getAFTEvent());
+        this.eventLoop.enqueue(fortuneTellerStory);
         break;
     }
 
@@ -178,19 +160,31 @@ class State {
         this.botUser,
         this.inOutHelper
       );
-      this.eventLoop.enqueue(endSessionStory.getAFTEvent());
+      this.eventLoop.enqueue(endSessionStory);
       return;
     }
 
     this.currentUser = this.users.find(userId) || this.users.create(userId);
 
     if (this.currentUser.name) {
-      this.newOldSessionDrawer.user = this.currentUser;
-      this.eventLoop.enqueue(this.newOldSessionDrawer.getAFTEvent());
+      const newKnownUserSessionEvent = new NewKnownUserSessionEvent(
+        this.currentUser,
+        this.botUser,
+        this.inOutHelper,
+        this.glassBallDrawer
+      );
+      this.eventLoop.enqueue(newKnownUserSessionEvent);
       return;
     }
 
-    this.eventLoop.enqueue(this.newSessionDrawer.getAFTEvent());
+    const newUserSessionEvent = new NewUserSessionEvent(
+      this.botUser,
+      this.inOutHelper,
+      this.glassBallDrawer,
+      this.changeStoryStateCallback
+    );
+
+    this.eventLoop.enqueue(newUserSessionEvent);
   };
 
   private showFortuneTellerImg() {

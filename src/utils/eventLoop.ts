@@ -1,11 +1,11 @@
+import BaseEvent from "../events/baseEvent";
 import { StateId } from "../state";
 import { pause, sleep } from "./helpers";
 import StateReturn from "./stateReturn";
-import AFTEvent from "../events/aftEvent";
 
 class EventLoop {
   private looping = false;
-  private eventQueue = new Map<string, AFTEvent>();
+  private eventQueue = new Map<string, BaseEvent>();
   private currentEventIterator?: AsyncGenerator<
     StateReturn | null,
     undefined,
@@ -21,18 +21,18 @@ class EventLoop {
     this.mainLoop();
   }
 
-  enqueue(aftEvent: AFTEvent | AFTEvent[]) {
-    if (Array.isArray(aftEvent)) {
-      aftEvent.forEach(this.addEvent);
+  enqueue(newEvent: BaseEvent | BaseEvent[]) {
+    if (Array.isArray(newEvent)) {
+      newEvent.forEach(this.addEvent);
       return;
     }
 
-    this.addEvent(aftEvent);
+    this.addEvent(newEvent);
   }
 
-  private addEvent(aftEvent: AFTEvent) {
+  private addEvent(newEvent: BaseEvent) {
     const key = crypto.randomUUID();
-    this.eventQueue.set(key, aftEvent);
+    this.eventQueue.set(key, newEvent);
   }
 
   clear = (): Promise<StateReturn> =>
@@ -88,11 +88,11 @@ class EventLoop {
         await pause(100);
         yield null;
       } else {
-        for (let [key, aftEvent] of this.eventQueue.entries()) {
+        for (let [key, event] of this.eventQueue.entries()) {
           if (this.currentEventKey === undefined) {
             this.currentEventKey = key;
 
-            for await (let eventPart of aftEvent.eventIterator()) {
+            for await (let eventPart of event.eventIterator()) {
               console.log("next event part");
               yield eventPart;
             }

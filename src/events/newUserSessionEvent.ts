@@ -2,30 +2,28 @@ import newSession1Video from "../media/newSession1.webm";
 import newSession2Video from "../media/newSession2.webm";
 import newSession3Video from "../media/newSession3.webm";
 import newSession4Video from "../media/newSession4.webm";
-import AFTEvent from "./aftEvent";
 import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
 import User from "../utils/user";
 import GlassBallDrawer from "../utils/glassBallDrawer";
+import BaseEvent from "./baseEvent";
 
-class NewUserSessionEvent {
+class NewUserSessionEvent extends BaseEvent {
   private newSession1Video: HTMLVideoElement;
   private newSession2Video: HTMLVideoElement;
   private newSession3Video: HTMLVideoElement;
   private newSession4Video: HTMLVideoElement;
-  private inOutHelper: InOutHelper;
-  private botUser: User;
   private changeStateCallback: (stateReturn: StateReturn) => void;
-  private needsAbort = false;
   private glassBallDrawer: GlassBallDrawer;
 
   constructor(
-    inOutHelper: InOutHelper,
     botUser: User,
+    inOutHelper: InOutHelper,
     glassBallDrawer: GlassBallDrawer,
     changeStateCallback: (stateReturn: StateReturn) => void
   ) {
+    super(botUser, inOutHelper);
     this.newSession1Video = document.getElementById(
       "newSession1"
     ) as HTMLVideoElement;
@@ -43,21 +41,14 @@ class NewUserSessionEvent {
     ) as HTMLVideoElement;
 
     this.changeStateCallback = changeStateCallback;
-    this.inOutHelper = inOutHelper;
-    this.botUser = botUser;
     this.loadVideos();
     this.glassBallDrawer = glassBallDrawer;
   }
 
-  getAFTEvent() {
-    return new AFTEvent(this.run.bind(this), this.abort);
-  }
-
-  abort = () => {
-    this.needsAbort = true;
+  async abort() {
     this.stopAndHideVideos();
     this.inOutHelper.abort();
-  };
+  }
 
   private loadVideos() {
     this.newSession1Video.src = newSession1Video;
@@ -66,18 +57,7 @@ class NewUserSessionEvent {
     this.newSession4Video.src = newSession4Video;
   }
 
-  async draw() {
-    this.needsAbort = false;
-    this.stopAndHideVideos();
-
-    const iterator = this.run();
-    for await (let part of iterator) {
-      if (this.needsAbort) return;
-      this.changeStateCallback(part);
-    }
-  }
-
-  private async *run(): AsyncGenerator<StateReturn, void, unknown> {
+  async *eventIterator(): AsyncGenerator<StateReturn, void, unknown> {
     yield new StateReturn(StateId.INTRO1);
     this.playVideo(this.newSession1Video);
     const writeIterator1 = this.inOutHelper.writeWithSynthesisIterator(

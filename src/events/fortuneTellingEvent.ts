@@ -4,7 +4,6 @@ import InOutHelper from "../utils/inOutHelper";
 import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
-import AFTEvent from "./aftEvent";
 import { StateId } from "../state";
 
 class FortuneTellingEvent extends BaseEvent {
@@ -16,20 +15,16 @@ class FortuneTellingEvent extends BaseEvent {
     inOutHelper: InOutHelper,
     socket: Socket
   ) {
-    super(user, botUser, inOutHelper);
+    super(botUser, inOutHelper, user);
     this.socket = socket;
   }
 
-  abort = () => {
+  async abort() {
     this.inOutHelper.abort();
     this.socket.abort();
-  };
-
-  getAFTEvent() {
-    return new AFTEvent(this.tell.bind(this), this.abort);
   }
 
-  async *tell() {
+  async *eventIterator() {
     yield new StateReturn(StateId.FORTUNE_TELLER);
 
     await this.inOutHelper.writeWithSynthesis(
@@ -47,7 +42,7 @@ class FortuneTellingEvent extends BaseEvent {
 
       if (question !== "") {
         const response = await this.socket.send(
-          new SocketMessage(SocketMessageType.PROMPT, question, this.user.name)
+          new SocketMessage(SocketMessageType.PROMPT, question, this.user?.name)
         );
         if (response.type === SocketMessageType.BOT && response.prompt) {
           await this.inOutHelper.writeWithSynthesis(

@@ -1,23 +1,23 @@
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
-import { StateId } from "../state";
 
-class BaseEvent {
+abstract class BaseEvent {
   protected inOutHelper: InOutHelper;
-  protected user: User;
   protected botUser: User;
-  protected active = true;
+  protected user?: User;
 
-  constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
+  constructor(botUser: User, inOutHelper: InOutHelper, user?: User) {
+    this.botUser = botUser;
     this.inOutHelper = inOutHelper;
     this.user = user;
-    this.botUser = botUser;
+
+    this.eventIterator.bind(this);
+    this.abort.bind(this);
   }
 
-  async *tell(): AsyncGenerator<StateReturn, void, unknown> {
-    yield new StateReturn(StateId.NO_SESSION);
-  }
+  abstract eventIterator(): AsyncGenerator<StateReturn, void, unknown>;
+  abstract abort(): Promise<void>;
 }
 
 export default BaseEvent;

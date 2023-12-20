@@ -16,3 +16,10 @@
 - save user profiles
 - refactoring
 - use ultrawave sensor for distance (track if user there) #better-session-handling
+
+# Usability
+
+- Make it possible to skip text
+- Turn on and off voice recognition and speech synthesis
+- Start new session with key
+- Start fortune telling with key
