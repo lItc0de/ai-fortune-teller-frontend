@@ -1,34 +1,24 @@
-export enum StoryIds {
-  NO_SESSION,
-  INTRO1,
-  INTRO2,
-  NEW_SESSION,
-  WELCOME_OLD_USER1,
-  WELCOME_OLD_USER2,
-  NAME_FINDING,
-  FORTUNE_TELLER,
-  END_SESSION,
-}
+import { StateId } from "../state";
 
-class StoryState {
-  private _storyId: StoryIds;
+class StateReturn {
+  private _storyId: StateId;
   private _returnValue?: string;
   private _isEnd = false;
-  private _nextStoryId?: StoryIds;
+  private _nextStoryId?: StateId;
 
   constructor(
-    storyId: StoryIds,
+    stateId: StateId,
     returnValue?: string,
     isEnd?: boolean,
-    nextStoryId?: StoryIds
+    nextStoryId?: StateId
   ) {
-    this._storyId = storyId;
+    this._storyId = stateId;
     this._returnValue = returnValue;
     if (isEnd !== undefined) this._isEnd = isEnd;
     this._nextStoryId = nextStoryId;
   }
 
-  get storyId() {
+  get stateId() {
     return this._storyId;
   }
 
@@ -45,4 +35,4 @@ class StoryState {
   }
 }
 
-export default StoryState;
+export default StateReturn;

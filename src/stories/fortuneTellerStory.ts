@@ -2,9 +2,10 @@ import Socket from "../socket";
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
 import BaseStory from "./baseStory";
-import StoryState, { StoryIds } from "../utils/storyState";
+import StateReturn from "../utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 import AFTEvent from "../messageQueue/aftEvent";
+import { StateId } from "../state";
 
 class FortuneTellerStory extends BaseStory {
   private socket: Socket;
@@ -29,20 +30,20 @@ class FortuneTellerStory extends BaseStory {
   }
 
   async *tell() {
-    yield new StoryState(StoryIds.FORTUNE_TELLER);
+    yield new StateReturn(StateId.FORTUNE_TELLER);
 
     await this.inOutHelper.writeWithSynthesis(
       "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!",
       this.botUser
     );
 
-    yield new StoryState(StoryIds.FORTUNE_TELLER);
+    yield new StateReturn(StateId.FORTUNE_TELLER);
 
     while (true) {
       const question = await this.inOutHelper.waitForUserInput();
       this.inOutHelper.write(question, this.user);
 
-      yield new StoryState(StoryIds.FORTUNE_TELLER);
+      yield new StateReturn(StateId.FORTUNE_TELLER);
 
       if (question !== "") {
         const response = await this.socket.send(
@@ -58,7 +59,7 @@ class FortuneTellerStory extends BaseStory {
         }
       }
 
-      yield new StoryState(StoryIds.FORTUNE_TELLER);
+      yield new StateReturn(StateId.FORTUNE_TELLER);
     }
   }
 }

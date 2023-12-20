@@ -1,7 +1,8 @@
 import newSessionVideo from "../media/newSession0.webm";
 import AFTEvent from "../messageQueue/aftEvent";
+import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
-import StoryState, { StoryIds } from "../utils/storyState";
+import StateReturn from "../utils/stateReturn";
 import User from "../utils/user";
 import GlassBallDrawer from "./glassBallDrawer";
 
@@ -42,16 +43,16 @@ class NewOldSessionDrawer {
     this.newSessionVideo.src = newSessionVideo;
   }
 
-  private async *run(): AsyncGenerator<StoryState, void, unknown> {
-    yield new StoryState(StoryIds.WELCOME_OLD_USER1);
+  private async *run(): AsyncGenerator<StateReturn, void, unknown> {
+    yield new StateReturn(StateId.WELCOME_OLD_USER1);
 
     await this.playVideo(this.newSessionVideo);
 
-    yield new StoryState(StoryIds.WELCOME_OLD_USER1);
+    yield new StateReturn(StateId.WELCOME_OLD_USER1);
 
     await this.glassBallDrawer.flyIn();
 
-    yield new StoryState(StoryIds.WELCOME_OLD_USER2);
+    yield new StateReturn(StateId.WELCOME_OLD_USER2);
 
     const writeIterator = this.inOutHelper.writeWithSynthesisIterator(
       `Welcome, welcome. What a pleasure it is to see you again ${this.user?.name}.`,
@@ -59,16 +60,16 @@ class NewOldSessionDrawer {
     );
 
     for await (let _write of writeIterator) {
-      yield new StoryState(StoryIds.WELCOME_OLD_USER2);
+      yield new StateReturn(StateId.WELCOME_OLD_USER2);
     }
 
     this.stopAndHideVideo();
 
-    yield new StoryState(
-      StoryIds.WELCOME_OLD_USER2,
+    yield new StateReturn(
+      StateId.WELCOME_OLD_USER2,
       undefined,
       true,
-      StoryIds.FORTUNE_TELLER
+      StateId.FORTUNE_TELLER
     );
   }
 

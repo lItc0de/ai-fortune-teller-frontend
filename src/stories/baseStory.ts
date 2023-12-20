@@ -1,6 +1,7 @@
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
-import StoryState, { StoryIds } from "../utils/storyState";
+import StateReturn from "../utils/stateReturn";
+import { StateId } from "../state";
 
 class BaseStory {
   protected inOutHelper: InOutHelper;
@@ -14,8 +15,8 @@ class BaseStory {
     this.botUser = botUser;
   }
 
-  async *tell(): AsyncGenerator<StoryState, void, unknown> {
-    yield new StoryState(StoryIds.NO_SESSION);
+  async *tell(): AsyncGenerator<StateReturn, void, unknown> {
+    yield new StateReturn(StateId.NO_SESSION);
   }
 }
 

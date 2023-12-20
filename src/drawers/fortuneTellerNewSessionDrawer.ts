@@ -3,8 +3,9 @@ import newSession2Video from "../media/newSession2.webm";
 import newSession3Video from "../media/newSession3.webm";
 import newSession4Video from "../media/newSession4.webm";
 import AFTEvent from "../messageQueue/aftEvent";
+import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
-import StoryState, { StoryIds } from "../utils/storyState";
+import StateReturn from "../utils/stateReturn";
 import User from "../utils/user";
 import GlassBallDrawer from "./glassBallDrawer";
 
@@ -15,7 +16,7 @@ class FortuneTellerNewSessionDrawer {
   private newSession4Video: HTMLVideoElement;
   private inOutHelper: InOutHelper;
   private botUser: User;
-  private changeStateCallback: (storyState: StoryState) => void;
+  private changeStateCallback: (stateReturn: StateReturn) => void;
   private needsAbort = false;
   private glassBallDrawer: GlassBallDrawer;
 
@@ -23,7 +24,7 @@ class FortuneTellerNewSessionDrawer {
     inOutHelper: InOutHelper,
     botUser: User,
     glassBallDrawer: GlassBallDrawer,
-    changeStateCallback: (storyState: StoryState) => void
+    changeStateCallback: (stateReturn: StateReturn) => void
   ) {
     this.newSession1Video = document.getElementById(
       "newSession1"
@@ -76,20 +77,20 @@ class FortuneTellerNewSessionDrawer {
     }
   }
 
-  private async *run(): AsyncGenerator<StoryState, void, unknown> {
-    yield new StoryState(StoryIds.INTRO1);
+  private async *run(): AsyncGenerator<StateReturn, void, unknown> {
+    yield new StateReturn(StateId.INTRO1);
     this.playVideo(this.newSession1Video);
     const writeIterator1 = this.inOutHelper.writeWithSynthesisIterator(
       "Welcome, welcome. What a pleasure it is to see that fates have crossed our paths as two souls keen on the mystic arts of fortune telling.",
       this.botUser
     );
     for await (let _write of writeIterator1) {
-      yield new StoryState(StoryIds.INTRO1);
+      yield new StateReturn(StateId.INTRO1);
     }
 
     this.newSession1Video.style.display = "none";
     this.newSession1Video.currentTime = 0;
-    yield new StoryState(StoryIds.INTRO1);
+    yield new StateReturn(StateId.INTRO1);
 
     this.playVideo(this.newSession2Video);
     const writeIterator2 = this.inOutHelper.writeWithSynthesisIterator(
@@ -97,12 +98,12 @@ class FortuneTellerNewSessionDrawer {
       this.botUser
     );
     for await (let _write of writeIterator2) {
-      yield new StoryState(StoryIds.INTRO1);
+      yield new StateReturn(StateId.INTRO1);
     }
 
     this.newSession2Video.style.display = "none";
     this.newSession2Video.currentTime = 0;
-    yield new StoryState(StoryIds.INTRO1);
+    yield new StateReturn(StateId.INTRO1);
 
     let needsINTRO2 = false;
     (async (): Promise<void> => {
@@ -111,7 +112,7 @@ class FortuneTellerNewSessionDrawer {
         this.playVideo(this.newSession4Video),
         (async (): Promise<void> => {
           await this.glassBallDrawer.flyIn();
-          this.changeStateCallback(new StoryState(StoryIds.INTRO2));
+          this.changeStateCallback(new StateReturn(StateId.INTRO2));
           needsINTRO2 = true;
         })(),
       ]);
@@ -121,17 +122,17 @@ class FortuneTellerNewSessionDrawer {
       this.botUser
     );
     for await (let _write of writeIterator3) {
-      yield new StoryState(needsINTRO2 ? StoryIds.INTRO2 : StoryIds.INTRO1);
+      yield new StateReturn(needsINTRO2 ? StateId.INTRO2 : StateId.INTRO1);
     }
 
     this.newSession4Video.style.display = "none";
     this.newSession4Video.currentTime = 0;
 
-    yield new StoryState(
-      StoryIds.INTRO2,
+    yield new StateReturn(
+      StateId.INTRO2,
       undefined,
       true,
-      StoryIds.NAME_FINDING
+      StateId.NAME_FINDING
     );
   }
 

@@ -9,10 +9,9 @@ import {
   sleep,
 } from "./utils/helpers";
 import { Dimensions } from "./types";
-import State from "./state";
+import State, { StateId } from "./state";
 import GlassBallDrawer from "./drawers/glassBallDrawer";
 import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
-import { StoryIds } from "./utils/storyState";
 import EventLoop from "./messageQueue/eventLoop";
 
 globalThis.speechSynthesisEnabled = true;
@@ -66,44 +65,44 @@ class Main {
 
   async draw() {
     do {
-      switch (this.state.storyState.storyId) {
-        case StoryIds.NO_SESSION:
+      switch (this.state.stateId) {
+        case StateId.NO_SESSION:
           this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
           break;
 
-        case StoryIds.INTRO1:
+        case StateId.INTRO1:
           this.faceDetection.draw();
           break;
 
-        case StoryIds.INTRO2:
-          this.faceDetection.draw();
-          this.glassBallDrawer.draw(this.dimensions);
-          break;
-
-        case StoryIds.NEW_SESSION:
-          this.faceDetection.draw();
-          break;
-
-        case StoryIds.WELCOME_OLD_USER1:
-          this.faceDetection.draw();
-          break;
-
-        case StoryIds.WELCOME_OLD_USER2:
+        case StateId.INTRO2:
           this.faceDetection.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
-        case StoryIds.NAME_FINDING:
+        case StateId.NEW_SESSION:
+          this.faceDetection.draw();
+          break;
+
+        case StateId.WELCOME_OLD_USER1:
+          this.faceDetection.draw();
+          break;
+
+        case StateId.WELCOME_OLD_USER2:
           this.faceDetection.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
-        case StoryIds.FORTUNE_TELLER:
+        case StateId.NAME_FINDING:
           this.faceDetection.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
-        case StoryIds.END_SESSION:
+        case StateId.FORTUNE_TELLER:
+          this.faceDetection.draw();
+          this.glassBallDrawer.draw(this.dimensions);
+          break;
+
+        case StateId.END_SESSION:
           this.fortuneTellerIdleDrawer.drawIdleAnimation(this.dimensions);
           break;
 
@@ -136,4 +135,4 @@ class Main {
   }
 }
 
-(() => new Main())();
+new Main();

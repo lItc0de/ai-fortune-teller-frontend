@@ -4,7 +4,7 @@ import Users from "./utils/users";
 import FortuneTellerNewSessionDrawer from "./drawers/fortuneTellerNewSessionDrawer";
 import InOutHelper from "./utils/inOutHelper";
 import GlassBallDrawer from "./drawers/glassBallDrawer";
-import StoryState, { StoryIds } from "./utils/storyState";
+import StateReturn from "./utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
 import EventLoop from "./messageQueue/eventLoop";
 import EndSessionStory from "./stories/endSessionStory";
@@ -13,6 +13,18 @@ import FortuneTellerStory from "./stories/fortuneTellerStory";
 import NewOldSessionDrawer from "./drawers/newOldSessionDrawer";
 
 import fortuneTellerImg from "./media/fortuneTelling.png";
+
+export enum StateId {
+  NO_SESSION,
+  INTRO1,
+  INTRO2,
+  NEW_SESSION,
+  WELCOME_OLD_USER1,
+  WELCOME_OLD_USER2,
+  NAME_FINDING,
+  FORTUNE_TELLER,
+  END_SESSION,
+}
 
 class State {
   private eventLoop: EventLoop;
@@ -29,10 +41,7 @@ class State {
 
   private fortuneTellerImg: HTMLImageElement;
 
-  currentState: StoryIds = StoryIds.NO_SESSION;
-  storyState: StoryState;
-
-  storyId = 0;
+  stateId: StateId = StateId.NO_SESSION;
 
   constructor(eventLoop: EventLoop, glassBallDrawer: GlassBallDrawer) {
     this.eventLoop = eventLoop;
@@ -61,8 +70,6 @@ class State {
       this.currentUser
     );
 
-    this.storyState = new StoryState(StoryIds.NO_SESSION);
-
     this.eventLoop.onStoryStateChange = this.changeStoryStateCallback;
 
     // only for testing
@@ -72,14 +79,14 @@ class State {
     this.fortuneTellerImg.src = fortuneTellerImg;
   }
 
-  private changeStoryStateCallback = (storyState: StoryState) => {
-    console.log(storyState);
+  private changeStoryStateCallback = (stateReturn: StateReturn) => {
+    console.log(stateReturn);
 
-    this.storyState = storyState;
+    this.stateId = stateReturn.stateId;
     if (!this.currentUser) return;
 
-    switch (storyState.nextStoryId) {
-      case StoryIds.NAME_FINDING:
+    switch (stateReturn.nextStoryId) {
+      case StateId.NAME_FINDING:
         const nameFinderStory = new NameFinderStory(
           this.currentUser,
           this.botUser,
@@ -88,7 +95,7 @@ class State {
         this.eventLoop.enqueue(nameFinderStory.getAFTEvent());
         break;
 
-      case StoryIds.FORTUNE_TELLER:
+      case StateId.FORTUNE_TELLER:
         const fortuneTellerStory = new FortuneTellerStory(
           this.currentUser,
           this.botUser,
@@ -99,12 +106,12 @@ class State {
         break;
     }
 
-    switch (storyState.storyId) {
-      case StoryIds.NAME_FINDING:
+    switch (stateReturn.stateId) {
+      case StateId.NAME_FINDING:
         this.showFortuneTellerImg();
 
-        if (storyState.isEnd && storyState.returnValue) {
-          this.currentUser.name = storyState.returnValue;
+        if (stateReturn.isEnd && stateReturn.returnValue) {
+          this.currentUser.name = stateReturn.returnValue;
           this.socket.send(
             new SocketMessage(
               SocketMessageType.USERNAME,
@@ -115,32 +122,32 @@ class State {
         }
         break;
 
-      case StoryIds.FORTUNE_TELLER:
+      case StateId.FORTUNE_TELLER:
         this.showFortuneTellerImg();
         break;
 
-      case StoryIds.NO_SESSION:
+      case StateId.NO_SESSION:
         this.hideFortuneTellerImg();
         break;
 
-      case StoryIds.NEW_SESSION:
+      case StateId.NEW_SESSION:
         this.hideFortuneTellerImg();
         this.socket.send(new SocketMessage(SocketMessageType.NEW_SESSION));
         break;
 
-      case StoryIds.END_SESSION:
+      case StateId.END_SESSION:
         this.hideFortuneTellerImg();
         break;
 
-      case StoryIds.INTRO1:
+      case StateId.INTRO1:
         this.hideFortuneTellerImg();
         break;
 
-      case StoryIds.INTRO2:
+      case StateId.INTRO2:
         this.hideFortuneTellerImg();
         break;
 
-      case StoryIds.WELCOME_OLD_USER1:
+      case StateId.WELCOME_OLD_USER1:
         this.hideFortuneTellerImg();
         this.socket.send(
           new SocketMessage(
@@ -151,7 +158,7 @@ class State {
         );
         break;
 
-      case StoryIds.WELCOME_OLD_USER2:
+      case StateId.WELCOME_OLD_USER2:
         this.hideFortuneTellerImg();
         break;
     }
@@ -161,7 +168,7 @@ class State {
     console.log("New session called");
 
     await this.eventLoop.clear();
-    this.storyState = new StoryState(StoryIds.NO_SESSION);
+    this.stateId = StateId.NO_SESSION;
 
     if (userId === "undefined" && this.currentUser === undefined) return;
 

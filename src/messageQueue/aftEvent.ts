@@ -1,4 +1,4 @@
-import StoryState from "../utils/storyState";
+import StateReturn from "../utils/stateReturn";
 
 export interface AFTEventReturnValue {
   value?: any;
@@ -6,11 +6,11 @@ export interface AFTEventReturnValue {
 }
 
 class AFTEvent {
-  eventIterator: () => AsyncGenerator<StoryState, void, unknown>;
+  eventIterator: () => AsyncGenerator<StateReturn, void, unknown>;
   _abort?: () => Promise<void> | void;
 
   constructor(
-    eventIterator: () => AsyncGenerator<StoryState, void, unknown>,
+    eventIterator: () => AsyncGenerator<StateReturn, void, unknown>,
     abort?: () => Promise<void> | void
   ) {
     this.eventIterator = eventIterator;
