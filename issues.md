@@ -1,9 +1,18 @@
+# General
+
+- add Readme.md
+
+# Story
+
 - loosing session too fast
 - try other language model
-- tell backend username
-- don't play animation if reoccuring user (only full vidoe in faster and no text)
 - speech synthesis in chrome (different voice)
-- greeting text need to be different
-- fix session switching
-- error callback
-- when in input and abort it should cancel the input
+- shorter new user greeting
+
+# Technical
+
+- use bun
+- socket reconnect
+- save user profiles
+- refactoring
+- use ultrawave sensor for distance (track if user there) #better-session-handling
