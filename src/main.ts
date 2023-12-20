@@ -15,7 +15,7 @@ import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
 import { StoryIds } from "./utils/storyState";
 import EventLoop from "./messageQueue/eventLoop";
 
-globalThis.speechSynthesisEnabled = false;
+globalThis.speechSynthesisEnabled = true;
 globalThis.cheetahEnabled = import.meta.env.PROD;
 
 class Main {
@@ -84,8 +84,13 @@ class Main {
           this.faceDetection.draw();
           break;
 
-        case StoryIds.WELCOME_OLD_USER:
+        case StoryIds.WELCOME_OLD_USER1:
           this.faceDetection.draw();
+          break;
+
+        case StoryIds.WELCOME_OLD_USER2:
+          this.faceDetection.draw();
+          this.glassBallDrawer.draw(this.dimensions);
           break;
 
         case StoryIds.NAME_FINDING:

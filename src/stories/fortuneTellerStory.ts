@@ -32,7 +32,7 @@ class FortuneTellerStory extends BaseStory {
     yield new StoryState(StoryIds.FORTUNE_TELLER);
 
     await this.inOutHelper.writeWithSynthesis(
-      "I'm ready to to look into my glassball to tell you everything you whish to know. So go ahead!",
+      "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!",
       this.botUser
     );
 
@@ -44,16 +44,18 @@ class FortuneTellerStory extends BaseStory {
 
       yield new StoryState(StoryIds.FORTUNE_TELLER);
 
-      const response = await this.socket.send(
-        new SocketMessage(SocketMessageType.PROMPT, question, this.user.name)
-      );
-      if (response.type === SocketMessageType.BOT && response.prompt) {
-        await this.inOutHelper.writeWithSynthesis(
-          response.prompt,
-          this.botUser
+      if (question !== "") {
+        const response = await this.socket.send(
+          new SocketMessage(SocketMessageType.PROMPT, question, this.user.name)
         );
-      } else {
-        console.log(response);
+        if (response.type === SocketMessageType.BOT && response.prompt) {
+          await this.inOutHelper.writeWithSynthesis(
+            response.prompt,
+            this.botUser
+          );
+        } else {
+          console.log(response);
+        }
       }
 
       yield new StoryState(StoryIds.FORTUNE_TELLER);

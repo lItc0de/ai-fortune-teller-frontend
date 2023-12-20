@@ -43,13 +43,15 @@ class NewOldSessionDrawer {
   }
 
   private async *run(): AsyncGenerator<StoryState, void, unknown> {
-    yield new StoryState(StoryIds.WELCOME_OLD_USER);
+    yield new StoryState(StoryIds.WELCOME_OLD_USER1);
 
     await this.playVideo(this.newSessionVideo);
 
-    yield new StoryState(StoryIds.WELCOME_OLD_USER);
+    yield new StoryState(StoryIds.WELCOME_OLD_USER1);
 
     await this.glassBallDrawer.flyIn();
+
+    yield new StoryState(StoryIds.WELCOME_OLD_USER2);
 
     const writeIterator = this.inOutHelper.writeWithSynthesisIterator(
       `Welcome, welcome. What a pleasure it is to see you again ${this.user?.name}.`,
@@ -57,13 +59,13 @@ class NewOldSessionDrawer {
     );
 
     for await (let _write of writeIterator) {
-      yield new StoryState(StoryIds.WELCOME_OLD_USER);
+      yield new StoryState(StoryIds.WELCOME_OLD_USER2);
     }
 
     this.stopAndHideVideo();
 
     yield new StoryState(
-      StoryIds.WELCOME_OLD_USER,
+      StoryIds.WELCOME_OLD_USER2,
       undefined,
       true,
       StoryIds.FORTUNE_TELLER
@@ -73,6 +75,7 @@ class NewOldSessionDrawer {
   private playVideo = (videoEl: HTMLVideoElement) =>
     new Promise((resolve) => {
       videoEl.style.display = "block";
+      videoEl.playbackRate = 2;
 
       videoEl.addEventListener("ended", resolve);
       videoEl.play();

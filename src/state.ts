@@ -143,7 +143,7 @@ class State {
         this.hideFortuneTellerImg();
         break;
 
-      case StoryIds.WELCOME_OLD_USER:
+      case StoryIds.WELCOME_OLD_USER1:
         this.hideFortuneTellerImg();
         this.socket.send(
           new SocketMessage(
@@ -152,6 +152,10 @@ class State {
             this.currentUser.name
           )
         );
+        break;
+
+      case StoryIds.WELCOME_OLD_USER2:
+        this.hideFortuneTellerImg();
         break;
     }
   };

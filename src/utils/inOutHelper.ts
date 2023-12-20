@@ -4,7 +4,7 @@ import Message from "./message";
 import Transcribe from "../transcribe";
 import {
   BACKGROUND_DIMENSIONS,
-  // countWords,
+  countWords,
   getDimensions,
   getSentences,
   pause,
@@ -44,6 +44,7 @@ class InOutHelper {
 
   abort() {
     this.clearOutputArea();
+    this.transcribe.stop();
     (document.getElementById("submitBtn") as HTMLButtonElement).click();
   }
 
@@ -126,9 +127,9 @@ class InOutHelper {
   private async writeWithSynthesisHelper(sentence: string, user?: User) {
     this.write(sentence, user);
     if (!speechSynthesisEnabled) {
-      // const wordCount = countWords(sentence);
-      // await pause(1500 * Math.ceil(wordCount / 5));
-      await pause(1000);
+      const wordCount = countWords(sentence);
+      await pause(1000 * Math.ceil(wordCount / 5));
+      // await pause(1000);
       return;
     }
 

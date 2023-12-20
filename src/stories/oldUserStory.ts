@@ -14,7 +14,7 @@ class OldUserStory extends BaseStory {
       What can I do for you?`,
       this.botUser
     );
-    yield new StoryState(StoryIds.WELCOME_OLD_USER, undefined, true);
+    yield new StoryState(StoryIds.WELCOME_OLD_USER1, undefined, true);
   }
 }
 

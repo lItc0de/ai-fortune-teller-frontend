@@ -102,9 +102,13 @@ class FaceDetection {
   }
 
   private getAverageId(): string {
-    if (this.lastDetectionIds.length < 30) return "undefined";
-
-    this.lastDetectionIds = this.lastDetectionIds.slice(-100);
+    if (this.currentDetectionId === "undefined") {
+      if (this.lastDetectionIds.length < 100) return "undefined";
+      this.lastDetectionIds = this.lastDetectionIds.slice(-100);
+    } else {
+      if (this.lastDetectionIds.length < 600) return this.currentDetectionId;
+      this.lastDetectionIds = this.lastDetectionIds.slice(-600);
+    }
 
     const weightedIds = this.lastDetectionIds.reduce(
       (map: { [key: string]: number }, val) => {
