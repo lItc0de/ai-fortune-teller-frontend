@@ -1,6 +1,6 @@
 import * as faceapi from "face-api.js";
-import FaceDescriptors from "./utils/faceDescriptors";
-import { sleepMs } from "./utils/helpers";
+import FaceDescriptors from "./faceDescriptors";
+import { sleepMs } from "../helpers";
 
 const CANVAS_WIDTH = 250;
 const CANVAS_HEIGHT = 250;

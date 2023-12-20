@@ -1,7 +1,7 @@
-import SpeechSynthesis from "../speechSynthesis";
+import SpeechSynthesis from "./speechSynthesis";
 import User from "./user";
 import Message from "./message";
-import Transcribe from "../transcribe";
+import Transcribe from "./transcribe";
 import {
   BACKGROUND_DIMENSIONS,
   countWords,

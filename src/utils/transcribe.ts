@@ -4,7 +4,7 @@ declare global {
 
 import { type CheetahTranscript, CheetahWorker } from "@picovoice/cheetah-web";
 import { WebVoiceProcessor } from "@picovoice/web-voice-processor";
-import microphoneImg from "./media/microphone.svg";
+import microphoneImg from "../media/microphone.svg";
 
 class Transcribe {
   private cheetah?: CheetahWorker;

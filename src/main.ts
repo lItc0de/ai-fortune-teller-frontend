@@ -1,6 +1,6 @@
 import "./style.css";
 // import "./test.ts";
-import FaceDetection from "./faceDetection";
+import FaceDetection from "./utils/faceRecognition/faceDetection";
 
 import {
   WebCamHelper,
