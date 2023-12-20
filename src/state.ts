@@ -1,18 +1,18 @@
 import Socket from "./socket";
 import User, { UserType } from "./utils/user";
 import Users from "./utils/users";
-import FortuneTellerNewSessionDrawer from "./drawers/fortuneTellerNewSessionDrawer";
 import InOutHelper from "./utils/inOutHelper";
-import GlassBallDrawer from "./drawers/glassBallDrawer";
 import StateReturn from "./utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
-import EventLoop from "./messageQueue/eventLoop";
-import EndSessionStory from "./stories/endSessionStory";
-import NameFinderStory from "./stories/nameFinderStory";
-import FortuneTellerStory from "./stories/fortuneTellerStory";
-import NewOldSessionDrawer from "./drawers/newOldSessionDrawer";
+import EventLoop from "./utils/eventLoop";
 
 import fortuneTellerImg from "./media/fortuneTelling.png";
+import NewUserSessionEvent from "./events/newUserSessionEvent";
+import NewKnownUserSessionEvent from "./events/newKnownUserSessionEvent";
+import GlassBallDrawer from "./utils/glassBallDrawer";
+import NameFindingEvent from "./events/nameFindingEvent";
+import FortuneTellingEvent from "./events/fortuneTellingEvent";
+import EndSessionEvent from "./events/endSessionEvent";
 
 export enum StateId {
   NO_SESSION,
@@ -35,8 +35,8 @@ class State {
   private users: Users;
   private currentUser?: User;
 
-  private newSessionDrawer: FortuneTellerNewSessionDrawer;
-  private newOldSessionDrawer: NewOldSessionDrawer;
+  private newSessionDrawer: NewUserSessionEvent;
+  private newOldSessionDrawer: NewKnownUserSessionEvent;
   private glassBallDrawer: GlassBallDrawer;
 
   private fortuneTellerImg: HTMLImageElement;
@@ -56,14 +56,14 @@ class State {
       "fortuneTellerImg"
     ) as HTMLImageElement;
 
-    this.newSessionDrawer = new FortuneTellerNewSessionDrawer(
+    this.newSessionDrawer = new NewUserSessionEvent(
       this.inOutHelper,
       this.botUser,
       this.glassBallDrawer,
       this.changeStoryStateCallback
     );
 
-    this.newOldSessionDrawer = new NewOldSessionDrawer(
+    this.newOldSessionDrawer = new NewKnownUserSessionEvent(
       this.inOutHelper,
       this.botUser,
       this.glassBallDrawer,
@@ -87,7 +87,7 @@ class State {
 
     switch (stateReturn.nextStoryId) {
       case StateId.NAME_FINDING:
-        const nameFinderStory = new NameFinderStory(
+        const nameFinderStory = new NameFindingEvent(
           this.currentUser,
           this.botUser,
           this.inOutHelper
@@ -96,7 +96,7 @@ class State {
         break;
 
       case StateId.FORTUNE_TELLER:
-        const fortuneTellerStory = new FortuneTellerStory(
+        const fortuneTellerStory = new FortuneTellingEvent(
           this.currentUser,
           this.botUser,
           this.inOutHelper,
@@ -173,7 +173,7 @@ class State {
     if (userId === "undefined" && this.currentUser === undefined) return;
 
     if (userId === "undefined" && this.currentUser !== undefined) {
-      const endSessionStory = new EndSessionStory(
+      const endSessionStory = new EndSessionEvent(
         this.currentUser,
         this.botUser,
         this.inOutHelper

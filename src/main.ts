@@ -10,9 +10,9 @@ import {
 } from "./utils/helpers";
 import { Dimensions } from "./types";
 import State, { StateId } from "./state";
-import GlassBallDrawer from "./drawers/glassBallDrawer";
-import FortuneTellerIdleDrawer from "./drawers/fortuneTellerIdleDrawer";
-import EventLoop from "./messageQueue/eventLoop";
+import IdleEvent from "./events/idleEvent";
+import EventLoop from "./utils/eventLoop";
+import GlassBallDrawer from "./utils/glassBallDrawer";
 
 globalThis.speechSynthesisEnabled = true;
 globalThis.cheetahEnabled = import.meta.env.PROD;
@@ -24,7 +24,7 @@ class Main {
 
   private webCamHelper: WebCamHelper;
   private glassBallDrawer: GlassBallDrawer;
-  private fortuneTellerIdleDrawer: FortuneTellerIdleDrawer;
+  private fortuneTellerIdleDrawer: IdleEvent;
 
   private faceDetection: FaceDetection;
   private state: State;
@@ -43,7 +43,7 @@ class Main {
 
     this.webCamHelper = new WebCamHelper();
     this.glassBallDrawer = new GlassBallDrawer(this.ctx);
-    this.fortuneTellerIdleDrawer = new FortuneTellerIdleDrawer(this.ctx);
+    this.fortuneTellerIdleDrawer = new IdleEvent(this.ctx);
 
     this.eventLoop = new EventLoop();
     this.state = new State(this.eventLoop, this.glassBallDrawer);

@@ -2,14 +2,14 @@ import newSession1Video from "../media/newSession1.webm";
 import newSession2Video from "../media/newSession2.webm";
 import newSession3Video from "../media/newSession3.webm";
 import newSession4Video from "../media/newSession4.webm";
-import AFTEvent from "../messageQueue/aftEvent";
+import AFTEvent from "./aftEvent";
 import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
 import User from "../utils/user";
-import GlassBallDrawer from "./glassBallDrawer";
+import GlassBallDrawer from "../utils/glassBallDrawer";
 
-class FortuneTellerNewSessionDrawer {
+class NewUserSessionEvent {
   private newSession1Video: HTMLVideoElement;
   private newSession2Video: HTMLVideoElement;
   private newSession3Video: HTMLVideoElement;
@@ -158,4 +158,4 @@ class FortuneTellerNewSessionDrawer {
   }
 }
 
-export default FortuneTellerNewSessionDrawer;
+export default NewUserSessionEvent;

@@ -1,12 +1,12 @@
 import newSessionVideo from "../media/newSession0.webm";
-import AFTEvent from "../messageQueue/aftEvent";
+import AFTEvent from "./aftEvent";
 import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
 import User from "../utils/user";
-import GlassBallDrawer from "./glassBallDrawer";
+import GlassBallDrawer from "../utils/glassBallDrawer";
 
-class NewOldSessionDrawer {
+class NewKnownUserSessionEvent {
   private newSessionVideo: HTMLVideoElement;
   private inOutHelper: InOutHelper;
   private botUser: User;
@@ -87,4 +87,4 @@ class NewOldSessionDrawer {
   }
 }
 
-export default NewOldSessionDrawer;
+export default NewKnownUserSessionEvent;

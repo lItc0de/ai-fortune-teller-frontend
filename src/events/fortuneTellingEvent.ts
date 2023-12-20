@@ -1,13 +1,13 @@
 import Socket from "../socket";
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
-import BaseStory from "./baseStory";
+import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
-import AFTEvent from "../messageQueue/aftEvent";
+import AFTEvent from "./aftEvent";
 import { StateId } from "../state";
 
-class FortuneTellerStory extends BaseStory {
+class FortuneTellingEvent extends BaseEvent {
   private socket: Socket;
 
   constructor(
@@ -64,4 +64,4 @@ class FortuneTellerStory extends BaseStory {
   }
 }
 
-export default FortuneTellerStory;
+export default FortuneTellingEvent;

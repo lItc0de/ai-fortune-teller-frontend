@@ -1,7 +1,7 @@
 import { StateId } from "../state";
-import { pause, sleep } from "../utils/helpers";
-import StateReturn from "../utils/stateReturn";
-import AFTEvent from "./aftEvent";
+import { pause, sleep } from "./helpers";
+import StateReturn from "./stateReturn";
+import AFTEvent from "../events/aftEvent";
 
 class EventLoop {
   private looping = false;

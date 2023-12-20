@@ -1,12 +1,12 @@
 import User from "../utils/user";
 import InOutHelper from "../utils/inOutHelper";
-import BaseStory from "./baseStory";
+import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
-import AFTEvent from "../messageQueue/aftEvent";
+import AFTEvent from "./aftEvent";
 import { pause } from "../utils/helpers";
 import { StateId } from "../state";
 
-class EndSessionStory extends BaseStory {
+class EndSessionEvent extends BaseEvent {
   constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
     super(user, botUser, inOutHelper);
   }
@@ -39,4 +39,4 @@ class EndSessionStory extends BaseStory {
   }
 }
 
-export default EndSessionStory;
+export default EndSessionEvent;

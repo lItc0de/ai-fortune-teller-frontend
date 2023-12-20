@@ -1,6 +1,6 @@
 import glassBall from "../media/glassBall.png";
 import { Dimensions } from "../types";
-import { getDimensions, sleep } from "../utils/helpers";
+import { getDimensions, sleep } from "./helpers";
 
 export const BALL_SIZE = 184;
 

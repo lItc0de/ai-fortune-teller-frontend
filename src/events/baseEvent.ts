@@ -3,7 +3,7 @@ import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
 import { StateId } from "../state";
 
-class BaseStory {
+class BaseEvent {
   protected inOutHelper: InOutHelper;
   protected user: User;
   protected botUser: User;
@@ -20,4 +20,4 @@ class BaseStory {
   }
 }
 
-export default BaseStory;
+export default BaseEvent;
