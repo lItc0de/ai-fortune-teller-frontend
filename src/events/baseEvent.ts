@@ -1,4 +1,4 @@
-import User from "../utils/user";
+import User from "../user";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
 

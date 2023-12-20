@@ -1,4 +1,4 @@
-import User, { UserType } from "./user";
+import User, { UserType } from "../user";
 
 class Message {
   user?: User;

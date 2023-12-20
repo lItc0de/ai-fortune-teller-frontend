@@ -1,6 +1,6 @@
 import Socket from "./socket";
-import User, { UserType } from "./utils/user";
-import Users from "./utils/users";
+import User, { UserType } from "./user";
+import Users from "./users";
 import InOutHelper from "./utils/inOutHelper";
 import StateReturn from "./utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "./utils/socketMessage";

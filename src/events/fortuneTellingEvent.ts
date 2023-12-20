@@ -1,5 +1,5 @@
 import Socket from "../socket";
-import User from "../utils/user";
+import User from "../user";
 import InOutHelper from "../utils/inOutHelper";
 import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";

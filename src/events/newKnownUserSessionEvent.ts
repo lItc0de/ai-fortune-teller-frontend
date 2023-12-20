@@ -2,7 +2,7 @@ import newSessionVideo from "../media/newSession0.webm";
 import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
-import User from "../utils/user";
+import User from "../user";
 import GlassBallDrawer from "../utils/glassBallDrawer";
 import BaseEvent from "./baseEvent";
 
