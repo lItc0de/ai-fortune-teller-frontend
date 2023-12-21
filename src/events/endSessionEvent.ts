@@ -2,7 +2,7 @@ import User from "../user";
 import InOutHelper from "../utils/inOutHelper";
 import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
-import { pause } from "../utils/helpers";
+import { sleep } from "../utils/helpers";
 import { StateId } from "../state";
 
 class EndSessionEvent extends BaseEvent {
@@ -31,7 +31,7 @@ class EndSessionEvent extends BaseEvent {
       );
     }
 
-    await pause(2000);
+    await sleep(2000);
     this.inOutHelper.clearOutputArea();
 
     yield new StateReturn(StateId.END_SESSION, undefined, true);

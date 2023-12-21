@@ -3,15 +3,15 @@ import { Dimensions } from "../types";
 export const BALL_SIZE = 184;
 export const BACKGROUND_DIMENSIONS = { width: 1280, height: 720 };
 
-export const sleep = () =>
+export const asyncRequestAnimationFrame = () =>
   new Promise((resolve) => window.requestAnimationFrame(resolve));
 
-export const sleepMs = (ms: number = 0) =>
+export const asyncRequestAnimationFrameMs = (ms: number = 0) =>
   new Promise((resolve) =>
     setTimeout(() => window.requestAnimationFrame(resolve), ms)
   );
 
-export const pause = (ms: number = 1000) =>
+export const sleep = (ms: number = 1000) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getDimensions = (): Dimensions => {

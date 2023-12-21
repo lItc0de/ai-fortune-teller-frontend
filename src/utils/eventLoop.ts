@@ -1,6 +1,6 @@
 import BaseEvent from "../events/baseEvent";
 import { StateId } from "../state";
-import { pause, sleep } from "./helpers";
+import { sleep, asyncRequestAnimationFrame } from "./helpers";
 import StateReturn from "./stateReturn";
 
 class EventLoop {
@@ -74,7 +74,7 @@ class EventLoop {
         break;
       }
 
-      await sleep();
+      await asyncRequestAnimationFrame();
     } while (this.looping);
   }
 
@@ -85,7 +85,7 @@ class EventLoop {
   > {
     while (this.looping) {
       if (this.eventQueue.size === 0) {
-        await pause(100);
+        await sleep(100);
         yield null;
       } else {
         for (let [key, event] of this.eventQueue.entries()) {

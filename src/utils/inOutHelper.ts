@@ -7,7 +7,7 @@ import {
   countWords,
   getDimensions,
   getSentences,
-  pause,
+  sleep,
 } from "./helpers";
 
 class InOutHelper {
@@ -83,7 +83,7 @@ class InOutHelper {
     this.showElements();
     const message = new Message(msg, user);
     this.pushMessage(message);
-    await pause(1000);
+    await sleep(1000);
   }
 
   toggleDisabled(disabled: boolean) {
@@ -116,9 +116,9 @@ class InOutHelper {
     if (!speechSynthesisEnabled) {
       if (!globalThis.fastText) {
         const wordCount = countWords(sentence);
-        await pause(1000 * Math.ceil(wordCount / 5));
+        await sleep(1000 * Math.ceil(wordCount / 5));
       } else {
-        await pause(1000);
+        await sleep(1000);
       }
       return;
     }

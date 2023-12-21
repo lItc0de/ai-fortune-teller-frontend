@@ -146,7 +146,7 @@ class State {
     }
   };
 
-  newSession = async (userId: string) => {
+  handleUser = async (userId: string) => {
     console.log("New session called");
 
     await this.eventLoop.clear();

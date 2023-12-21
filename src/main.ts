@@ -6,13 +6,14 @@ import {
   WebCamHelper,
   getDimensions,
   resizeCanvas,
-  sleep,
+  asyncRequestAnimationFrame,
 } from "./utils/helpers";
 import { Dimensions } from "./types";
 import State, { StateId } from "./state";
 import IdleDrawer from "./utils/idleDrawer";
 import EventLoop from "./utils/eventLoop";
 import GlassBallDrawer from "./utils/glassBallDrawer";
+import FaceDrawer from "./utils/drawers/faceDrawer";
 
 globalThis.speechSynthesisEnabled = false;
 globalThis.cheetahEnabled = import.meta.env.PROD;
@@ -26,6 +27,7 @@ class Main {
   private webCamHelper: WebCamHelper;
   private glassBallDrawer: GlassBallDrawer;
   private idleDrawer: IdleDrawer;
+  private faceDrawer: FaceDrawer;
 
   private faceDetection: FaceDetection;
   private state: State;
@@ -45,13 +47,13 @@ class Main {
     this.webCamHelper = new WebCamHelper();
     this.glassBallDrawer = new GlassBallDrawer(this.ctx);
     this.idleDrawer = new IdleDrawer(this.ctx);
+    this.faceDrawer = new FaceDrawer(this.canvas, this.ctx);
 
     this.eventLoop = new EventLoop();
     this.state = new State(this.eventLoop, this.glassBallDrawer);
+    this.faceDetection = new FaceDetection();
 
     this.addEventListeners();
-
-    this.faceDetection = new FaceDetection(this.state.newSession);
   }
 
   handleStart = async () => {
@@ -72,34 +74,34 @@ class Main {
           break;
 
         case StateId.INTRO1:
-          this.faceDetection.draw();
+          this.faceDrawer.draw();
           break;
 
         case StateId.INTRO2:
-          this.faceDetection.draw();
+          this.faceDrawer.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
         case StateId.NEW_SESSION:
-          this.faceDetection.draw();
+          this.faceDrawer.draw();
           break;
 
         case StateId.WELCOME_OLD_USER1:
-          this.faceDetection.draw();
+          this.faceDrawer.draw();
           break;
 
         case StateId.WELCOME_OLD_USER2:
-          this.faceDetection.draw();
+          this.faceDrawer.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
         case StateId.NAME_FINDING:
-          this.faceDetection.draw();
+          this.faceDrawer.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
         case StateId.FORTUNE_TELLER:
-          this.faceDetection.draw();
+          this.faceDrawer.draw();
           this.glassBallDrawer.draw(this.dimensions);
           break;
 
@@ -112,7 +114,7 @@ class Main {
           break;
       }
 
-      await sleep();
+      await asyncRequestAnimationFrame();
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     } while (true);
   }
@@ -125,6 +127,9 @@ class Main {
   private addEventListeners() {
     this.addEventListenerResize();
     this.addEventListenerStartBtn();
+
+    this.faceDetection.onDetect = this.faceDrawer.handleDetect;
+    this.faceDetection.onUser = this.state.handleUser;
   }
 
   private addEventListenerStartBtn() {
