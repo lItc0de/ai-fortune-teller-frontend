@@ -6,7 +6,7 @@ import StateReturn from "./utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
 import EventLoop from "./utils/eventLoop";
 
-import fortuneTellerImg from "./media/fortuneTelling.png";
+import fortuneTellerImg from "./media/fortuneTelling.webp";
 import NewUserSessionEvent from "./events/newUserSessionEvent";
 import NewKnownUserSessionEvent from "./events/newKnownUserSessionEvent";
 import GlassBallDrawer from "./utils/glassBallDrawer";

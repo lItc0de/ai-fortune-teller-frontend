@@ -1,4 +1,4 @@
-import fortuneTellerIdleImage from "../media/fortunetellerIdle.png";
+import fortuneTellerIdleImage from "../media/fortunetellerIdle.webp";
 import { Dimensions } from "../types";
 
 class IdleDrawer {

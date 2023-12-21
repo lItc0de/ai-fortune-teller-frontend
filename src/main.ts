@@ -16,6 +16,7 @@ import GlassBallDrawer from "./utils/glassBallDrawer";
 
 globalThis.speechSynthesisEnabled = false;
 globalThis.cheetahEnabled = import.meta.env.PROD;
+globalThis.fastText = true;
 
 class Main {
   private canvas: HTMLCanvasElement;

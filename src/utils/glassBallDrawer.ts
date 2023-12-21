@@ -1,4 +1,4 @@
-import glassBall from "../media/glassBall.png";
+import glassBall from "../media/glassBall.webp";
 import { Dimensions } from "../types";
 import { getDimensions, sleep } from "./helpers";
 

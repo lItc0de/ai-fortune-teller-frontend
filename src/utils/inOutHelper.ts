@@ -10,11 +10,6 @@ import {
   pause,
 } from "./helpers";
 
-declare global {
-  var cheetahEnabled: boolean;
-  var speechSynthesisEnabled: boolean;
-}
-
 class InOutHelper {
   private outputArea: HTMLDivElement;
   private input: HTMLInputElement;
@@ -119,9 +114,12 @@ class InOutHelper {
   private async writeWithSynthesisHelper(sentence: string, user?: User) {
     this.write(sentence, user);
     if (!speechSynthesisEnabled) {
-      const wordCount = countWords(sentence);
-      await pause(1000 * Math.ceil(wordCount / 5));
-      // await pause(1000);
+      if (!globalThis.fastText) {
+        const wordCount = countWords(sentence);
+        await pause(1000 * Math.ceil(wordCount / 5));
+      } else {
+        await pause(1000);
+      }
       return;
     }
 

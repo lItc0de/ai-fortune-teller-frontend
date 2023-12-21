@@ -43,7 +43,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: url("/src/media/background.png") no-repeat center center fixed;
+  background: url("/src/media/background.webp") no-repeat center center fixed;
   background-size: contain;
 
   display: flex;
