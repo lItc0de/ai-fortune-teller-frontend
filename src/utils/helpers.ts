@@ -42,33 +42,25 @@ export const resizeCanvas = (canvas: HTMLCanvasElement) => {
 
 export class WebCamHelper {
   video: HTMLVideoElement;
-  streaming = false;
 
   constructor() {
     this.video = document.getElementById("video") as HTMLVideoElement;
-
-    this.video.addEventListener(
-      "canplay",
-      () => {
-        if (!this.streaming) {
-          this.streaming = true;
-        }
-      },
-      false
-    );
   }
 
-  start() {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: false })
-      .then((stream) => {
-        this.video.srcObject = stream;
-        this.video.play();
-      })
-      .catch((err) => {
-        console.error(`An error occurred: ${err}`);
-      });
-  }
+  start = () =>
+    new Promise((resolve) => {
+      this.video.addEventListener("canplay", resolve, false);
+
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: false })
+        .then((stream) => {
+          this.video.srcObject = stream;
+          this.video.play();
+        })
+        .catch((err) => {
+          console.error(`An error occurred: ${err}`);
+        });
+    });
 }
 
 export const countWords = (str: string) => {

@@ -3,7 +3,6 @@ import "./style.css";
 import FaceDetection from "./utils/faceRecognition/faceDetection";
 
 import {
-  WebCamHelper,
   getDimensions,
   resizeCanvas,
   asyncRequestAnimationFrame,
@@ -24,7 +23,6 @@ class Main {
   private ctx: CanvasRenderingContext2D;
   private startBtn: HTMLButtonElement;
 
-  private webCamHelper: WebCamHelper;
   private glassBallDrawer: GlassBallDrawer;
   private idleDrawer: IdleDrawer;
   private faceDrawer: FaceDrawer;
@@ -43,8 +41,6 @@ class Main {
 
     resizeCanvas(this.canvas);
     this.dimensions = getDimensions();
-
-    this.webCamHelper = new WebCamHelper();
     this.glassBallDrawer = new GlassBallDrawer(this.ctx);
     this.idleDrawer = new IdleDrawer(this.ctx);
     this.faceDrawer = new FaceDrawer(this.canvas, this.ctx);
@@ -60,7 +56,6 @@ class Main {
     this.startBtn.style.display = "none";
 
     this.eventLoop.start();
-    this.webCamHelper.start();
     await this.faceDetection.init();
 
     this.draw();

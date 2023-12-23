@@ -9,6 +9,7 @@ class FaceDrawer extends BaseDrawer {
   private faceCanvas: HTMLCanvasElement;
   private faceCtx: CanvasRenderingContext2D;
   private lastBoxes: Box[] = [];
+  private averageBox?: Box;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     super(canvas, ctx);
@@ -22,21 +23,23 @@ class FaceDrawer extends BaseDrawer {
 
   handleDetect = (faceBox: Box) => {
     this.lastBoxes.push(faceBox);
+    this.lastBoxes = this.lastBoxes.slice(-3);
+    this.averageBox = this.calculateAverageBox();
   };
 
   draw() {
-    const averageBox = this.calculateAverageBox();
+    if (!this.averageBox) return;
 
     this.faceCanvas.width = FACE_CANVAS_WIDTH;
     this.faceCanvas.height = FACE_CANVAS_HEIGHT;
-    const offsetY = averageBox.height / 2;
+    const offsetY = this.averageBox.height / 2;
     const offsetX = 50;
 
-    const scaleX = (FACE_CANVAS_WIDTH - offsetX) / averageBox.width;
-    const scaleY = FACE_CANVAS_HEIGHT / averageBox.height - 0.4;
+    const scaleX = (FACE_CANVAS_WIDTH - offsetX) / this.averageBox.width;
+    const scaleY = FACE_CANVAS_HEIGHT / this.averageBox.height - 0.4;
 
-    const translateX = offsetX / 2 - averageBox.x * scaleX;
-    const translateY = offsetY - averageBox.y * scaleY;
+    const translateX = offsetX / 2 - this.averageBox.x * scaleX;
+    const translateY = offsetY - this.averageBox.y * scaleY;
 
     this.faceCtx.translate(translateX, translateY);
     this.faceCtx.scale(scaleX, scaleY);
@@ -68,8 +71,6 @@ class FaceDrawer extends BaseDrawer {
       width: sumBox.width / this.lastBoxes.length,
       height: sumBox.height / this.lastBoxes.length,
     };
-
-    this.lastBoxes = this.lastBoxes.slice(-3);
 
     const newFaceBox = averageBox as Box;
 

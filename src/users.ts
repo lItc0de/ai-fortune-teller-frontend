@@ -1,20 +1,35 @@
-import User, { UserType } from "./user";
+import { Box, LabeledFaceDescriptors } from "face-api.js";
+import User from "./user";
 
 class Users {
-  private users: User[] = [];
+  private users = new Map<string, User>();
+  currentUser?: User;
 
   find(userId: string): User | undefined {
-    return this.users.find((user) => user.id === userId);
+    return this.users.get(userId);
   }
 
-  create(userId: string): User {
-    const oldUser = this.find(userId);
-    if (oldUser) return oldUser;
+  login(userId: string) {
+    this.currentUser = this.find(userId);
 
-    const user = new User(userId, UserType.PERSON);
-    this.users.push(user);
+    // TODO: create login callback
+  }
 
-    return user;
+  create(faceDescriptor: Float32Array, faceBox: Box) {
+    const user = new User(faceDescriptor, faceBox);
+    this.users.set(user.id, user);
+
+    this.login(user.id);
+  }
+
+  get length(): number {
+    return this.users.size;
+  }
+
+  get labeledFaceDescriptors(): LabeledFaceDescriptors[] {
+    return Array.from(this.users.values()).map(
+      ({ labeledFaceDescriptor }) => labeledFaceDescriptor
+    );
   }
 }
 

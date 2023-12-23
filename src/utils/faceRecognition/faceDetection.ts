@@ -1,29 +1,38 @@
-import * as faceapi from "face-api.js";
-import FaceDescriptors from "./faceDescriptors";
-import { asyncRequestAnimationFrameMs } from "../helpers";
+import {
+  Box,
+  FaceMatcher,
+  TinyFaceDetectorOptions,
+  detectSingleFace,
+  nets,
+} from "face-api.js";
+import { WebCamHelper, asyncRequestAnimationFrameMs } from "../helpers";
+import Users from "../../users";
+import User from "../../user";
 
 class FaceDetection {
   private video: HTMLVideoElement;
-  private detectionOptions: faceapi.TinyFaceDetectorOptions;
-
-  private faceDescriptors: FaceDescriptors;
+  private detectionOptions: TinyFaceDetectorOptions;
+  private webcamHelper: WebCamHelper;
   private started = false;
-  private lastDetectionIds: string[] = [];
-  private currentDetectionId: string = "undefined";
 
-  onDetect?: (faceBox: faceapi.Box) => void;
+  private currentDetectionId: string = "undefined";
+  private users: Users;
+
+  onDetect?: (faceBox: Box) => void;
   onUser?: (userId: string) => void;
 
-  constructor() {
-    this.video = document.getElementById("video") as HTMLVideoElement;
-    this.detectionOptions = new faceapi.TinyFaceDetectorOptions();
-    this.faceDescriptors = new FaceDescriptors();
+  constructor(users: Users) {
+    this.detectionOptions = new TinyFaceDetectorOptions();
+    this.webcamHelper = new WebCamHelper();
+    this.video = this.webcamHelper.video;
+    this.users = users;
   }
 
   async init() {
-    await faceapi.nets.tinyFaceDetector.loadFromUri("models");
-    await faceapi.nets.faceLandmark68Net.loadFromUri("models");
-    await faceapi.nets.faceRecognitionNet.loadFromUri("models");
+    await nets.tinyFaceDetector.loadFromUri("models");
+    await nets.faceLandmark68Net.loadFromUri("models");
+    await nets.faceRecognitionNet.loadFromUri("models");
+    await this.webcamHelper.start();
 
     this.start();
   }
@@ -37,34 +46,51 @@ class FaceDetection {
     this.started = false;
   }
 
-  private async detect() {
-    const detection = await faceapi
-      .detectSingleFace(this.video, this.detectionOptions)
+  private async detect(): Promise<void> {
+    const detection = await detectSingleFace(this.video, this.detectionOptions)
       .withFaceLandmarks()
       .withFaceDescriptor();
 
     if (!detection) {
-      this.lastDetectionIds.push("undefined");
+      // TODO:
       return;
     }
 
-    if (this.faceDescriptors.length === 0)
-      this.faceDescriptors.add(detection.descriptor);
+    // if (this.onDetect) this.onDetect(detection.detection.box);
 
-    const faceMatcher = new faceapi.FaceMatcher(
-      this.faceDescriptors.desctiptors
-    );
-    const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+    const faceDescriptor = detection.descriptor;
+    const faceBox = detection.detection.box;
 
-    if (bestMatch.toString(false) === "unknown") {
-      this.lastDetectionIds.push(
-        this.faceDescriptors.add(detection.descriptor)
-      );
-    } else {
-      this.lastDetectionIds.push(bestMatch.label);
+    if (this.users.length === 0) {
+      this.users.create(faceDescriptor, faceBox);
     }
 
-    if (this.onDetect) this.onDetect(detection.detection.box);
+    const faceMatcher = new FaceMatcher(this.users.labeledFaceDescriptors);
+    const bestMatch = faceMatcher.findBestMatch(faceDescriptor);
+
+    if (this.users.currentUser) {
+      if (bestMatch.toString(false) === "unknown") {
+        if (this.users.currentUser.lastDetectionAt - Date.now() < 5000) {
+          this.users.currentUser.addFaceDescriptor(faceDescriptor);
+          this.users.currentUser.handleDetected(faceBox);
+        } else {
+          this.users.create(faceDescriptor, faceBox);
+        }
+      } else {
+        this.users.currentUser.handleDetected(faceBox);
+      }
+    } else {
+      if (bestMatch.toString(false) === "unknown") {
+        this.users.create(faceDescriptor, faceBox);
+      } else {
+        this.users.login(bestMatch.toString(false));
+        if (!this.users.currentUser) {
+          this.users.create(faceDescriptor, faceBox);
+        } else {
+          this.users.currentUser.handleDetected(faceBox);
+        }
+      }
+    }
   }
 
   private getAverageId(): string {
@@ -91,11 +117,12 @@ class FaceDetection {
 
   private async loop() {
     do {
-      this.detect();
-      const detectionId = this.getAverageId();
-      if (this.currentDetectionId !== detectionId) {
-        this.currentDetectionId = detectionId;
-        if (this.onUser) this.onUser(detectionId);
+      await this.detect();
+
+      const averageDetectionId = this.getAverageId();
+      if (this.currentDetectionId !== averageDetectionId) {
+        this.currentDetectionId = averageDetectionId;
+        // if (this.onUser) this.onUser(averageDetectionId);
       }
 
       await asyncRequestAnimationFrameMs(100);

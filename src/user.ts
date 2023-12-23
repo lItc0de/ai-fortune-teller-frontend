@@ -1,18 +1,34 @@
-export enum UserType {
-  BOT,
-  PERSON,
-}
+import { Box, LabeledFaceDescriptors } from "face-api.js";
 
 class User {
   id: string;
-  type: UserType;
+  createdAt: number;
+  lastDetectionAt: number;
+  labeledFaceDescriptor: LabeledFaceDescriptors;
   name?: string;
-  lastVisits: number[] = [];
+  currentFaceBox: Box;
 
-  constructor(id: string, type: UserType) {
-    this.id = id;
-    this.type = type;
-    this.lastVisits.push(Date.now());
+  constructor(faceDescriptor: Float32Array, faceBox: Box) {
+    this.id = crypto.randomUUID();
+    this.createdAt = Date.now();
+    this.lastDetectionAt = this.createdAt;
+    this.labeledFaceDescriptor = new LabeledFaceDescriptors(this.id, [
+      faceDescriptor,
+    ]);
+    this.currentFaceBox = faceBox;
+  }
+
+  addFaceDescriptor(faceDescriptor: Float32Array) {
+    this.labeledFaceDescriptor.descriptors.push(faceDescriptor);
+  }
+
+  handleDetected(faceBox: Box) {
+    this.lastDetectionAt = Date.now();
+    this.currentFaceBox = faceBox;
+  }
+
+  get isNew() {
+    return !this.name;
   }
 }
 
