@@ -1,5 +1,6 @@
 import { Box } from "face-api.js";
 import BaseDrawer from "./baseDrawer";
+import Users from "../../users";
 
 const FACE_CANVAS_WIDTH = 250;
 const FACE_CANVAS_HEIGHT = 250;
@@ -8,10 +9,13 @@ class FaceDrawer extends BaseDrawer {
   private video: HTMLVideoElement;
   private faceCanvas: HTMLCanvasElement;
   private faceCtx: CanvasRenderingContext2D;
-  private lastBoxes: Box[] = [];
-  private averageBox?: Box;
+  private users: Users;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    users: Users
+  ) {
     super(canvas, ctx);
 
     this.video = document.getElementById("video") as HTMLVideoElement;
@@ -19,27 +23,22 @@ class FaceDrawer extends BaseDrawer {
       "faceCanvas"
     ) as HTMLCanvasElement;
     this.faceCtx = this.faceCanvas.getContext("2d") as CanvasRenderingContext2D;
+    this.users = users;
   }
 
-  handleDetect = (faceBox: Box) => {
-    this.lastBoxes.push(faceBox);
-    this.lastBoxes = this.lastBoxes.slice(-3);
-    this.averageBox = this.calculateAverageBox();
-  };
-
   draw() {
-    if (!this.averageBox) return;
+    if (!this.averageFaceBox) return;
 
     this.faceCanvas.width = FACE_CANVAS_WIDTH;
     this.faceCanvas.height = FACE_CANVAS_HEIGHT;
-    const offsetY = this.averageBox.height / 2;
+    const offsetY = this.averageFaceBox.height / 2;
     const offsetX = 50;
 
-    const scaleX = (FACE_CANVAS_WIDTH - offsetX) / this.averageBox.width;
-    const scaleY = FACE_CANVAS_HEIGHT / this.averageBox.height - 0.4;
+    const scaleX = (FACE_CANVAS_WIDTH - offsetX) / this.averageFaceBox.width;
+    const scaleY = FACE_CANVAS_HEIGHT / this.averageFaceBox.height - 0.4;
 
-    const translateX = offsetX / 2 - this.averageBox.x * scaleX;
-    const translateY = offsetY - this.averageBox.y * scaleY;
+    const translateX = offsetX / 2 - this.averageFaceBox.x * scaleX;
+    const translateY = offsetY - this.averageFaceBox.y * scaleY;
 
     this.faceCtx.translate(translateX, translateY);
     this.faceCtx.scale(scaleX, scaleY);
@@ -52,8 +51,13 @@ class FaceDrawer extends BaseDrawer {
     );
   }
 
-  private calculateAverageBox(): Box {
-    const sumBox = this.lastBoxes.reduce(
+  private get averageFaceBox(): Box | undefined {
+    if (!this.users.currentUser?.lastFaceBoxes) return;
+
+    const lastFaceBoxes = this.users.currentUser.lastFaceBoxes;
+    const length = lastFaceBoxes.length;
+
+    const sumBox = lastFaceBoxes.reduce(
       (prev, curr) => {
         return {
           x: prev.x + curr.x,
@@ -66,10 +70,10 @@ class FaceDrawer extends BaseDrawer {
     );
 
     const averageBox = {
-      x: sumBox.x / this.lastBoxes.length,
-      y: sumBox.y / this.lastBoxes.length,
-      width: sumBox.width / this.lastBoxes.length,
-      height: sumBox.height / this.lastBoxes.length,
+      x: sumBox.x / length,
+      y: sumBox.y / length,
+      width: sumBox.width / length,
+      height: sumBox.height / length,
     };
 
     const newFaceBox = averageBox as Box;

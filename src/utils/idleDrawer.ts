@@ -1,5 +1,5 @@
 import fortuneTellerIdleImage from "../media/fortunetellerIdle.webp";
-import { Dimensions } from "../types";
+import { getDimensions } from "./helpers";
 
 class IdleDrawer {
   private ctx: CanvasRenderingContext2D;
@@ -20,11 +20,11 @@ class IdleDrawer {
     this.fortuneTellerIdleImage.src = fortuneTellerIdleImage;
   }
 
-  drawIdleAnimation(dimensions: Dimensions) {
+  drawIdleAnimation() {
     if (!this.loaded) return;
 
     const fortuneTellerImgWidth = this.fortuneTellerIdleImage.width;
-    const { width } = dimensions;
+    const { width } = getDimensions();
     const scale = width / fortuneTellerImgWidth;
 
     const now = (Date.now() / 150).toFixed(2);

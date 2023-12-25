@@ -1,13 +1,7 @@
 import "./style.css";
 // import "./test.ts";
 import FaceDetection from "./utils/faceRecognition/faceDetection";
-
-import {
-  getDimensions,
-  resizeCanvas,
-  asyncRequestAnimationFrame,
-} from "./utils/helpers";
-import { Dimensions } from "./types";
+import { resizeCanvas, asyncRequestAnimationFrame } from "./utils/helpers";
 import State, { StateId } from "./state";
 import IdleDrawer from "./utils/idleDrawer";
 import EventLoop from "./utils/eventLoop";
@@ -31,8 +25,6 @@ class Main {
   private state: State;
   private eventLoop: EventLoop;
 
-  private dimensions: Dimensions;
-
   constructor() {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -40,14 +32,13 @@ class Main {
     this.startBtn = document.getElementById("startBtn") as HTMLButtonElement;
 
     resizeCanvas(this.canvas);
-    this.dimensions = getDimensions();
-    this.glassBallDrawer = new GlassBallDrawer(this.ctx);
-    this.idleDrawer = new IdleDrawer(this.ctx);
-    this.faceDrawer = new FaceDrawer(this.canvas, this.ctx);
 
     this.eventLoop = new EventLoop();
+    this.glassBallDrawer = new GlassBallDrawer(this.ctx);
+    this.idleDrawer = new IdleDrawer(this.ctx);
     this.state = new State(this.eventLoop, this.glassBallDrawer);
-    this.faceDetection = new FaceDetection();
+    this.faceDetection = new FaceDetection(this.state.users);
+    this.faceDrawer = new FaceDrawer(this.canvas, this.ctx, this.state.users);
 
     this.addEventListeners();
   }
@@ -65,7 +56,7 @@ class Main {
     do {
       switch (this.state.stateId) {
         case StateId.NO_SESSION:
-          this.idleDrawer.drawIdleAnimation(this.dimensions);
+          this.idleDrawer.drawIdleAnimation();
           break;
 
         case StateId.INTRO1:
@@ -74,7 +65,7 @@ class Main {
 
         case StateId.INTRO2:
           this.faceDrawer.draw();
-          this.glassBallDrawer.draw(this.dimensions);
+          this.glassBallDrawer.draw();
           break;
 
         case StateId.NEW_SESSION:
@@ -87,25 +78,25 @@ class Main {
 
         case StateId.WELCOME_OLD_USER2:
           this.faceDrawer.draw();
-          this.glassBallDrawer.draw(this.dimensions);
+          this.glassBallDrawer.draw();
           break;
 
         case StateId.NAME_FINDING:
           this.faceDrawer.draw();
-          this.glassBallDrawer.draw(this.dimensions);
+          this.glassBallDrawer.draw();
           break;
 
         case StateId.FORTUNE_TELLER:
           this.faceDrawer.draw();
-          this.glassBallDrawer.draw(this.dimensions);
+          this.glassBallDrawer.draw();
           break;
 
         case StateId.END_SESSION:
-          this.idleDrawer.drawIdleAnimation(this.dimensions);
+          this.idleDrawer.drawIdleAnimation();
           break;
 
         default:
-          this.idleDrawer.drawIdleAnimation(this.dimensions);
+          this.idleDrawer.drawIdleAnimation();
           break;
       }
 
@@ -116,15 +107,11 @@ class Main {
 
   private resize = () => {
     resizeCanvas(this.canvas);
-    this.dimensions = getDimensions();
   };
 
   private addEventListeners() {
     this.addEventListenerResize();
     this.addEventListenerStartBtn();
-
-    this.faceDetection.onDetect = this.faceDrawer.handleDetect;
-    this.faceDetection.onUser = this.state.handleUser;
   }
 
   private addEventListenerStartBtn() {

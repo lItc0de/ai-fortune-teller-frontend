@@ -4,11 +4,9 @@ import StateReturn from "../utils/stateReturn";
 
 abstract class BaseEvent {
   protected inOutHelper: InOutHelper;
-  protected botUser: User;
   protected user?: User;
 
-  constructor(botUser: User, inOutHelper: InOutHelper, user?: User) {
-    this.botUser = botUser;
+  constructor(inOutHelper: InOutHelper, user?: User) {
     this.inOutHelper = inOutHelper;
     this.user = user;
 

@@ -1,5 +1,4 @@
 import {
-  Box,
   FaceMatcher,
   TinyFaceDetectorOptions,
   detectSingleFace,
@@ -7,19 +6,14 @@ import {
 } from "face-api.js";
 import { WebCamHelper, asyncRequestAnimationFrameMs } from "../helpers";
 import Users from "../../users";
-import User from "../../user";
 
 class FaceDetection {
   private video: HTMLVideoElement;
   private detectionOptions: TinyFaceDetectorOptions;
   private webcamHelper: WebCamHelper;
-  private started = false;
-
-  private currentDetectionId: string = "undefined";
   private users: Users;
-
-  onDetect?: (faceBox: Box) => void;
-  onUser?: (userId: string) => void;
+  private detectedUserIds: string[] = [];
+  private started = false;
 
   constructor(users: Users) {
     this.detectionOptions = new TinyFaceDetectorOptions();
@@ -52,11 +46,16 @@ class FaceDetection {
       .withFaceDescriptor();
 
     if (!detection) {
-      // TODO:
+      // console.log("No detection");
+
+      if (
+        this.users.currentUser &&
+        Date.now() - this.users.currentUser.lastDetectionAt >= 5000
+      ) {
+        this.users.logout();
+      }
       return;
     }
-
-    // if (this.onDetect) this.onDetect(detection.detection.box);
 
     const faceDescriptor = detection.descriptor;
     const faceBox = detection.detection.box;
@@ -66,43 +65,56 @@ class FaceDetection {
     }
 
     const faceMatcher = new FaceMatcher(this.users.labeledFaceDescriptors);
-    const bestMatch = faceMatcher.findBestMatch(faceDescriptor);
+    const matchedUserId = faceMatcher
+      .findBestMatch(faceDescriptor)
+      .toString(false);
 
+    console.log("Matched id:", matchedUserId);
+
+    const averageMatchedUserId = this.getAverageUserId(matchedUserId);
+
+    // handle previous session
     if (this.users.currentUser) {
-      if (bestMatch.toString(false) === "unknown") {
-        if (this.users.currentUser.lastDetectionAt - Date.now() < 5000) {
-          this.users.currentUser.addFaceDescriptor(faceDescriptor);
+      switch (averageMatchedUserId) {
+        case this.users.currentUser.id:
           this.users.currentUser.handleDetected(faceBox);
-        } else {
-          this.users.create(faceDescriptor, faceBox);
-        }
-      } else {
-        this.users.currentUser.handleDetected(faceBox);
+          if (averageMatchedUserId !== matchedUserId) {
+            this.users.currentUser.addFaceDescriptor(faceDescriptor);
+          }
+          break;
+
+        case "undefined":
+          if (Date.now() - this.users.currentUser.lastDetectionAt < 5000) {
+            this.users.currentUser.addFaceDescriptor(faceDescriptor);
+            this.users.currentUser.handleDetected(faceBox);
+          } else {
+            this.users.logout();
+            this.users.create(faceDescriptor, faceBox);
+          }
+          break;
+
+        default:
+          this.users.logout();
+          this.users.login(averageMatchedUserId, faceBox);
+          break;
       }
-    } else {
-      if (bestMatch.toString(false) === "unknown") {
-        this.users.create(faceDescriptor, faceBox);
-      } else {
-        this.users.login(bestMatch.toString(false));
-        if (!this.users.currentUser) {
-          this.users.create(faceDescriptor, faceBox);
-        } else {
-          this.users.currentUser.handleDetected(faceBox);
-        }
-      }
+
+      return;
     }
+
+    if (averageMatchedUserId === "undefined") {
+      this.users.create(faceDescriptor, faceBox);
+      return;
+    }
+
+    this.users.login(averageMatchedUserId, faceBox);
   }
 
-  private getAverageId(): string {
-    if (this.currentDetectionId === "undefined") {
-      if (this.lastDetectionIds.length < 30) return "undefined";
-      this.lastDetectionIds = this.lastDetectionIds.slice(-100);
-    } else {
-      if (this.lastDetectionIds.length < 600) return this.currentDetectionId;
-      this.lastDetectionIds = this.lastDetectionIds.slice(-600);
-    }
+  private getAverageUserId(matchedUserId: string): string {
+    this.detectedUserIds.push(matchedUserId);
+    this.detectedUserIds = this.detectedUserIds.slice(-30);
 
-    const weightedIds = this.lastDetectionIds.reduce(
+    const weightedIds = this.detectedUserIds.reduce(
       (map: { [key: string]: number }, val) => {
         map[val] = (Number(map[val]) || 0) + 1;
         return map;
@@ -118,12 +130,6 @@ class FaceDetection {
   private async loop() {
     do {
       await this.detect();
-
-      const averageDetectionId = this.getAverageId();
-      if (this.currentDetectionId !== averageDetectionId) {
-        this.currentDetectionId = averageDetectionId;
-        // if (this.onUser) this.onUser(averageDetectionId);
-      }
 
       await asyncRequestAnimationFrameMs(100);
     } while (this.started);

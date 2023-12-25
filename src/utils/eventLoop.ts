@@ -93,7 +93,7 @@ class EventLoop {
             this.currentEventKey = key;
 
             for await (let eventPart of event.eventIterator()) {
-              console.log("next event part");
+              // console.log("next event part");
               yield eventPart;
             }
 

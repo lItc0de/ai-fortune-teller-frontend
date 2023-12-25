@@ -5,27 +5,28 @@ import StateReturn from "../utils/stateReturn";
 import User from "../user";
 import GlassBallDrawer from "../utils/glassBallDrawer";
 import BaseEvent from "./baseEvent";
+import Socket from "../socket";
+import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 
 class NewKnownUserSessionEvent extends BaseEvent {
   private newSessionVideo: HTMLVideoElement;
   private glassBallDrawer: GlassBallDrawer;
+  private socket: Socket;
 
   constructor(
-    user: User,
-    botUser: User,
     inOutHelper: InOutHelper,
-    glassBallDrawer: GlassBallDrawer
+    glassBallDrawer: GlassBallDrawer,
+    socket: Socket,
+    user?: User
   ) {
-    super(botUser, inOutHelper, user);
+    super(inOutHelper, user);
 
     this.newSessionVideo = document.getElementById(
       "newSession0"
     ) as HTMLVideoElement;
 
-    this.inOutHelper = inOutHelper;
-    this.botUser = botUser;
     this.glassBallDrawer = glassBallDrawer;
-    this.user = user;
+    this.socket = socket;
     this.loadVideo();
   }
 
@@ -41,6 +42,14 @@ class NewKnownUserSessionEvent extends BaseEvent {
   async *eventIterator(): AsyncGenerator<StateReturn, void, unknown> {
     yield new StateReturn(StateId.WELCOME_OLD_USER1);
 
+    this.socket.send(
+      new SocketMessage(
+        SocketMessageType.OLD_SESSION,
+        undefined,
+        this.user?.name
+      )
+    );
+
     await this.playVideo(this.newSessionVideo);
 
     yield new StateReturn(StateId.WELCOME_OLD_USER1);
@@ -50,8 +59,7 @@ class NewKnownUserSessionEvent extends BaseEvent {
     yield new StateReturn(StateId.WELCOME_OLD_USER2);
 
     const writeIterator = this.inOutHelper.writeWithSynthesisIterator(
-      `Welcome, welcome. What a pleasure it is to see you again ${this.user?.name}.`,
-      this.botUser
+      `Welcome, welcome. What a pleasure it is to see you again ${this.user?.name}.`
     );
 
     for await (let _write of writeIterator) {

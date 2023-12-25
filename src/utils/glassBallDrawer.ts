@@ -1,5 +1,4 @@
 import glassBall from "../media/glassBall.webp";
-import { Dimensions } from "../types";
 import { getDimensions, asyncRequestAnimationFrame } from "./helpers";
 
 export const BALL_SIZE = 184;
@@ -29,9 +28,10 @@ class GlassBallDrawer {
     this.image.src = glassBall;
   }
 
-  draw(dimensions: Dimensions) {
+  draw() {
     if (!this.loaded) return;
-    const { ratio } = dimensions;
+
+    const { ratio } = getDimensions();
 
     const x = 536 * ratio;
     const y = 413 * ratio;

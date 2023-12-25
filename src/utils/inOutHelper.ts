@@ -1,5 +1,4 @@
 import SpeechSynthesis from "./speechSynthesis";
-import User from "../user";
 import Message from "./message";
 import Transcribe from "./transcribe";
 import {
@@ -52,36 +51,36 @@ class InOutHelper {
     )}px`;
   };
 
-  async *writeWithSynthesisIterator(msg: string, user?: User) {
+  async *writeWithSynthesisIterator(msg: string) {
     const sentences = getSentences(msg);
 
     if (sentences === null) {
-      await this.writeWithSynthesisHelper(msg, user);
+      await this.writeWithSynthesisHelper(msg);
       yield;
     } else {
       for (let i = 0; i < sentences.length; i++) {
-        await this.writeWithSynthesisHelper(sentences[i], user);
+        await this.writeWithSynthesisHelper(sentences[i]);
         yield;
       }
     }
   }
 
-  async writeWithSynthesis(msg: string, user?: User) {
+  async writeWithSynthesis(msg: string) {
     const sentences = getSentences(msg);
 
     if (sentences === null) {
-      await this.writeWithSynthesisHelper(msg, user);
+      await this.writeWithSynthesisHelper(msg);
       return;
     }
 
     for (let i = 0; i < sentences.length; i++) {
-      await this.writeWithSynthesisHelper(sentences[i], user);
+      await this.writeWithSynthesisHelper(sentences[i]);
     }
   }
 
-  async write(msg: string, user?: User) {
+  async write(msg: string, isBot: boolean, label?: string) {
     this.showElements();
-    const message = new Message(msg, user);
+    const message = new Message(msg, isBot, label);
     this.pushMessage(message);
     await sleep(1000);
   }
@@ -111,8 +110,9 @@ class InOutHelper {
     this.input.style.display = "none";
   }
 
-  private async writeWithSynthesisHelper(sentence: string, user?: User) {
-    this.write(sentence, user);
+  private async writeWithSynthesisHelper(sentence: string, label?: string) {
+    const isBot = true;
+    this.write(sentence, isBot, label);
     if (!speechSynthesisEnabled) {
       if (!globalThis.fastText) {
         const wordCount = countWords(sentence);

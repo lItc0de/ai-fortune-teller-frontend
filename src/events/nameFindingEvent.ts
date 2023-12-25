@@ -4,10 +4,17 @@ import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
 import { countWords } from "../utils/helpers";
 import { StateId } from "../state";
+import Socket from "../socket";
+import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 
 class NameFindingEvent extends BaseEvent {
-  constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
-    super(botUser, inOutHelper, user);
+  socket: Socket;
+  user: User;
+
+  constructor(inOutHelper: InOutHelper, socket: Socket, user: User) {
+    super(inOutHelper, user);
+    this.socket = socket;
+    this.user = user; // for typing
   }
 
   async abort() {
@@ -17,8 +24,7 @@ class NameFindingEvent extends BaseEvent {
   async *eventIterator() {
     yield new StateReturn(StateId.NAME_FINDING);
     await this.inOutHelper.writeWithSynthesis(
-      "So now I ask you to speak your name!",
-      this.botUser
+      "All I ask of you is to speak your name!"
     );
     yield new StateReturn(StateId.NAME_FINDING);
 
@@ -30,13 +36,12 @@ class NameFindingEvent extends BaseEvent {
         name = (await this.inOutHelper.waitForUserInput())
           .trim()
           .replace(".", "");
-        await this.inOutHelper.write(name, this.user);
+        await this.inOutHelper.write(name, false, this.user?.name);
         yield new StateReturn(StateId.NAME_FINDING);
 
         if (countWords(name) !== 1) {
           await this.inOutHelper.writeWithSynthesis(
-            "Oh dear, unfortunately your name got lost in the void, repeat it for me please!",
-            this.botUser
+            "Oh dear, unfortunately your name got lost in the void, repeat it for me please!"
           );
         } else {
           askForName = false;
@@ -45,8 +50,7 @@ class NameFindingEvent extends BaseEvent {
       }
 
       await this.inOutHelper.writeWithSynthesis(
-        `So your name is ${name}? A short "yes" or "no" is enough.`,
-        this.botUser
+        `So your name is ${name}? A short "yes" or "no" is enough.`
       );
 
       yield new StateReturn(StateId.NAME_FINDING);
@@ -57,14 +61,13 @@ class NameFindingEvent extends BaseEvent {
           .trim()
           .toLowerCase()
           .replace(".", "");
-        await this.inOutHelper.write(answer, this.user);
+        await this.inOutHelper.write(answer, true, this.user?.name);
 
         yield new StateReturn(StateId.NAME_FINDING);
 
         if (answer === "no") {
           await this.inOutHelper.writeWithSynthesis(
-            "Ok, well then tell me your name again.",
-            this.botUser
+            "Ok, well then tell me your name again."
           );
           checkIfName = false;
           yield new StateReturn(StateId.NAME_FINDING);
@@ -74,8 +77,7 @@ class NameFindingEvent extends BaseEvent {
           yield new StateReturn(StateId.NAME_FINDING);
         } else {
           await this.inOutHelper.writeWithSynthesis(
-            'Please my dear, a short "yes" or "no" is enough.',
-            this.botUser
+            'Please my dear, a short "yes" or "no" is enough.'
           );
           yield new StateReturn(StateId.NAME_FINDING);
         }
@@ -83,12 +85,15 @@ class NameFindingEvent extends BaseEvent {
     }
 
     await this.inOutHelper.writeWithSynthesis(
-      `Hello my dear ${name}, a beautiful name that is.`,
-      this.botUser
+      `Hello my dear ${name}, a beautiful name that is.`
     );
 
-    // TODO: check if this is ok
-    // this.user.name = name;
+    this.socket.send(
+      new SocketMessage(SocketMessageType.USERNAME, undefined, name)
+    );
+
+    this.user.name = name;
+
     yield new StateReturn(
       StateId.NAME_FINDING,
       name,

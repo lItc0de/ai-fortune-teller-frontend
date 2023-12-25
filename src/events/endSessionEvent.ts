@@ -4,10 +4,15 @@ import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
 import { sleep } from "../utils/helpers";
 import { StateId } from "../state";
+import Socket from "../socket";
+import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 
 class EndSessionEvent extends BaseEvent {
-  constructor(user: User, botUser: User, inOutHelper: InOutHelper) {
-    super(botUser, inOutHelper, user);
+  socket: Socket;
+
+  constructor(inOutHelper: InOutHelper, socket: Socket, user?: User) {
+    super(inOutHelper, user);
+    this.socket = socket;
   }
 
   async abort() {
@@ -17,24 +22,29 @@ class EndSessionEvent extends BaseEvent {
   async *eventIterator() {
     yield new StateReturn(StateId.END_SESSION);
 
+    this.socket.send(new SocketMessage(SocketMessageType.END_SESSION));
+
     if (this.user?.name) {
       await this.inOutHelper.writeWithSynthesis(
         `Goodbye ${this.user.name}!
-        Was nice talking to you.`,
-        this.botUser
+        Was nice talking to you.`
       );
     } else {
       await this.inOutHelper.writeWithSynthesis(
         `Goodbye Human!
-        Was nice talking to you.`,
-        this.botUser
+        Was nice talking to you.`
       );
     }
 
     await sleep(2000);
     this.inOutHelper.clearOutputArea();
 
-    yield new StateReturn(StateId.END_SESSION, undefined, true);
+    yield new StateReturn(
+      StateId.END_SESSION,
+      undefined,
+      true,
+      StateId.NO_SESSION
+    );
   }
 }
 

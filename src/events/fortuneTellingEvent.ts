@@ -9,13 +9,8 @@ import { StateId } from "../state";
 class FortuneTellingEvent extends BaseEvent {
   private socket: Socket;
 
-  constructor(
-    user: User,
-    botUser: User,
-    inOutHelper: InOutHelper,
-    socket: Socket
-  ) {
-    super(botUser, inOutHelper, user);
+  constructor(inOutHelper: InOutHelper, socket: Socket, user?: User) {
+    super(inOutHelper, user);
     this.socket = socket;
   }
 
@@ -28,15 +23,14 @@ class FortuneTellingEvent extends BaseEvent {
     yield new StateReturn(StateId.FORTUNE_TELLER);
 
     await this.inOutHelper.writeWithSynthesis(
-      "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!",
-      this.botUser
+      "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!"
     );
 
     yield new StateReturn(StateId.FORTUNE_TELLER);
 
     while (true) {
       const question = await this.inOutHelper.waitForUserInput();
-      this.inOutHelper.write(question, this.user);
+      this.inOutHelper.write(question, false, this.user?.name);
 
       yield new StateReturn(StateId.FORTUNE_TELLER);
 
@@ -45,10 +39,7 @@ class FortuneTellingEvent extends BaseEvent {
           new SocketMessage(SocketMessageType.PROMPT, question, this.user?.name)
         );
         if (response.type === SocketMessageType.BOT && response.prompt) {
-          await this.inOutHelper.writeWithSynthesis(
-            response.prompt,
-            this.botUser
-          );
+          await this.inOutHelper.writeWithSynthesis(response.prompt);
         } else {
           console.log(response);
         }

@@ -17,8 +17,13 @@ class Socket {
   };
 
   send = (message: SocketMessage): Promise<SocketMessage> =>
-    new Promise((resolve, reject) => {
-      if (!this.connected) return reject("Not connected");
+    new Promise((resolve) => {
+      if (!this.connected) {
+        console.error("Socket not connected");
+        return resolve(
+          new SocketMessage(SocketMessageType.PROMPT, "Not connected")
+        );
+      }
       this.aborted = false;
 
       const handleResponse = (response: MessageEvent) => {

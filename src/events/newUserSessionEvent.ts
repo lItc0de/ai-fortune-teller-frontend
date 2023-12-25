@@ -5,25 +5,25 @@ import newSession4Video from "../media/newSession4.webm";
 import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
-import User from "../user";
 import GlassBallDrawer from "../utils/glassBallDrawer";
 import BaseEvent from "./baseEvent";
+import Socket from "../socket";
+import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 
 class NewUserSessionEvent extends BaseEvent {
   private newSession1Video: HTMLVideoElement;
   private newSession2Video: HTMLVideoElement;
   private newSession3Video: HTMLVideoElement;
   private newSession4Video: HTMLVideoElement;
-  private changeStateCallback: (stateReturn: StateReturn) => void;
   private glassBallDrawer: GlassBallDrawer;
+  private socket: Socket;
 
   constructor(
-    botUser: User,
     inOutHelper: InOutHelper,
     glassBallDrawer: GlassBallDrawer,
-    changeStateCallback: (stateReturn: StateReturn) => void
+    socket: Socket
   ) {
-    super(botUser, inOutHelper);
+    super(inOutHelper);
     this.newSession1Video = document.getElementById(
       "newSession1"
     ) as HTMLVideoElement;
@@ -40,9 +40,9 @@ class NewUserSessionEvent extends BaseEvent {
       "newSession4"
     ) as HTMLVideoElement;
 
-    this.changeStateCallback = changeStateCallback;
     this.loadVideos();
     this.glassBallDrawer = glassBallDrawer;
+    this.socket = socket;
   }
 
   async abort() {
@@ -59,10 +59,11 @@ class NewUserSessionEvent extends BaseEvent {
 
   async *eventIterator(): AsyncGenerator<StateReturn, void, unknown> {
     yield new StateReturn(StateId.INTRO1);
+    this.socket.send(new SocketMessage(SocketMessageType.NEW_SESSION));
+
     this.playVideo(this.newSession1Video);
     const writeIterator1 = this.inOutHelper.writeWithSynthesisIterator(
-      "Welcome, welcome. What a pleasure it is to see that fates have crossed our paths as two souls keen on the mystic arts of fortune telling.",
-      this.botUser
+      "Welcome, welcome. What a pleasure it is to see that fates have crossed our paths as two souls keen on the mystic arts of fortune telling."
     );
     for await (let _write of writeIterator1) {
       yield new StateReturn(StateId.INTRO1);
@@ -74,8 +75,7 @@ class NewUserSessionEvent extends BaseEvent {
 
     this.playVideo(this.newSession2Video);
     const writeIterator2 = this.inOutHelper.writeWithSynthesisIterator(
-      "That sparkle in your eyes carries the burden of both curiosity and mockery, so let us embark on a journey across the spiritual realms with the help of some… uh… artificial intelligence. Tricky business; looking into that stardust hidden behind the façade of our personalities.",
-      this.botUser
+      "That sparkle in your eyes carries the burden of both curiosity and mockery, so let us embark on a journey across the spiritual realms with the help of some… uh… artificial intelligence."
     );
     for await (let _write of writeIterator2) {
       yield new StateReturn(StateId.INTRO1);
@@ -92,14 +92,12 @@ class NewUserSessionEvent extends BaseEvent {
         this.playVideo(this.newSession4Video),
         (async (): Promise<void> => {
           await this.glassBallDrawer.flyIn();
-          this.changeStateCallback(new StateReturn(StateId.INTRO2));
           needsINTRO2 = true;
         })(),
       ]);
     })();
     const writeIterator3 = this.inOutHelper.writeWithSynthesisIterator(
-      "Out of millions of stars in the galaxy, one has made you into who you are today; and to foresee how its energy will flow through you in the days and years to come, I will need to see through to your soul and learn your true identity. And, in good old AI fashion, your name should be enough to see right through you. All I ask of you is to speak your name. If fate has misinterpreted it, please feel free to correct my shortcomings with a keyboard. My magic is integrated into a computer, after all. After I have attuned to your star, you may ask me questions as you please. I shall listen to the whispers of the Moirai, hidden across the realms and together, we shall reap the fortunes of your days. Let the mystical divinity unravel before your very eyes and enjoy the ride.",
-      this.botUser
+      "Out of millions of stars in the galaxy, one has made you into who you are today; and to foresee how its energy will flow through you in the days and years to come, I will need to see through to your soul and learn your true identity. And, in good old AI fashion, your name should be enough to see right through you."
     );
     for await (let _write of writeIterator3) {
       yield new StateReturn(needsINTRO2 ? StateId.INTRO2 : StateId.INTRO1);

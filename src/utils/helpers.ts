@@ -14,7 +14,11 @@ export const asyncRequestAnimationFrameMs = (ms: number = 0) =>
 export const sleep = (ms: number = 1000) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-export const getDimensions = (): Dimensions => {
+let dimensions: Dimensions;
+
+export const getDimensions = (recalculate = false): Dimensions => {
+  if (dimensions && !recalculate) return dimensions;
+
   const backgroundRatio =
     BACKGROUND_DIMENSIONS.height / BACKGROUND_DIMENSIONS.width;
   const windowRatio = window.innerHeight / window.innerWidth;
@@ -31,11 +35,12 @@ export const getDimensions = (): Dimensions => {
   }
 
   const ratio = width / BACKGROUND_DIMENSIONS.width;
-  return { width, height, ratio };
+  dimensions = { width, height, ratio };
+  return dimensions;
 };
 
 export const resizeCanvas = (canvas: HTMLCanvasElement) => {
-  const dimensions = getDimensions();
+  dimensions = getDimensions(true);
   canvas.width = dimensions.width;
   canvas.height = dimensions.height;
 };

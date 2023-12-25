@@ -1,34 +1,26 @@
-import User, { UserType } from "../user";
-
 class Message {
-  user?: User;
-  text: string;
+  private text: string;
+  private isBot: boolean;
+  private _label?: string;
 
-  constructor(text: string, user?: User) {
+  constructor(text: string, isBot: boolean = true, label?: string) {
     this.text = text;
-    this.user = user;
-  }
-
-  private getUser(): string {
-    if (!this.user) return "";
-
-    if (this.user.type === UserType.BOT) return "Fortune Teller";
-
-    return this.user.name ? `${this.user.name}` : "You";
+    this._label = label;
+    this.isBot = isBot;
   }
 
   toString(): string {
-    return [this.getUser(), this.text, "<br>"].join("");
+    return [this.label, this.text, "<br>"].join("");
   }
 
   toHtml(): HTMLDivElement {
     const wrapper = document.createElement("div");
     wrapper.className = "outputWrapper";
 
-    if (this.user) {
+    if (this.label) {
       const label = document.createElement("label");
       label.className = "outputLabel";
-      label.textContent = this.getUser();
+      label.textContent = this.label;
       wrapper.appendChild(label);
     }
 
@@ -39,6 +31,14 @@ class Message {
     wrapper.appendChild(output);
 
     return wrapper;
+  }
+
+  private get label(): string {
+    if (this.isBot) {
+      return this._label || "Fortune Teller";
+    }
+
+    return this._label || "You";
   }
 }
 

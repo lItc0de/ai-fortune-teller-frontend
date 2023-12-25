@@ -1,9 +1,7 @@
 import Socket from "./socket";
-import User, { UserType } from "./user";
 import Users from "./users";
 import InOutHelper from "./utils/inOutHelper";
 import StateReturn from "./utils/stateReturn";
-import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
 import EventLoop from "./utils/eventLoop";
 
 import fortuneTellerImg from "./media/fortuneTelling.webp";
@@ -31,13 +29,10 @@ class State {
   private socket: Socket;
   private inOutHelper: InOutHelper;
 
-  private botUser: User;
-  private users: Users;
-  private currentUser?: User;
-
   private glassBallDrawer: GlassBallDrawer;
   private fortuneTellerImg: HTMLImageElement;
 
+  users: Users;
   stateId: StateId = StateId.NO_SESSION;
 
   constructor(eventLoop: EventLoop, glassBallDrawer: GlassBallDrawer) {
@@ -45,7 +40,6 @@ class State {
     this.socket = new Socket();
     this.inOutHelper = new InOutHelper();
 
-    this.botUser = new User("bot111", UserType.BOT);
     this.users = new Users();
     this.glassBallDrawer = glassBallDrawer;
 
@@ -56,143 +50,117 @@ class State {
     this.eventLoop.onStoryStateChange = this.changeStoryStateCallback;
     this.fortuneTellerImg.src = fortuneTellerImg;
 
-    // only for testing
-    // this.newSession("defaultUser");
-    // this.newSession("undefined");
+    this.users.onLogin = this.handleLogin;
+    this.users.onLogout = this.handleLogout;
   }
 
-  private changeStoryStateCallback = (stateReturn: StateReturn) => {
-    console.log(stateReturn);
-
-    this.stateId = stateReturn.stateId;
-    if (!this.currentUser) return;
-
-    switch (stateReturn.nextStoryId) {
-      case StateId.NAME_FINDING:
-        const nameFinderStory = new NameFindingEvent(
-          this.currentUser,
-          this.botUser,
-          this.inOutHelper
-        );
-        this.eventLoop.enqueue(nameFinderStory);
-        break;
-
-      case StateId.FORTUNE_TELLER:
-        const fortuneTellerStory = new FortuneTellingEvent(
-          this.currentUser,
-          this.botUser,
-          this.inOutHelper,
-          this.socket
-        );
-        this.eventLoop.enqueue(fortuneTellerStory);
-        break;
+  private handleLogin = () => {
+    if (
+      this.stateId !== StateId.NO_SESSION &&
+      this.stateId !== StateId.END_SESSION
+    ) {
+      console.error("Login called with existing session");
+      return;
     }
 
-    switch (stateReturn.stateId) {
-      case StateId.NAME_FINDING:
-        this.showFortuneTellerImg();
+    if (!this.users.currentUser) {
+      console.error("Login called without user");
+      return;
+    }
 
-        if (stateReturn.isEnd && stateReturn.returnValue) {
-          this.currentUser.name = stateReturn.returnValue;
-          this.socket.send(
-            new SocketMessage(
-              SocketMessageType.USERNAME,
-              undefined,
-              this.currentUser.name
-            )
-          );
-        }
-        break;
+    if (this.users.currentUser.name) {
+      this.newStoryState(StateId.WELCOME_OLD_USER1);
+      return;
+    }
 
-      case StateId.FORTUNE_TELLER:
-        this.showFortuneTellerImg();
-        break;
+    this.newStoryState(StateId.NEW_SESSION);
+  };
 
+  private handleLogout = () => {
+    this.eventLoop.clear();
+
+    this.newStoryState(StateId.END_SESSION);
+  };
+
+  private newStoryState(stateId: StateId) {
+    switch (stateId) {
       case StateId.NO_SESSION:
-        this.hideFortuneTellerImg();
+        this.eventLoop.clear();
         break;
 
       case StateId.NEW_SESSION:
-        this.hideFortuneTellerImg();
-        this.socket.send(new SocketMessage(SocketMessageType.NEW_SESSION));
-        break;
-
-      case StateId.END_SESSION:
-        this.hideFortuneTellerImg();
+        this.eventLoop.enqueue(
+          new NewUserSessionEvent(
+            this.inOutHelper,
+            this.glassBallDrawer,
+            this.socket
+          )
+        );
         break;
 
       case StateId.INTRO1:
-        this.hideFortuneTellerImg();
         break;
 
       case StateId.INTRO2:
-        this.hideFortuneTellerImg();
         break;
 
       case StateId.WELCOME_OLD_USER1:
-        this.hideFortuneTellerImg();
-        this.socket.send(
-          new SocketMessage(
-            SocketMessageType.OLD_SESSION,
-            undefined,
-            this.currentUser.name
+        this.eventLoop.enqueue(
+          new NewKnownUserSessionEvent(
+            this.inOutHelper,
+            this.glassBallDrawer,
+            this.socket,
+            this.currentUser
           )
         );
         break;
 
       case StateId.WELCOME_OLD_USER2:
-        this.hideFortuneTellerImg();
+        break;
+
+      case StateId.NAME_FINDING:
+        if (!this.currentUser) break;
+
+        this.eventLoop.enqueue(
+          new NameFindingEvent(this.inOutHelper, this.socket, this.currentUser)
+        );
+        break;
+
+      case StateId.FORTUNE_TELLER:
+        this.eventLoop.enqueue(
+          new FortuneTellingEvent(
+            this.inOutHelper,
+            this.socket,
+            this.currentUser
+          )
+        );
+        break;
+
+      case StateId.END_SESSION:
+        this.eventLoop.enqueue(
+          new EndSessionEvent(this.inOutHelper, this.socket, this.currentUser)
+        );
         break;
     }
-  };
-
-  handleUser = async (userId: string) => {
-    console.log("New session called");
-
-    await this.eventLoop.clear();
-    this.stateId = StateId.NO_SESSION;
-
-    if (userId === "undefined" && this.currentUser === undefined) return;
-
-    if (userId === "undefined" && this.currentUser !== undefined) {
-      const endSessionStory = new EndSessionEvent(
-        this.currentUser,
-        this.botUser,
-        this.inOutHelper
-      );
-      this.eventLoop.enqueue(endSessionStory);
-      return;
-    }
-
-    this.currentUser = this.users.find(userId) || this.users.create(userId);
-
-    if (this.currentUser.name) {
-      const newKnownUserSessionEvent = new NewKnownUserSessionEvent(
-        this.currentUser,
-        this.botUser,
-        this.inOutHelper,
-        this.glassBallDrawer
-      );
-      this.eventLoop.enqueue(newKnownUserSessionEvent);
-      return;
-    }
-
-    const newUserSessionEvent = new NewUserSessionEvent(
-      this.botUser,
-      this.inOutHelper,
-      this.glassBallDrawer,
-      this.changeStoryStateCallback
-    );
-
-    this.eventLoop.enqueue(newUserSessionEvent);
-  };
-
-  private showFortuneTellerImg() {
-    this.fortuneTellerImg.style.display = "block";
   }
 
-  private hideFortuneTellerImg() {
-    this.fortuneTellerImg.style.display = "none";
+  private changeStoryStateCallback = (stateReturn: StateReturn) => {
+    this.stateId = stateReturn.stateId;
+    if (stateReturn.isEnd && stateReturn.nextStoryId) {
+      this.newStoryState(stateReturn.nextStoryId);
+    }
+  };
+
+  // private showFortuneTellerImg() {
+  //   this.fortuneTellerImg.style.display = "block";
+  // }
+
+  // private hideFortuneTellerImg() {
+  //   this.fortuneTellerImg.style.display = "none";
+  // }
+
+  private get currentUser() {
+    return this.users.currentUser;
   }
 }
 
