@@ -75,7 +75,7 @@ class User {
     this.store.updateUser(this.id, { name: newName });
   }
 
-  static fromDBUser(store: Store, dbUser: DBUser): User {
+  static async fromDBUser(store: Store, dbUser: DBUser): Promise<User> {
     const [firstFaceDescriptor, ...faceDescriptors] = dbUser.faceDescriptors;
     const user = new User(
       store,
@@ -87,7 +87,9 @@ class User {
       dbUser.lastDetectionAt,
       dbUser.name
     );
-    faceDescriptors.forEach(user.addFaceDescriptor);
+    for (let i = 0; i < faceDescriptors.length; i++) {
+      await user.addFaceDescriptor(faceDescriptors[i]);
+    }
 
     return user;
   }

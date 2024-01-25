@@ -184,3 +184,14 @@ body {
   position: fixed;
   top: 3rem;
 } */
+
+.ui {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+}

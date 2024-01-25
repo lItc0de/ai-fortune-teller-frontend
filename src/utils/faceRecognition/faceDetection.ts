@@ -69,7 +69,7 @@ class FaceDetection {
       .findBestMatch(faceDescriptor)
       .toString(false);
 
-    console.log("Matched id:", matchedUserId);
+    // console.log("Matched id:", matchedUserId);
 
     const averageMatchedUserId = this.getAverageUserId(matchedUserId);
 

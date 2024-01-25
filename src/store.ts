@@ -34,7 +34,11 @@ class Store {
     if (!this.db) return [];
 
     const dbUsers = await this.db.getAll("users");
-    return dbUsers.map((dbUser) => User.fromDBUser(this, dbUser));
+    const users: User[] = [];
+    for (let i = 0; i < dbUsers.length; i++) {
+      users.push(await User.fromDBUser(this, dbUsers[i]));
+    }
+    return users;
   }
 
   async addUser(user: User) {

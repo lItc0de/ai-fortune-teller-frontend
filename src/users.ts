@@ -27,7 +27,7 @@ class Users {
 
     this.currentUser = this.find(userId);
     if (!this.currentUser) {
-      console.error("Wrong userId");
+      console.error("Wrong userId", userId);
       return;
     }
     this.currentUser.handleLogin(faceBox);

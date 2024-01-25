@@ -12,6 +12,7 @@ import NameFindingEvent from "./events/nameFindingEvent";
 import FortuneTellingEvent from "./events/fortuneTellingEvent";
 import EndSessionEvent from "./events/endSessionEvent";
 import Store from "./store";
+import UserInterface from "./utils/userInterface";
 
 export enum StateId {
   NO_SESSION,
@@ -33,6 +34,7 @@ class State {
 
   private glassBallDrawer: GlassBallDrawer;
   private fortuneTellerImg: HTMLImageElement;
+  private userInterface: UserInterface;
 
   users: Users;
   stateId: StateId = StateId.NO_SESSION;
@@ -44,6 +46,7 @@ class State {
 
     this.store = new Store();
     this.users = new Users(this.store);
+    this.userInterface = new UserInterface();
     this.glassBallDrawer = glassBallDrawer;
 
     this.fortuneTellerImg = document.getElementById(
@@ -76,6 +79,8 @@ class State {
       return;
     }
 
+    this.userInterface.login(this.users.currentUser);
+
     if (this.users.currentUser.name) {
       this.newStoryState(StateId.WELCOME_OLD_USER1);
       return;
@@ -84,8 +89,9 @@ class State {
     this.newStoryState(StateId.NEW_SESSION);
   };
 
-  private handleLogout = () => {
-    this.eventLoop.clear();
+  private handleLogout = async () => {
+    await this.eventLoop.clear();
+    this.userInterface.logout();
 
     this.newStoryState(StateId.END_SESSION);
   };
@@ -118,7 +124,7 @@ class State {
             this.inOutHelper,
             this.glassBallDrawer,
             this.socket,
-            this.currentUser
+            this.users.currentUser
           )
         );
         break;
@@ -127,10 +133,14 @@ class State {
         break;
 
       case StateId.NAME_FINDING:
-        if (!this.currentUser) break;
+        if (!this.users.currentUser) break;
 
         this.eventLoop.enqueue(
-          new NameFindingEvent(this.inOutHelper, this.socket, this.currentUser)
+          new NameFindingEvent(
+            this.inOutHelper,
+            this.socket,
+            this.users.currentUser
+          )
         );
         break;
 
@@ -139,14 +149,18 @@ class State {
           new FortuneTellingEvent(
             this.inOutHelper,
             this.socket,
-            this.currentUser
+            this.users.currentUser
           )
         );
         break;
 
       case StateId.END_SESSION:
         this.eventLoop.enqueue(
-          new EndSessionEvent(this.inOutHelper, this.socket, this.currentUser)
+          new EndSessionEvent(
+            this.inOutHelper,
+            this.socket,
+            this.users.currentUser
+          )
         );
         break;
     }
@@ -158,18 +172,6 @@ class State {
       this.newStoryState(stateReturn.nextStoryId);
     }
   };
-
-  // private showFortuneTellerImg() {
-  //   this.fortuneTellerImg.style.display = "block";
-  // }
-
-  // private hideFortuneTellerImg() {
-  //   this.fortuneTellerImg.style.display = "none";
-  // }
-
-  private get currentUser() {
-    return this.users.currentUser;
-  }
 }
 
 export default State;
