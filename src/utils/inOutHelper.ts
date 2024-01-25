@@ -95,8 +95,10 @@ class InOutHelper {
       const handleSubmit = (ev: any) => {
         this.form.removeEventListener("submit", handleSubmit);
         this.toggleDisabled(true);
+        this.transcribe.stop();
         return resolve(this.handleSubmit(ev));
       };
+
       this.form.addEventListener("submit", handleSubmit);
       this.toggleDisabled(false);
       this.transcribe.start();
@@ -128,7 +130,7 @@ class InOutHelper {
 
   private transcribeCallback = (transcript: string) => {
     this.input.value = transcript;
-    (document.getElementById("submitBtn") as HTMLButtonElement).click();
+    // (document.getElementById("submitBtn") as HTMLButtonElement).click();
   };
 
   private handleSubmit = (ev: any) => {

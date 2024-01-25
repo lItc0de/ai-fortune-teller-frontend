@@ -13,6 +13,7 @@
 - socket reconnect
 - refactoring
 - use ultrawave sensor for distance (track if user there) #better-session-handling
+- use whisper for transcribing with keypress
 
 # Usability
 

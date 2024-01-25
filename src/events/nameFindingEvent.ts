@@ -92,7 +92,7 @@ class NameFindingEvent extends BaseEvent {
       new SocketMessage(SocketMessageType.USERNAME, undefined, name)
     );
 
-    this.user.name = name;
+    if (name) this.user.name = name;
 
     yield new StateReturn(
       StateId.NAME_FINDING,
