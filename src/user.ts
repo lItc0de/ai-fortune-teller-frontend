@@ -1,39 +1,60 @@
 import { Box, LabeledFaceDescriptors } from "face-api.js";
+import Store, { DBUser } from "./store";
 
 class User {
+  private store: Store;
+  private _name?: string;
   id: string;
   createdAt: number;
   lastLoginAt: number;
   lastDetectionAt: number;
   labeledFaceDescriptor: LabeledFaceDescriptors;
-  name?: string;
   lastFaceBoxes: Box[] = [];
 
-  constructor(faceDescriptor: Float32Array, faceBox: Box) {
-    this.id = crypto.randomUUID();
-    this.createdAt = Date.now();
-    this.lastDetectionAt = this.createdAt;
-    this.lastLoginAt = this.createdAt;
+  constructor(
+    store: Store,
+    faceDescriptor: Float32Array,
+    faceBox?: Box,
+    id?: string,
+    createdAt?: number,
+    lastDetectionAt?: number,
+    lastLoginAt?: number,
+    name?: string
+  ) {
+    this.id = id || crypto.randomUUID();
+    this.createdAt = createdAt || Date.now();
+    this.lastDetectionAt = lastDetectionAt || this.createdAt;
+    this.lastLoginAt = lastLoginAt || this.createdAt;
     this.labeledFaceDescriptor = new LabeledFaceDescriptors(this.id, [
       faceDescriptor,
     ]);
-    this.addFaceBox(faceBox);
+    this.store = store;
+    if (faceBox) this.addFaceBox(faceBox);
+    if (name) this._name = name;
   }
 
-  addFaceDescriptor(faceDescriptor: Float32Array) {
+  async addFaceDescriptor(faceDescriptor: Float32Array) {
     console.log("add desctiptor");
 
     this.labeledFaceDescriptor.descriptors.push(faceDescriptor);
+    // TODO: Check if needed
+    await this.store.updateUser(this.id, {
+      faceDescriptors: this.labeledFaceDescriptor.descriptors,
+    });
   }
 
-  handleDetected(faceBox: Box) {
+  async handleDetected(faceBox: Box) {
     this.lastDetectionAt = Date.now();
     this.addFaceBox(faceBox);
+    await this.store.updateUser(this.id, {
+      lastDetectionAt: this.lastDetectionAt,
+    });
   }
 
-  handleLogin(faceBox: Box) {
+  async handleLogin(faceBox: Box) {
     this.lastLoginAt = Date.now();
-    this.handleDetected(faceBox);
+    await this.handleDetected(faceBox);
+    await this.store.updateUser(this.id, { lastLoginAt: this.lastLoginAt });
   }
 
   private addFaceBox(faceBox: Box) {
@@ -42,7 +63,33 @@ class User {
   }
 
   get isNew() {
-    return !this.name;
+    return !this._name;
+  }
+
+  get name(): string | undefined {
+    return this._name;
+  }
+
+  set name(newName: string) {
+    this._name = newName;
+    this.store.updateUser(this.id, { name: newName });
+  }
+
+  static fromDBUser(store: Store, dbUser: DBUser): User {
+    const [firstFaceDescriptor, ...faceDescriptors] = dbUser.faceDescriptors;
+    const user = new User(
+      store,
+      firstFaceDescriptor,
+      undefined,
+      dbUser.id,
+      dbUser.createdAt,
+      dbUser.lastDetectionAt,
+      dbUser.lastDetectionAt,
+      dbUser.name
+    );
+    faceDescriptors.forEach(user.addFaceDescriptor);
+
+    return user;
   }
 }
 

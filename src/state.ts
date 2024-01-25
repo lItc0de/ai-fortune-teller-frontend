@@ -11,6 +11,7 @@ import GlassBallDrawer from "./utils/glassBallDrawer";
 import NameFindingEvent from "./events/nameFindingEvent";
 import FortuneTellingEvent from "./events/fortuneTellingEvent";
 import EndSessionEvent from "./events/endSessionEvent";
+import Store from "./store";
 
 export enum StateId {
   NO_SESSION,
@@ -28,6 +29,7 @@ class State {
   private eventLoop: EventLoop;
   private socket: Socket;
   private inOutHelper: InOutHelper;
+  private store: Store;
 
   private glassBallDrawer: GlassBallDrawer;
   private fortuneTellerImg: HTMLImageElement;
@@ -40,7 +42,8 @@ class State {
     this.socket = new Socket();
     this.inOutHelper = new InOutHelper();
 
-    this.users = new Users();
+    this.store = new Store();
+    this.users = new Users(this.store);
     this.glassBallDrawer = glassBallDrawer;
 
     this.fortuneTellerImg = document.getElementById(
@@ -52,6 +55,11 @@ class State {
 
     this.users.onLogin = this.handleLogin;
     this.users.onLogout = this.handleLogout;
+  }
+
+  async init() {
+    await this.store.init();
+    await this.users.init();
   }
 
   private handleLogin = () => {

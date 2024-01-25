@@ -16,6 +16,7 @@
     "@picovoice/cheetah-web": "^2.0.0",
     "@picovoice/web-voice-processor": "^4.0.8",
     "face-api.js": "^0.22.2",
+    "idb": "^8.0.0",
     "socket.io-client": "^4.7.2"
   }
 }

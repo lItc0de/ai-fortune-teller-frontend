@@ -43,6 +43,10 @@ class Main {
     this.addEventListeners();
   }
 
+  async init() {
+    await this.state.init();
+  }
+
   handleStart = async () => {
     this.startBtn.style.display = "none";
 
@@ -123,4 +127,5 @@ class Main {
   }
 }
 
-new Main();
+const main = new Main();
+main.init();
