@@ -37,10 +37,14 @@ const FortuneTellerStory: React.FC = () => {
 
         if (question) {
           addMessage(question);
-          const response = await socketRef.current.send(
+          const response = await socketRef.current?.send(
             new SocketMessage(SocketMessageType.PROMPT, question, user?.name)
           );
-          if (response.type === SocketMessageType.BOT && response.prompt) {
+          if (
+            response &&
+            response.type === SocketMessageType.BOT &&
+            response.prompt
+          ) {
             addMessage(response.prompt);
           } else {
             console.log(response);
