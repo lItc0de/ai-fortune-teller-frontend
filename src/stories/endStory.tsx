@@ -2,10 +2,10 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext } from "../stateProvider";
 import OutputWrapper from "../components/outputWrapper";
 import { Message } from "../types";
-import { StateId } from "../constants";
+import { SessionStateId } from "../constants";
 
 const EndStory: React.FC = () => {
-  const { setStateId } = useContext(StateContext);
+  const { setSessionStateId } = useContext(StateContext);
   const [messages, setMessages] = useState<Message[]>([]);
   const [done, setDone] = useState(false);
 
@@ -56,8 +56,8 @@ const EndStory: React.FC = () => {
   useEffect(() => {
     if (!done) return;
 
-    setStateId(StateId.NO_SESSION);
-  }, [done, setStateId]);
+    setSessionStateId(SessionStateId.NO_SESSION);
+  }, [done, setSessionStateId]);
 
   return (
     <>

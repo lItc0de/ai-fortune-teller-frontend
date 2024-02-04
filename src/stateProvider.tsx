@@ -7,13 +7,19 @@ import {
 } from "react";
 import User from "./user";
 import Session from "./session";
-import { StateId } from "./constants";
-// import { Message } from "./types";
+import { AnimationStateId, SessionStateId } from "./constants";
 
 export const StateContext = createContext<{
-  stateId: StateId;
-  setStateId: (newStateId: StateId) => void;
-}>({ stateId: StateId.NO_SESSION, setStateId: () => {} });
+  sessionStateId: SessionStateId;
+  animationStateId: AnimationStateId;
+  setSessionStateId: (id: SessionStateId) => void;
+  setAnimationStateId: (id: AnimationStateId) => void;
+}>({
+  sessionStateId: SessionStateId.NO_SESSION,
+  animationStateId: AnimationStateId.IDLE,
+  setSessionStateId: () => {},
+  setAnimationStateId: () => {},
+});
 
 export const UserContext = createContext<{
   user: User | undefined;
@@ -33,28 +39,32 @@ const StateProvider: React.FC<Props> = ({
   getCurrentUser,
   updateUsername,
 }) => {
-  const [stateId, setStateId] = useState<StateId>(StateId.NO_SESSION);
+  const [sessionStateId, setSessionStateId] = useState<SessionStateId>(
+    SessionStateId.NO_SESSION
+  );
+  const [animationStateId, setAnimationStateId] = useState<AnimationStateId>(
+    AnimationStateId.IDLE
+  );
   const user = useSyncExternalStore(userSubscribe, getCurrentUser);
 
   useEffect(() => {
-    console.log("user change:", user);
-
     if (!user) return;
-    const session = new Session(user, setStateId);
+    const session = new Session(user, setSessionStateId);
 
     return () => session.end();
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    console.debug(StateId[stateId]);
-  }, [stateId]);
-
   return (
     <UserContext.Provider value={{ user, updateUsername }}>
-      <StateContext.Provider value={{ stateId, setStateId }}>
-        {/* <MessagesContext.Provider value={{ messages, addMessage }}> */}
+      <StateContext.Provider
+        value={{
+          sessionStateId,
+          animationStateId,
+          setSessionStateId,
+          setAnimationStateId,
+        }}
+      >
         {children}
-        {/* </MessagesContext.Provider> */}
       </StateContext.Provider>
     </UserContext.Provider>
   );

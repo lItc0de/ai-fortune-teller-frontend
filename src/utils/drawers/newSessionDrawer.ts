@@ -1,14 +1,16 @@
-import { StateId } from "../../constants";
+import { AnimationStateId } from "../../constants";
 import { getDimensions } from "../helpers";
 import BaseDrawer from "./baseDrawer";
 
 class NewSessionDrawer extends BaseDrawer {
   private video: HTMLVideoElement;
 
-  constructor(stateId: StateId) {
+  constructor(animationStateId: AnimationStateId) {
     super();
 
-    this.video = document.getElementById(`video${stateId}`) as HTMLVideoElement;
+    this.video = document.getElementById(
+      `video${animationStateId}`
+    ) as HTMLVideoElement;
   }
 
   async init() {}

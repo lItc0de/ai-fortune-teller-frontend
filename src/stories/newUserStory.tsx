@@ -2,11 +2,11 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext } from "../stateProvider";
 import OutputWrapper from "../components/outputWrapper";
 import { GeneratorState, Message } from "../types";
-import { StateId } from "../constants";
+import { AnimationStateId, SessionStateId } from "../constants";
 import { waitForEnter } from "../utils/helpers";
 
 const NewUserStory: React.FC = () => {
-  const { stateId, setStateId } = useContext(StateContext);
+  const { animationStateId, setSessionStateId } = useContext(StateContext);
   const [messages, setMessages] = useState<Message[]>([]);
   const [done, setDone] = useState(false);
   const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
@@ -55,10 +55,10 @@ const NewUserStory: React.FC = () => {
 
   useEffect(() => {
     if (!done) return;
-    if (stateId !== StateId.NEW_SESSION_4) return;
+    if (animationStateId !== AnimationStateId.NEW_SESSION_4) return;
 
-    setStateId(StateId.NAME_FINDING);
-  }, [done, stateId, setStateId]);
+    setSessionStateId(SessionStateId.NAME_FINDING);
+  }, [done, animationStateId, setSessionStateId]);
 
   return (
     <>

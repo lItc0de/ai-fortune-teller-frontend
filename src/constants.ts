@@ -1,24 +1,32 @@
-export enum StateId {
-  NO_SESSION,
-  NEW_SESSION,
+export enum AnimationStateId {
+  IDLE,
   NEW_SESSION_1,
   NEW_SESSION_2,
   NEW_SESSION_3,
   NEW_SESSION_4,
   WELCOME_OLD_USER,
-  WELCOME_OLD_USER_1,
+  FORTUNE_TELLER,
+}
+
+export enum SessionStateId {
+  NO_SESSION,
+  NEW_SESSION,
+  WELCOME_OLD_USER,
   NAME_FINDING,
   FORTUNE_TELLER,
   END_SESSION,
 }
 
-export const NEXT_STATE_ID_MAP = new Map<StateId, StateId>();
-NEXT_STATE_ID_MAP.set(StateId.NEW_SESSION, StateId.NEW_SESSION_1);
-NEXT_STATE_ID_MAP.set(StateId.NEW_SESSION_1, StateId.NEW_SESSION_2);
-NEXT_STATE_ID_MAP.set(StateId.NEW_SESSION_2, StateId.NEW_SESSION_3);
-NEXT_STATE_ID_MAP.set(StateId.NEW_SESSION_3, StateId.NEW_SESSION_4);
-
-NEXT_STATE_ID_MAP.set(StateId.NAME_FINDING, StateId.FORTUNE_TELLER);
-
-NEXT_STATE_ID_MAP.set(StateId.WELCOME_OLD_USER, StateId.WELCOME_OLD_USER_1);
-NEXT_STATE_ID_MAP.set(StateId.WELCOME_OLD_USER_1, StateId.FORTUNE_TELLER);
+export const ANIMATION_MAP = new Map<AnimationStateId, AnimationStateId>();
+ANIMATION_MAP.set(
+  AnimationStateId.NEW_SESSION_1,
+  AnimationStateId.NEW_SESSION_2
+);
+ANIMATION_MAP.set(
+  AnimationStateId.NEW_SESSION_2,
+  AnimationStateId.NEW_SESSION_3
+);
+ANIMATION_MAP.set(
+  AnimationStateId.NEW_SESSION_3,
+  AnimationStateId.NEW_SESSION_4
+);

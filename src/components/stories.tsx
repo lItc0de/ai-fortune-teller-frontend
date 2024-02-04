@@ -1,43 +1,50 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { StateContext } from "../stateProvider";
 import NewUserStory from "../stories/newUserStory";
-import { StateId } from "../constants";
+import { AnimationStateId, SessionStateId } from "../constants";
 import EndStory from "../stories/endStory";
 import FortuneTellerStory from "../stories/fortuneTellerStory";
 import NameFindingStory from "../stories/nameFindingStory";
 
 const Stories: React.FC = () => {
-  const { stateId, setStateId } = useContext(StateContext);
-  const [story, setStory] = useState<string | null>(null);
+  const { sessionStateId, setSessionStateId, setAnimationStateId } =
+    useContext(StateContext);
 
   useEffect(() => {
-    if (
-      [
-        StateId.NEW_SESSION,
-        StateId.NEW_SESSION_1,
-        StateId.NEW_SESSION_2,
-        StateId.NEW_SESSION_3,
-        StateId.NEW_SESSION_4,
-      ].includes(stateId)
-    ) {
-      setStory("newUserStory");
-    } else if (stateId === StateId.WELCOME_OLD_USER) {
-      setStateId(StateId.FORTUNE_TELLER);
-    } else if (stateId === StateId.FORTUNE_TELLER) {
-      setStory("fortuneTellerStory");
-    } else if (stateId === StateId.NAME_FINDING) {
-      setStory("nameFindingStory");
-    } else if (stateId === StateId.END_SESSION) {
-      setStory("endStory");
-    } else setStory(null);
-  }, [stateId, setStateId]);
+    switch (sessionStateId) {
+      case SessionStateId.NEW_SESSION:
+        setAnimationStateId(AnimationStateId.NEW_SESSION_1);
+        break;
+      case SessionStateId.WELCOME_OLD_USER:
+        setSessionStateId(SessionStateId.FORTUNE_TELLER);
+        break;
+
+      case SessionStateId.FORTUNE_TELLER:
+        setAnimationStateId(AnimationStateId.FORTUNE_TELLER);
+        break;
+
+      case SessionStateId.NAME_FINDING:
+        setAnimationStateId(AnimationStateId.FORTUNE_TELLER);
+        break;
+
+      case SessionStateId.END_SESSION:
+        setAnimationStateId(AnimationStateId.IDLE);
+        break;
+
+      default:
+        setAnimationStateId(AnimationStateId.IDLE);
+        break;
+    }
+  }, [sessionStateId, setSessionStateId, setAnimationStateId]);
 
   return (
     <>
-      {story === "newUserStory" && <NewUserStory />}
-      {story === "nameFindingStory" && <NameFindingStory />}
-      {story === "fortuneTellerStory" && <FortuneTellerStory />}
-      {story === "endStory" && <EndStory />}
+      {sessionStateId === SessionStateId.NEW_SESSION && <NewUserStory />}
+      {sessionStateId === SessionStateId.NAME_FINDING && <NameFindingStory />}
+      {sessionStateId === SessionStateId.FORTUNE_TELLER && (
+        <FortuneTellerStory />
+      )}
+      {sessionStateId === SessionStateId.END_SESSION && <EndStory />}
     </>
   );
 };

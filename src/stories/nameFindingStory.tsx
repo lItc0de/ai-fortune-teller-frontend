@@ -2,12 +2,12 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext, UserContext } from "../stateProvider";
 import OutputWrapper from "../components/outputWrapper";
 import { Message } from "../types";
-import { StateId } from "../constants";
+import { SessionStateId } from "../constants";
 import { countWords, waitForEnter } from "../utils/helpers";
 import Input, { RefProps } from "../components/input";
 
 const NameFindingStory: React.FC = () => {
-  const { stateId, setStateId } = useContext(StateContext);
+  const { setSessionStateId } = useContext(StateContext);
   const inputRef = useRef<RefProps>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [userName, setUserName] = useState("");
@@ -96,18 +96,11 @@ const NameFindingStory: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!done) return;
-    if (stateId !== StateId.NEW_SESSION_4) return;
+    if (!userName || !done) return;
 
-    setStateId(StateId.NAME_FINDING);
-  }, [done, stateId, setStateId]);
-
-  useEffect(() => {
-    if (!userName) return;
-
-    console.log("Username:", userName);
     updateUsername(userName);
-  }, [userName, updateUsername]);
+    setSessionStateId(SessionStateId.FORTUNE_TELLER);
+  }, [userName, updateUsername, setSessionStateId, done]);
 
   return (
     <>

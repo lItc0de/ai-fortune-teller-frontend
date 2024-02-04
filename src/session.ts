@@ -8,37 +8,37 @@
 // import EndSessionEvent from "./events/endSessionEvent";
 // import Socket from "./socket";
 import User from "./user";
-import { StateId } from "./constants";
+import { SessionStateId } from "./constants";
 
 class Session {
   // private eventLoop: EventLoop;
   // private socket: Socket;
-  // private stateId: StateId = StateId.NO_SESSION;
+  // private SessionStateId: SessionStateId = SessionStateId.NO_SESSION;
   private user: User;
-  private setStateId: React.Dispatch<React.SetStateAction<StateId>>;
+  private setStateId: React.Dispatch<React.SetStateAction<SessionStateId>>;
 
   constructor(
     user: User,
-    setStateId: React.Dispatch<React.SetStateAction<StateId>>
+    setStateId: React.Dispatch<React.SetStateAction<SessionStateId>>
   ) {
     this.user = user;
     this.setStateId = setStateId;
 
-    if (this.user.name) this.newStoryState(StateId.WELCOME_OLD_USER);
-    else this.newStoryState(StateId.NEW_SESSION_1);
+    if (this.user.name) this.newStoryState(SessionStateId.WELCOME_OLD_USER);
+    else this.newStoryState(SessionStateId.NEW_SESSION);
   }
 
   end() {
-    this.newStoryState(StateId.END_SESSION);
+    this.newStoryState(SessionStateId.END_SESSION);
   }
 
-  newStoryState(stateId: StateId) {
-    this.setStateId(stateId);
-    // switch (stateId) {
-    //   case StateId.NO_SESSION:
+  newStoryState(sessionStateId: SessionStateId) {
+    this.setStateId(sessionStateId);
+    // switch (SessionStateId) {
+    //   case SessionStateId.NO_SESSION:
     //     this.eventLoop.clear();
     //     break;
-    //   case StateId.NEW_SESSION:
+    //   case SessionStateId.NEW_SESSION:
     //     this.eventLoop.enqueue(
     //       new NewUserSessionEvent(
     //         this.inOutHelper,
@@ -47,11 +47,11 @@ class Session {
     //       )
     //     );
     //     break;
-    //   case StateId.INTRO1:
+    //   case SessionStateId.INTRO1:
     //     break;
-    //   case StateId.INTRO2:
+    //   case SessionStateId.INTRO2:
     //     break;
-    //   case StateId.WELCOME_OLD_USER1:
+    //   case SessionStateId.WELCOME_OLD_USER1:
     //     this.eventLoop.enqueue(
     //       new NewKnownUserSessionEvent(
     //         this.inOutHelper,
@@ -61,9 +61,9 @@ class Session {
     //       )
     //     );
     //     break;
-    //   case StateId.WELCOME_OLD_USER2:
+    //   case SessionStateId.WELCOME_OLD_USER2:
     //     break;
-    //   case StateId.NAME_FINDING:
+    //   case SessionStateId.NAME_FINDING:
     //     if (!this.users.currentUser) break;
     //     this.eventLoop.enqueue(
     //       new NameFindingEvent(
@@ -73,7 +73,7 @@ class Session {
     //       )
     //     );
     //     break;
-    //   case StateId.FORTUNE_TELLER:
+    //   case SessionStateId.FORTUNE_TELLER:
     //     this.eventLoop.enqueue(
     //       new FortuneTellingEvent(
     //         this.inOutHelper,
@@ -82,7 +82,7 @@ class Session {
     //       )
     //     );
     //     break;
-    //   case StateId.END_SESSION:
+    //   case SessionStateId.END_SESSION:
     //     this.eventLoop.enqueue(
     //       new EndSessionEvent(
     //         this.inOutHelper,
@@ -95,7 +95,7 @@ class Session {
   }
 
   // private changeStoryStateCallback = (stateReturn: StateReturn) => {
-  //   this.stateId = stateReturn.stateId;
+  //   this.SessionStateId = stateReturn.SessionStateId;
   //   if (stateReturn.isEnd && stateReturn.nextStoryId) {
   //     this.newStoryState(stateReturn.nextStoryId);
   //   }

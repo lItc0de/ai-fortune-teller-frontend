@@ -1,25 +1,25 @@
 import { useContext, useEffect, useRef } from "react";
 import styles from "./video.module.css";
 import { StateContext } from "../stateProvider";
-import { NEXT_STATE_ID_MAP, StateId } from "../constants";
+import { ANIMATION_MAP, AnimationStateId } from "../constants";
 
 type Props = {
   src: string;
-  videoStateId: StateId;
+  videoStateId: AnimationStateId;
 };
 
 const Video: React.FC<Props> = ({ src, videoStateId }) => {
-  const { stateId, setStateId } = useContext(StateContext);
+  const { animationStateId, setAnimationStateId } = useContext(StateContext);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoStateId === undefined || stateId === undefined) return;
-    if (videoStateId !== stateId) return;
+    if (videoStateId === undefined || animationStateId === undefined) return;
+    if (videoStateId !== animationStateId) return;
     const video = videoRef.current;
     if (!video) return;
     const handleEnded = () => {
-      const nextStateId = NEXT_STATE_ID_MAP.get(stateId);
-      if (nextStateId !== undefined) setStateId(nextStateId);
+      const nextStateId = ANIMATION_MAP.get(animationStateId);
+      if (nextStateId !== undefined) setAnimationStateId(nextStateId);
     };
     video.addEventListener("ended", handleEnded);
     video.play();
@@ -29,7 +29,7 @@ const Video: React.FC<Props> = ({ src, videoStateId }) => {
       video.pause();
       video.currentTime = 0;
     };
-  }, [videoStateId, stateId, setStateId]);
+  }, [videoStateId, animationStateId, setAnimationStateId]);
 
   return (
     <video
