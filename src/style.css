@@ -41,6 +41,9 @@ a:hover {
 
 body {
   margin: 0;
+}
+
+#root {
   min-width: 320px;
   min-height: 100vh;
   background: url("/src/media/background.webp") no-repeat center center fixed;
@@ -52,6 +55,7 @@ body {
 }
 
 #canvas {
+  position: fixed;
   display: block;
   margin: 0;
   padding: 0;
@@ -69,19 +73,6 @@ body {
   display: none;
   position: fixed;
   bottom: 0;
-}
-
-#startBtn {
-  display: block;
-  position: fixed;
-  padding: 0.5rem 1rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 0.2rem;
-  font-size: 2rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid #fff;
-
-  z-index: 900;
 }
 
 #mainInput {

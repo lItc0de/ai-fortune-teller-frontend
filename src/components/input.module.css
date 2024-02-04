@@ -1,0 +1,13 @@
+.input {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.87);
+  border: none;
+  padding: 0.5rem;
+  color: #fff;
+  outline: none;
+
+  z-index: 400;
+}

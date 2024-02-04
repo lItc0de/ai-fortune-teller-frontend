@@ -14,6 +14,20 @@ export const asyncRequestAnimationFrameMs = (ms: number = 0) =>
 export const sleep = (ms: number = 1000) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
+export const waitForEnter = () =>
+  new Promise<void>((resolve) => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      console.log("keyPressed", e.key);
+
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+
+      document.removeEventListener("keydown", handleKeydown);
+      resolve();
+    };
+    document.addEventListener("keydown", handleKeydown);
+  });
+
 let dimensions: Dimensions;
 
 export const getDimensions = (recalculate = false): Dimensions => {

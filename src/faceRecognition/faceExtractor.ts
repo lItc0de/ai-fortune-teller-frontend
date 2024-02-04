@@ -1,44 +1,38 @@
 import { Box } from "face-api.js";
-import BaseDrawer from "./baseDrawer";
-import Users from "../../users";
+import User from "../user";
 
 const FACE_CANVAS_WIDTH = 250;
 const FACE_CANVAS_HEIGHT = 250;
 
-class FaceDrawer extends BaseDrawer {
+class FaceExtractor {
   private video: HTMLVideoElement;
   private faceCanvas: HTMLCanvasElement;
   private faceCtx: CanvasRenderingContext2D;
-  private users: Users;
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-    users: Users
-  ) {
-    super(canvas, ctx);
-
+  constructor() {
     this.video = document.getElementById("video") as HTMLVideoElement;
     this.faceCanvas = document.getElementById(
       "faceCanvas"
     ) as HTMLCanvasElement;
     this.faceCtx = this.faceCanvas.getContext("2d") as CanvasRenderingContext2D;
-    this.users = users;
-  }
-
-  draw() {
-    if (!this.averageFaceBox) return;
 
     this.faceCanvas.width = FACE_CANVAS_WIDTH;
     this.faceCanvas.height = FACE_CANVAS_HEIGHT;
-    const offsetY = this.averageFaceBox.height / 2;
+  }
+
+  draw(user: User) {
+    const averageFaceBox = this.getAverageFaceBox(user);
+
+    if (!averageFaceBox) return;
+
+    const offsetY = averageFaceBox.height / 2;
     const offsetX = 50;
 
-    const scaleX = (FACE_CANVAS_WIDTH - offsetX) / this.averageFaceBox.width;
-    const scaleY = FACE_CANVAS_HEIGHT / this.averageFaceBox.height - 0.4;
+    const scaleX = (FACE_CANVAS_WIDTH - offsetX) / averageFaceBox.width;
+    const scaleY = FACE_CANVAS_HEIGHT / averageFaceBox.height - 0.4;
 
-    const translateX = offsetX / 2 - this.averageFaceBox.x * scaleX;
-    const translateY = offsetY - this.averageFaceBox.y * scaleY;
+    const translateX = offsetX / 2 - averageFaceBox.x * scaleX;
+    const translateY = offsetY - averageFaceBox.y * scaleY;
 
     this.faceCtx.translate(translateX, translateY);
     this.faceCtx.scale(scaleX, scaleY);
@@ -51,10 +45,10 @@ class FaceDrawer extends BaseDrawer {
     );
   }
 
-  private get averageFaceBox(): Box | undefined {
-    if (!this.users.currentUser?.lastFaceBoxes) return;
+  private getAverageFaceBox(user: User): Box | undefined {
+    if (!user.lastFaceBoxes) return;
 
-    const lastFaceBoxes = this.users.currentUser.lastFaceBoxes;
+    const lastFaceBoxes = user.lastFaceBoxes;
     const length = lastFaceBoxes.length;
 
     const sumBox = lastFaceBoxes.reduce(
@@ -82,4 +76,4 @@ class FaceDrawer extends BaseDrawer {
   }
 }
 
-export default FaceDrawer;
+export default FaceExtractor;

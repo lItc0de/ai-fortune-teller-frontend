@@ -1,5 +1,5 @@
+import { StateId } from "../constants";
 import BaseEvent from "../events/baseEvent";
-import { StateId } from "../state";
 import { sleep, asyncRequestAnimationFrame } from "./helpers";
 import StateReturn from "./stateReturn";
 
@@ -88,11 +88,11 @@ class EventLoop {
         await sleep(100);
         yield null;
       } else {
-        for (let [key, event] of this.eventQueue.entries()) {
+        for (const [key, event] of this.eventQueue.entries()) {
           if (this.currentEventKey === undefined) {
             this.currentEventKey = key;
 
-            for await (let eventPart of event.eventIterator()) {
+            for await (const eventPart of event.eventIterator()) {
               // console.log("next event part");
               yield eventPart;
             }

@@ -1,12 +1,12 @@
 import newSessionVideo from "../media/newSession0.webm";
-import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
 import User from "../user";
-import GlassBallDrawer from "../utils/glassBallDrawer";
+import GlassBallDrawer from "../utils/drawers/glassBallBaseDrawer";
 import BaseEvent from "./baseEvent";
 import Socket from "../socket";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
+import { StateId } from "../constants";
 
 class NewKnownUserSessionEvent extends BaseEvent {
   private newSessionVideo: HTMLVideoElement;
@@ -62,7 +62,7 @@ class NewKnownUserSessionEvent extends BaseEvent {
       `Welcome, welcome. What a pleasure it is to see you again ${this.user?.name}.`
     );
 
-    for await (let _write of writeIterator) {
+    for await (const _write of writeIterator) {
       yield new StateReturn(StateId.WELCOME_OLD_USER2);
     }
 

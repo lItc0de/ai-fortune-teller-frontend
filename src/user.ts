@@ -3,13 +3,13 @@ import Store, { DBUser } from "./store";
 
 class User {
   private store: Store;
-  private _name?: string;
   id: string;
   createdAt: number;
   lastLoginAt: number;
   lastDetectionAt: number;
   labeledFaceDescriptor: LabeledFaceDescriptors;
   lastFaceBoxes: Box[] = [];
+  name?: string;
 
   constructor(
     store: Store,
@@ -30,7 +30,7 @@ class User {
     ]);
     this.store = store;
     if (faceBox) this.addFaceBox(faceBox);
-    if (name) this._name = name;
+    if (name) this.name = name;
   }
 
   async addFaceDescriptor(faceDescriptor: Float32Array) {
@@ -63,15 +63,11 @@ class User {
   }
 
   get isNew() {
-    return !this._name;
+    return !this.name;
   }
 
-  get name(): string | undefined {
-    return this._name;
-  }
-
-  set name(newName: string) {
-    this._name = newName;
+  updateName(newName: string) {
+    this.name = newName;
     this.store.updateUser(this.id, { name: newName });
   }
 

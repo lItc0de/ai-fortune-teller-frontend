@@ -2,13 +2,13 @@ import newSession1Video from "../media/newSession1.webm";
 import newSession2Video from "../media/newSession2.webm";
 import newSession3Video from "../media/newSession3.webm";
 import newSession4Video from "../media/newSession4.webm";
-import { StateId } from "../state";
 import InOutHelper from "../utils/inOutHelper";
 import StateReturn from "../utils/stateReturn";
-import GlassBallDrawer from "../utils/glassBallDrawer";
+import GlassBallDrawer from "../utils/drawers/glassBallBaseDrawer";
 import BaseEvent from "./baseEvent";
 import Socket from "../socket";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
+import { StateId } from "../constants";
 
 class NewUserSessionEvent extends BaseEvent {
   private newSession1Video: HTMLVideoElement;
@@ -65,7 +65,7 @@ class NewUserSessionEvent extends BaseEvent {
     const writeIterator1 = this.inOutHelper.writeWithSynthesisIterator(
       "Welcome, welcome. What a pleasure it is to see that fates have crossed our paths as two souls keen on the mystic arts of fortune telling."
     );
-    for await (let _write of writeIterator1) {
+    for await (const _write of writeIterator1) {
       yield new StateReturn(StateId.INTRO1);
     }
 
@@ -77,7 +77,7 @@ class NewUserSessionEvent extends BaseEvent {
     const writeIterator2 = this.inOutHelper.writeWithSynthesisIterator(
       "That sparkle in your eyes carries the burden of both curiosity and mockery, so let us embark on a journey across the spiritual realms with the help of some… uh… artificial intelligence."
     );
-    for await (let _write of writeIterator2) {
+    for await (const _write of writeIterator2) {
       yield new StateReturn(StateId.INTRO1);
     }
 
@@ -99,7 +99,7 @@ class NewUserSessionEvent extends BaseEvent {
     const writeIterator3 = this.inOutHelper.writeWithSynthesisIterator(
       "Out of millions of stars in the galaxy, one has made you into who you are today; and to foresee how its energy will flow through you in the days and years to come, I will need to see through to your soul and learn your true identity. And, in good old AI fashion, your name should be enough to see right through you."
     );
-    for await (let _write of writeIterator3) {
+    for await (const _write of writeIterator3) {
       yield new StateReturn(needsINTRO2 ? StateId.INTRO2 : StateId.INTRO1);
     }
 

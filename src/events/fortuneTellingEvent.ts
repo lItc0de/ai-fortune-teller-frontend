@@ -4,7 +4,7 @@ import InOutHelper from "../utils/inOutHelper";
 import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
-import { StateId } from "../state";
+import { StateId } from "../constants";
 
 class FortuneTellingEvent extends BaseEvent {
   private socket: Socket;

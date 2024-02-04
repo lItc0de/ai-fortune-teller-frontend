@@ -3,9 +3,9 @@ import InOutHelper from "../utils/inOutHelper";
 import BaseEvent from "./baseEvent";
 import StateReturn from "../utils/stateReturn";
 import { countWords } from "../utils/helpers";
-import { StateId } from "../state";
 import Socket from "../socket";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
+import { StateId } from "../constants";
 
 class NameFindingEvent extends BaseEvent {
   socket: Socket;

@@ -1,0 +1,14 @@
+.outputWrapper {
+  display: flex;
+  position: fixed;
+  right: 2vw;
+  width: 200px;
+  height: 400px;
+  color: #fff;
+  overflow-y: scroll;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 5rem;
+
+  z-index: 400;
+}

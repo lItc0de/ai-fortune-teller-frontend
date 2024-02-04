@@ -1,4 +1,4 @@
-import { StateId } from "../state";
+import { StateId } from "../constants";
 
 class StateReturn {
   private _storyId: StateId;

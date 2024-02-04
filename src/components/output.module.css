@@ -1,0 +1,32 @@
+.output {
+  display: flex;
+  flex-direction: column;
+  /* border: 1px solid #fff; */
+  border-radius: 0.2rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  animation-name: fadeIn;
+  animation-duration: 200ms;
+  width: 100%;
+  box-sizing: border-box;
+  backdrop-filter: blur(10px);
+
+  > .label {
+    /* border: 1px solid #fff; */
+    border-radius: 0.2rem 0;
+    align-self: flex-start;
+    padding: 0.1rem 2rem 0.1rem 0.5rem;
+    /* margin: -1px; */
+    font-size: 0.7rem;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.1);
+    /* color: var(--primary-color); */
+    /* width: 100%; */
+    box-sizing: border-box;
+    color: var(--secondary-color);
+  }
+
+  .text {
+    padding: 0.5rem;
+    color: #fff;
+  }
+}
