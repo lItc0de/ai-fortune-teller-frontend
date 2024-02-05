@@ -22,7 +22,6 @@ class FaceExtractor {
 
   draw(user: User) {
     const averageFaceBox = this.getAverageFaceBox(user);
-
     if (!averageFaceBox) return;
 
     const offsetY = averageFaceBox.height / 2;
@@ -34,6 +33,7 @@ class FaceExtractor {
     const translateX = offsetX / 2 - averageFaceBox.x * scaleX;
     const translateY = offsetY - averageFaceBox.y * scaleY;
 
+    this.faceCtx.save();
     this.faceCtx.translate(translateX, translateY);
     this.faceCtx.scale(scaleX, scaleY);
     this.faceCtx.drawImage(
@@ -43,6 +43,7 @@ class FaceExtractor {
       this.video.videoWidth,
       this.video.videoHeight
     );
+    this.faceCtx.restore();
   }
 
   private getAverageFaceBox(user: User): Box | undefined {

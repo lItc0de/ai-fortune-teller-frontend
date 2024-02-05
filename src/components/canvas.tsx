@@ -2,10 +2,10 @@ import { useContext, useEffect, useRef } from "react";
 import { getDimensions } from "../utils/helpers";
 import BaseDrawer from "../utils/drawers/baseDrawer";
 import IdleDrawer from "../utils/drawers/idleDrawer";
-import GlassBallIdleDrawer from "../utils/drawers/glassBallIdleDrawer";
 import { StateContext } from "../stateProvider";
 import NewSessionDrawer from "../utils/drawers/newSessionDrawer";
 import { AnimationStateId } from "../constants";
+import FortuneTellerDrawer from "../utils/drawers/fortuneTellerDrawer";
 
 type Props = {
   shouldAnimate: boolean;
@@ -67,6 +67,10 @@ const Canvas: React.FC<Props> = ({ shouldAnimate }) => {
       await idleDrawer.init();
       drawers.set(AnimationStateId.IDLE, idleDrawer);
 
+      const fortuneTellerDrawer = new FortuneTellerDrawer();
+      await fortuneTellerDrawer.init();
+      drawers.set(AnimationStateId.FORTUNE_TELLER, fortuneTellerDrawer);
+
       const newSession1Drawer = new NewSessionDrawer(
         AnimationStateId.NEW_SESSION_1
       );
@@ -90,10 +94,6 @@ const Canvas: React.FC<Props> = ({ shouldAnimate }) => {
       );
       await newSession4Drawer.init();
       drawers.set(AnimationStateId.NEW_SESSION_4, newSession4Drawer);
-
-      const glassBallIdleDrawer = new GlassBallIdleDrawer();
-      await glassBallIdleDrawer.init();
-      drawers.set(AnimationStateId.FORTUNE_TELLER, glassBallIdleDrawer);
 
       // const glassBallFlyInDrawer = new GlassBallFlyInDrawer();
       // await glassBallFlyInDrawer.init();

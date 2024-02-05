@@ -16,7 +16,7 @@ abstract class GlassBallBaseDrawer extends BaseDrawer {
     ) as HTMLCanvasElement;
   }
 
-  init = () =>
+  protected loadGlassBallImage = () =>
     new Promise((resolve) => {
       this.image.addEventListener("load", resolve);
 

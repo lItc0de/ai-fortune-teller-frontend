@@ -7,6 +7,7 @@ import {
 import { WebCamHelper, asyncRequestAnimationFrameMs } from "../utils/helpers";
 import Users from "../users";
 import User from "../user";
+import FaceExtractor from "./faceExtractor";
 
 class FaceDetection {
   private video: HTMLVideoElement;
@@ -16,6 +17,7 @@ class FaceDetection {
   private detectedUserIds: string[] = [];
   private currentUser?: User;
   private listeners: (() => void)[] = [];
+  private faceExtractor: FaceExtractor;
 
   private started = false;
 
@@ -24,6 +26,7 @@ class FaceDetection {
     this.webcamHelper = new WebCamHelper();
     this.video = this.webcamHelper.video;
     this.users = users;
+    this.faceExtractor = new FaceExtractor();
   }
 
   async init() {
@@ -172,6 +175,7 @@ class FaceDetection {
   private async loop() {
     do {
       await this.detect();
+      if (this.currentUser) this.faceExtractor.draw(this.currentUser);
 
       await asyncRequestAnimationFrameMs(100);
     } while (this.started);
