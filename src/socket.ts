@@ -1,6 +1,6 @@
 import SocketMessage, { SocketMessageType } from "./utils/socketMessage";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = `ws://${import.meta.env.VITE_BACKEND_URL}/socket`;
 
 class Socket {
   private webSocket: WebSocket;

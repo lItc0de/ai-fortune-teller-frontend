@@ -1,36 +1,36 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import OutputWrapper from "../components/outputWrapper";
-import { Message } from "../types";
-import { waitForEnter } from "../utils/helpers";
+import { useContext, useEffect, useRef } from "react";
+import OutputWrapper, {
+  OutputWrapperRefProps,
+} from "../components/outputWrapper";
 import Input, { RefProps } from "../components/input";
 import Socket from "../socket";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 import { UserContext } from "../stateProvider";
+import { FORTUNE_TELLER_USER } from "../constants";
+import useEventIterator from "../hooks/useEventIterator";
+import { GeneratorState } from "../types";
 
 const FortuneTellerStory: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
   const { user } = useContext(UserContext);
   const inputRef = useRef<RefProps>(null);
+  const outputWrapperRef = useRef<OutputWrapperRefProps>(null);
   const socketRef = useRef<Socket>();
-  const eventIteratorRef = useRef<AsyncGenerator<undefined>>();
+  const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
+  const iterate = useEventIterator();
 
-  const addMessage = (text: string) => {
-    const aiUser = "Fortune teller";
+  const addMessage = async (text: string) => {
+    const user = FORTUNE_TELLER_USER;
     const timestamp = Date.now();
 
-    setMessages((prefMessages) => [
-      ...prefMessages,
-      { text, user: aiUser, timestamp },
-    ]);
+    await outputWrapperRef.current?.addMessage({ text, user, timestamp });
   };
 
   const eventGeneratorRef = useRef(
-    async function* (): AsyncGenerator<undefined> {
+    async function* (): AsyncGenerator<GeneratorState> {
       addMessage(
         "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!"
       );
-      await waitForEnter();
-      yield;
+      yield { done: false };
 
       while (true) {
         const question = await inputRef.current?.waitForInput();
@@ -50,29 +50,21 @@ const FortuneTellerStory: React.FC = () => {
             console.log(response);
           }
         }
-
-        await waitForEnter();
-        yield;
+        yield { done: true };
       }
     }
   );
 
   useEffect(() => {
     eventIteratorRef.current = eventGeneratorRef.current();
-
-    const iterate = async () => {
-      if (!eventIteratorRef.current) return;
-      for await (const event of eventIteratorRef.current) {
-        console.log("iterate", event);
+    iterate(eventIteratorRef.current).catch((error) => {
+      if (error instanceof Error) {
+        if (error.message === "Aborted") return;
       }
-    };
-
-    iterate();
-
-    return () => {
-      setMessages([]);
-    };
-  }, []);
+      throw error;
+    });
+    return () => {};
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     socketRef.current = new Socket();
@@ -80,7 +72,7 @@ const FortuneTellerStory: React.FC = () => {
 
   return (
     <>
-      <OutputWrapper messages={messages} />
+      <OutputWrapper ref={outputWrapperRef} />
       <Input ref={inputRef} />
     </>
   );

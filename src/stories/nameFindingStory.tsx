@@ -1,99 +1,100 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext, UserContext } from "../stateProvider";
-import OutputWrapper from "../components/outputWrapper";
-import { Message } from "../types";
-import { SessionStateId } from "../constants";
-import { countWords, waitForEnter } from "../utils/helpers";
+import OutputWrapper, {
+  OutputWrapperRefProps,
+} from "../components/outputWrapper";
+import { FORTUNE_TELLER_USER, SessionStateId } from "../constants";
+import { countWords } from "../utils/helpers";
 import Input, { RefProps } from "../components/input";
+import useEventIterator from "../hooks/useEventIterator";
+import { GeneratorState } from "../types";
 
 const NameFindingStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
   const inputRef = useRef<RefProps>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const outputWrapperRef = useRef<OutputWrapperRefProps>(null);
   const [userName, setUserName] = useState("");
   const [done, setDone] = useState(false);
-  const eventIteratorRef = useRef<AsyncGenerator<string | undefined>>();
+  const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
+  const iterate = useEventIterator();
 
   const { updateUsername } = useContext(UserContext);
 
-  const addMessage = (text: string) => {
-    const user = "Fortune teller";
+  const addMessage = async (text: string) => {
+    const user = FORTUNE_TELLER_USER;
     const timestamp = Date.now();
 
-    setMessages((prefMessages) => [...prefMessages, { text, user, timestamp }]);
+    await outputWrapperRef.current?.addMessage({ text, user, timestamp });
   };
 
-  const eventGeneratorRef = useRef(async function* (): AsyncGenerator<
-    string | undefined
-  > {
-    addMessage("All I ask of you is to speak your name!");
-    await waitForEnter();
-    yield;
+  const eventGeneratorRef = useRef(
+    async function* (): AsyncGenerator<GeneratorState> {
+      await addMessage("All I ask of you is to speak your name!");
+      yield { done: false };
 
-    let findName = true;
-    let name;
-    while (findName) {
-      let askForName = true;
-      while (askForName) {
-        name = await inputRef.current?.waitForInput();
-        console.log("name:", name);
+      let findName = true;
+      let name;
+      while (findName) {
+        let askForName = true;
+        while (askForName) {
+          name = await inputRef.current?.waitForInput();
 
-        yield;
+          yield { done: false };
 
-        if (!name || countWords(name) !== 1) {
-          addMessage(
-            "Oh dear, unfortunately your name got lost in the void, repeat it for me please!"
-          );
-          await waitForEnter();
-        } else {
-          askForName = false;
+          if (!name || countWords(name) !== 1) {
+            await addMessage(
+              "Oh dear, unfortunately your name got lost in the void, repeat it for me please!"
+            );
+          } else {
+            askForName = false;
+          }
+        }
+
+        await addMessage(
+          `So your name is ${name}? A short "yes" or "no" is enough.`
+        );
+
+        let checkIfName = true;
+        let answer;
+        while (checkIfName) {
+          answer = await inputRef.current?.waitForInput();
+          yield { done: false };
+
+          if (answer === "no") {
+            await addMessage("Ok, well then tell me your name again.");
+            checkIfName = false;
+          } else if (answer === "yes") {
+            checkIfName = false;
+            findName = false;
+          } else {
+            await addMessage(
+              'Please my dear, a short "yes" or "no" is enough.'
+            );
+          }
         }
       }
 
-      addMessage(`So your name is ${name}? A short "yes" or "no" is enough.`);
+      await addMessage(`Hello my dear ${name}, a beautiful name that is.`);
 
-      let checkIfName = true;
-      let answer;
-      while (checkIfName) {
-        answer = await inputRef.current?.waitForInput();
-        yield;
-
-        if (answer === "no") {
-          addMessage("Ok, well then tell me your name again.");
-          checkIfName = false;
-        } else if (answer === "yes") {
-          checkIfName = false;
-          findName = false;
-        } else {
-          addMessage('Please my dear, a short "yes" or "no" is enough.');
-        }
-      }
+      yield { done: true, value: name };
     }
-
-    addMessage(`Hello my dear ${name}, a beautiful name that is.`);
-
-    yield name;
-  });
+  );
 
   useEffect(() => {
     eventIteratorRef.current = eventGeneratorRef.current();
-    console.log("useEffect called");
-
-    const iterate = async () => {
-      if (!eventIteratorRef.current) return;
-      for await (const event of eventIteratorRef.current) {
-        const name = event;
+    iterate(eventIteratorRef.current)
+      .then((name) => {
         if (name) setUserName(name);
-      }
-      setDone(true);
-    };
-
-    iterate();
-
-    return () => {
-      setMessages([]);
-    };
-  }, []);
+        setDone(true);
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          if (error.message === "Aborted") return;
+        }
+        throw error;
+      });
+    return () => {};
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!userName || !done) return;
@@ -104,7 +105,7 @@ const NameFindingStory: React.FC = () => {
 
   return (
     <>
-      <OutputWrapper messages={messages} />
+      <OutputWrapper ref={outputWrapperRef} />
       <Input ref={inputRef} />
     </>
   );

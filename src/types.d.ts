@@ -18,5 +18,5 @@ export type Message = {
 
 export type GeneratorState = {
   done: boolean;
-  state?: string;
+  value?: string;
 };

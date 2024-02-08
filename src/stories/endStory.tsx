@@ -1,57 +1,45 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext } from "../stateProvider";
-import OutputWrapper from "../components/outputWrapper";
-import { Message } from "../types";
-import { SessionStateId } from "../constants";
+import OutputWrapper, {
+  OutputWrapperRefProps,
+} from "../components/outputWrapper";
+import { FORTUNE_TELLER_USER, SessionStateId } from "../constants";
+import { GeneratorState } from "../types";
+import useEventIterator from "../hooks/useEventIterator";
 
 const EndStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [done, setDone] = useState(false);
+  const outputWrapperRef = useRef<OutputWrapperRefProps>(null);
+  const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
+  const iterate = useEventIterator();
 
-  const sessionMessages = useRef(new Map<string, string>());
-  sessionMessages.current.set("1", "Was nice talking to you.");
+  const addMessage = async (text: string) => {
+    const user = FORTUNE_TELLER_USER;
+    const timestamp = Date.now();
+
+    await outputWrapperRef.current?.addMessage({ text, user, timestamp });
+  };
+
+  const eventGeneratorRef = useRef(
+    async function* (): AsyncGenerator<GeneratorState> {
+      await addMessage("Was nice talking to you!");
+      yield { done: true };
+    }
+  );
 
   useEffect(() => {
-    const messagesIterator = sessionMessages.current.entries();
-
-    const addMessage = (text: string) => {
-      const user = "Fortune teller";
-      const timestamp = Date.now();
-
-      setMessages((prefMessages) => [
-        ...prefMessages,
-        { text, user, timestamp },
-      ]);
-    };
-
-    const nextMessage = (): boolean => {
-      const messageRes = messagesIterator.next();
-      if (messageRes.done) return true;
-      const message = messageRes.value;
-      addMessage(message[1]);
-
-      return false;
-    };
-
-    nextMessage();
-
-    const handleEnter = (e: KeyboardEvent) => {
-      if (e.key !== "Enter") return;
-      const messagesDone = nextMessage();
-      if (messagesDone) {
-        console.log("done");
-        setDone(true);
-        document.removeEventListener("keydown", handleEnter);
-      }
-    };
-    document.addEventListener("keydown", handleEnter);
-
-    return () => {
-      document.removeEventListener("keydown", handleEnter);
-      setMessages([]);
-    };
-  }, []);
+    eventIteratorRef.current = eventGeneratorRef.current();
+    iterate(eventIteratorRef.current)
+      .then(() => setDone(true))
+      .catch((error) => {
+        if (error instanceof Error) {
+          if (error.message === "Aborted") return;
+        }
+        throw error;
+      });
+    return () => {};
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!done) return;
@@ -61,7 +49,7 @@ const EndStory: React.FC = () => {
 
   return (
     <>
-      <OutputWrapper messages={messages} />
+      <OutputWrapper ref={outputWrapperRef} />
     </>
   );
 };

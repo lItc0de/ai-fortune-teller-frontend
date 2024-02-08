@@ -30,3 +30,5 @@ ANIMATION_MAP.set(
   AnimationStateId.NEW_SESSION_3,
   AnimationStateId.NEW_SESSION_4
 );
+
+export const FORTUNE_TELLER_USER = "Fortune Teller";
