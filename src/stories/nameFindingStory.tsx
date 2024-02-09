@@ -18,7 +18,7 @@ const NameFindingStory: React.FC = () => {
 
   const eventGeneratorRef = useRef(
     async function* (): AsyncGenerator<GeneratorState> {
-      await chatRef.current?.addMessageFortuneTeller(
+      await chatRef.current?.addFortuneTellerMessage(
         "Before we get into the fortunes your future beholds, tell me your name so we can get to know each other better! You can speak it out loud or type it down."
       );
       yield { done: false };
@@ -33,7 +33,7 @@ const NameFindingStory: React.FC = () => {
           yield { done: false };
 
           if (!name || countWords(name) !== 1) {
-            await chatRef.current?.addMessageFortuneTeller(
+            await chatRef.current?.addFortuneTellerMessage(
               "Oh dear, unfortunately your name got lost in the void, repeat it for me please!"
             );
           } else {
@@ -41,7 +41,7 @@ const NameFindingStory: React.FC = () => {
           }
         }
 
-        await chatRef.current?.addMessageFortuneTeller(
+        await chatRef.current?.addFortuneTellerMessage(
           `So your name is ${name}? A short "yes" or "no" is enough.`
         );
 
@@ -52,7 +52,7 @@ const NameFindingStory: React.FC = () => {
           yield { done: false };
 
           if (answer === "no") {
-            await chatRef.current?.addMessageFortuneTeller(
+            await chatRef.current?.addFortuneTellerMessage(
               "Ok, well then tell me your name again."
             );
             checkIfName = false;
@@ -60,14 +60,14 @@ const NameFindingStory: React.FC = () => {
             checkIfName = false;
             findName = false;
           } else {
-            await chatRef.current?.addMessageFortuneTeller(
+            await chatRef.current?.addFortuneTellerMessage(
               'Please my dear, a short "yes" or "no" is enough.'
             );
           }
         }
       }
 
-      await chatRef.current?.addMessageFortuneTeller(
+      await chatRef.current?.addFortuneTellerMessage(
         `Hello my dear ${name}, a beautiful name that is.`
       );
 
@@ -95,7 +95,7 @@ const NameFindingStory: React.FC = () => {
     if (!userName || !done) return;
 
     updateUsername(userName);
-    setSessionStateId(SessionStateId.FORTUNE_TELLER);
+    setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
   }, [userName, updateUsername, setSessionStateId, done]);
 
   return (

@@ -1,19 +1,68 @@
 import { forwardRef, useContext, useImperativeHandle, useState } from "react";
-import ChatMessage from "./chatMessage";
 import styles from "./chat.module.css";
 import { SettingsContext } from "../stateProvider";
-import { Message } from "../types";
 import { waitForEnter } from "../utils/helpers";
 import useTTS from "../hooks/useTTS";
+import ChatMessage from "./chatMessage";
+import ChatActionButtons from "./chatActionButtons";
+
+class Btn {
+  number: number;
+  label: string;
+  onClick: (number: number) => void;
+
+  constructor(
+    number: number,
+    label: string,
+    onClick: (number: number) => void
+  ) {
+    this.number = number;
+    this.label = label;
+    this.onClick = onClick;
+  }
+}
+
+export class ButtonMessage {
+  buttons: Btn[];
+  timestamp: number;
+
+  constructor(buttons: Btn[]) {
+    this.buttons = buttons;
+    this.timestamp = Date.now();
+  }
+}
+
+export class Message {
+  isFortuneTeller: boolean;
+  timestamp: number;
+  isInput: boolean;
+  text?: string;
+  onSubmit?: (value: string) => void;
+
+  constructor(
+    isFortuneTeller: boolean,
+    timestamp: number,
+    isInput: boolean,
+    text?: string,
+    onSubmit?: (value: string) => void
+  ) {
+    this.isFortuneTeller = isFortuneTeller;
+    this.timestamp = timestamp;
+    this.isInput = isInput;
+    this.text = text;
+    this.onSubmit = onSubmit;
+  }
+}
 
 export type ChatRefProps = {
-  addMessageFortuneTeller: (text: string) => Promise<void>;
+  addFortuneTellerMessage: (text: string) => Promise<void>;
   addUserInput: () => Promise<string>;
+  addButtons: (buttons: string[]) => Promise<number>;
 };
 
 const Chat = forwardRef<ChatRefProps>((_, ref) => {
   const { ttsEnabled } = useContext(SettingsContext);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<(Message | ButtonMessage)[]>([]);
   const { transcribe, playSound } = useTTS(ttsEnabled);
 
   // const addMessagePartially = async (message: Message) => {
@@ -28,14 +77,17 @@ const Chat = forwardRef<ChatRefProps>((_, ref) => {
   //   }
   // };
 
-  const addMessageFortuneTeller = async (text: string) => {
+  const addMessage = async (message: Message | ButtonMessage) => {
+    // if (message.isFortuneTeller) {
+    //   await addFortuneTellerMessage(message);
+    //   return;
+    // }
+    setMessages((oldMessages) => [...oldMessages.slice(0, -1), message]);
+  };
+
+  const addFortuneTellerMessage = async (text: string) => {
     const timestamp = Date.now();
-    const message: Message = {
-      text,
-      isFortuneTeller: true,
-      isInput: false,
-      timestamp,
-    };
+    const message = new Message(true, timestamp, false, text);
     try {
       await transcribe(text);
       await Promise.all([playSound(), addMessage(message)]);
@@ -53,14 +105,6 @@ const Chat = forwardRef<ChatRefProps>((_, ref) => {
     await waitForEnter();
   };
 
-  const addMessage = async (message: Message) => {
-    // if (message.isFortuneTeller) {
-    //   await addMessageFortuneTeller(message);
-    //   return;
-    // }
-    setMessages((oldMessages) => [...oldMessages.slice(0, -1), message]);
-  };
-
   const addUserInput = async () =>
     new Promise<string>((resolve) => {
       const timestamp = Date.now();
@@ -70,30 +114,42 @@ const Chat = forwardRef<ChatRefProps>((_, ref) => {
         return resolve(value);
       };
 
-      addMessage({
-        isFortuneTeller: false,
-        isInput: true,
-        timestamp,
-        onSubmit,
+      addMessage(new Message(false, timestamp, true, undefined, onSubmit));
+    });
+
+  const addButtons = (buttonLabels: string[]) =>
+    new Promise<number>((resolve) => {
+      const onClick = (number: number) => {
+        return resolve(number);
+      };
+
+      const btns = buttonLabels.map((label, i) => {
+        return new Btn(i, label, onClick);
       });
+
+      addMessage(new ButtonMessage(btns));
     });
 
   useImperativeHandle(ref, () => ({
-    addMessageFortuneTeller,
+    addFortuneTellerMessage,
     addUserInput,
+    addButtons,
   }));
 
   return (
     <section className={styles.outputWrapper}>
-      {messages.map((message) => (
-        <ChatMessage
-          isFortuneTeller={message.isFortuneTeller}
-          isInput={message.isInput}
-          message={message.text}
-          key={message.timestamp}
-          onSubmit={message.onSubmit}
-        />
-      ))}
+      {messages.map((message) => {
+        if (message instanceof Message) {
+          return <ChatMessage message={message} key={message.timestamp} />;
+        } else if (message instanceof ButtonMessage) {
+          return (
+            <ChatActionButtons
+              buttonMessage={message}
+              key={message.timestamp}
+            />
+          );
+        }
+      })}
     </section>
   );
 });

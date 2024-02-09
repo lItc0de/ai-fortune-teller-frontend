@@ -68,6 +68,7 @@ class FaceDetection {
 
   private emitUserChange() {
     console.log("emitUserChange", this.currentUser);
+    if (!this.currentUser) return;
 
     this.listeners.forEach((listener) => listener());
   }

@@ -15,7 +15,7 @@ const FortuneTellerStory: React.FC = () => {
 
   const eventGeneratorRef = useRef(
     async function* (): AsyncGenerator<GeneratorState> {
-      await chatRef.current?.addMessageFortuneTeller(
+      await chatRef.current?.addFortuneTellerMessage(
         "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!"
       );
       yield { done: false };
@@ -24,7 +24,7 @@ const FortuneTellerStory: React.FC = () => {
         const question = await chatRef.current?.addUserInput();
 
         if (question) {
-          await chatRef.current?.addMessageFortuneTeller(question);
+          await chatRef.current?.addFortuneTellerMessage(question);
           const response = await socketRef.current?.send(
             new SocketMessage(SocketMessageType.PROMPT, question, user?.name)
           );
@@ -33,7 +33,7 @@ const FortuneTellerStory: React.FC = () => {
             response.type === SocketMessageType.BOT &&
             response.prompt
           ) {
-            await chatRef.current?.addMessageFortuneTeller(response.prompt);
+            await chatRef.current?.addFortuneTellerMessage(response.prompt);
           } else {
             console.log(response);
           }

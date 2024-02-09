@@ -14,7 +14,7 @@ const EndStory: React.FC = () => {
 
   const eventGeneratorRef = useRef(
     async function* (): AsyncGenerator<GeneratorState> {
-      await chatRef.current?.addMessageFortuneTeller(
+      await chatRef.current?.addFortuneTellerMessage(
         "Was nice talking to you!"
       );
       yield { done: true };

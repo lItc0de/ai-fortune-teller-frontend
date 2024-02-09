@@ -3,31 +3,24 @@ import styles from "./chatMessage.module.css";
 import { UserContext } from "../stateProvider";
 import { FORTUNE_TELLER_USER } from "../constants";
 import Input from "./input";
+import { Message } from "./chat";
 
 type Props = {
-  isFortuneTeller: boolean;
-  isInput: boolean;
-  message?: string;
-  onSubmit?: (value: string) => void;
+  message: Message;
 };
 
-const ChatMessage: React.FC<Props> = ({
-  isFortuneTeller,
-  isInput,
-  message,
-  onSubmit,
-}) => {
+const ChatMessage: React.FC<Props> = ({ message }) => {
   const { user } = useContext(UserContext);
   const [userName, setUserName] = useState("");
-  const [outputText, setOutputText] = useState(message);
-  const [innerIsInput, setInnerIsInput] = useState(isInput);
+  const [outputText, setOutputText] = useState(message.text);
+  const [innerIsInput, setInnerIsInput] = useState(message.isInput);
 
   const handleSubmit = (value: string) => {
     console.log(value);
     setOutputText(value);
     setInnerIsInput(false);
 
-    if (onSubmit) onSubmit(value);
+    if (message.onSubmit) message.onSubmit(value);
   };
 
   useEffect(() => {
@@ -40,7 +33,7 @@ const ChatMessage: React.FC<Props> = ({
   return (
     <div className={styles.output}>
       <label className={styles.label}>
-        {isFortuneTeller ? FORTUNE_TELLER_USER : userName}
+        {message.isFortuneTeller ? FORTUNE_TELLER_USER : userName}
       </label>
       {!innerIsInput && <output className={styles.output}>{outputText}</output>}
       {innerIsInput && <Input onSubmit={handleSubmit} />}

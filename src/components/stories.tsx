@@ -5,6 +5,7 @@ import { AnimationStateId, SessionStateId } from "../constants";
 import EndStory from "../stories/endStory";
 import FortuneTellerStory from "../stories/fortuneTellerStory";
 import NameFindingStory from "../stories/nameFindingStory";
+import ProfileQuestionStory from "../stories/profileQuestionStory";
 
 const Stories: React.FC = () => {
   const { sessionStateId, setSessionStateId, setAnimationStateId } =
@@ -20,6 +21,10 @@ const Stories: React.FC = () => {
         break;
 
       case SessionStateId.FORTUNE_TELLER:
+        setAnimationStateId(AnimationStateId.FORTUNE_TELLER);
+        break;
+
+      case SessionStateId.PROFILE_QUESTIONS:
         setAnimationStateId(AnimationStateId.FORTUNE_TELLER);
         break;
 
@@ -41,6 +46,9 @@ const Stories: React.FC = () => {
     <>
       {sessionStateId === SessionStateId.NEW_SESSION && <NewUserStory />}
       {sessionStateId === SessionStateId.NAME_FINDING && <NameFindingStory />}
+      {sessionStateId === SessionStateId.PROFILE_QUESTIONS && (
+        <ProfileQuestionStory />
+      )}
       {sessionStateId === SessionStateId.FORTUNE_TELLER && (
         <FortuneTellerStory />
       )}
