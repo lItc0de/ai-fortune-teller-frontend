@@ -1,18 +1,14 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext, UserContext } from "../stateProvider";
-import OutputWrapper, {
-  OutputWrapperRefProps,
-} from "../components/outputWrapper";
-import { FORTUNE_TELLER_USER, SessionStateId } from "../constants";
+import Chat, { ChatRefProps } from "../components/chat";
+import { SessionStateId } from "../constants";
 import { countWords } from "../utils/helpers";
-import Input, { RefProps } from "../components/input";
 import useEventIterator from "../hooks/useEventIterator";
 import { GeneratorState } from "../types";
 
 const NameFindingStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
-  const inputRef = useRef<RefProps>(null);
-  const outputWrapperRef = useRef<OutputWrapperRefProps>(null);
+  const chatRef = useRef<ChatRefProps>(null);
   const [userName, setUserName] = useState("");
   const [done, setDone] = useState(false);
   const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
@@ -20,16 +16,11 @@ const NameFindingStory: React.FC = () => {
 
   const { updateUsername } = useContext(UserContext);
 
-  const addMessage = async (text: string) => {
-    const user = FORTUNE_TELLER_USER;
-    const timestamp = Date.now();
-
-    await outputWrapperRef.current?.addMessage({ text, user, timestamp });
-  };
-
   const eventGeneratorRef = useRef(
     async function* (): AsyncGenerator<GeneratorState> {
-      await addMessage("All I ask of you is to speak your name!");
+      await chatRef.current?.addMessageFortuneTeller(
+        "Before we get into the fortunes your future beholds, tell me your name so we can get to know each other better! You can speak it out loud or type it down."
+      );
       yield { done: false };
 
       let findName = true;
@@ -37,12 +28,12 @@ const NameFindingStory: React.FC = () => {
       while (findName) {
         let askForName = true;
         while (askForName) {
-          name = await inputRef.current?.waitForInput();
+          name = await chatRef.current?.addUserInput();
 
           yield { done: false };
 
           if (!name || countWords(name) !== 1) {
-            await addMessage(
+            await chatRef.current?.addMessageFortuneTeller(
               "Oh dear, unfortunately your name got lost in the void, repeat it for me please!"
             );
           } else {
@@ -50,31 +41,35 @@ const NameFindingStory: React.FC = () => {
           }
         }
 
-        await addMessage(
+        await chatRef.current?.addMessageFortuneTeller(
           `So your name is ${name}? A short "yes" or "no" is enough.`
         );
 
         let checkIfName = true;
         let answer;
         while (checkIfName) {
-          answer = await inputRef.current?.waitForInput();
+          answer = await chatRef.current?.addUserInput();
           yield { done: false };
 
           if (answer === "no") {
-            await addMessage("Ok, well then tell me your name again.");
+            await chatRef.current?.addMessageFortuneTeller(
+              "Ok, well then tell me your name again."
+            );
             checkIfName = false;
           } else if (answer === "yes") {
             checkIfName = false;
             findName = false;
           } else {
-            await addMessage(
+            await chatRef.current?.addMessageFortuneTeller(
               'Please my dear, a short "yes" or "no" is enough.'
             );
           }
         }
       }
 
-      await addMessage(`Hello my dear ${name}, a beautiful name that is.`);
+      await chatRef.current?.addMessageFortuneTeller(
+        `Hello my dear ${name}, a beautiful name that is.`
+      );
 
       yield { done: true, value: name };
     }
@@ -105,8 +100,7 @@ const NameFindingStory: React.FC = () => {
 
   return (
     <>
-      <OutputWrapper ref={outputWrapperRef} />
-      <Input ref={inputRef} />
+      <Chat ref={chatRef} />
     </>
   );
 };

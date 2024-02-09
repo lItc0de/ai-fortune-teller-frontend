@@ -9,13 +9,17 @@ import {
 } from "react";
 import styles from "./input.module.css";
 
+type Props = {
+  onSubmit: (value: string) => void;
+};
+
 export type RefProps = {
   waitForInput: () => Promise<string>;
 };
 
-const Input = forwardRef<RefProps>((_, ref) => {
+const Input = forwardRef<RefProps, Props>(({ onSubmit }, ref) => {
   const [value, setValue] = useState("");
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(false);
   const [inputCallbackFn, setInputCallbackFn] =
     useState<(res: string) => void>();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,9 +31,8 @@ const Input = forwardRef<RefProps>((_, ref) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     console.log("submit called", value);
     e.preventDefault();
-    setDisabled(true);
     if (inputCallbackFn) inputCallbackFn(value);
-    setValue("");
+    onSubmit(value);
   };
 
   const waitForInput = () =>

@@ -54,8 +54,9 @@ const useTTS = (ttsEnabled: boolean) => {
       currentPlayer.start(ctx.currentTime);
     });
 
-  const transcribe = async (text: string) => {
+  const transcribe = async (text?: string) => {
     if (!ttsEnabled) return;
+    if (!text) return;
 
     const res = await fetchAudio(text);
     if (!res) return;

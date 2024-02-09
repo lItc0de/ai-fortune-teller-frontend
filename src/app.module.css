@@ -1,12 +1,12 @@
 .startBtn {
   display: block;
   position: fixed;
-  padding: 0.5rem 1rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 0.2rem;
-  font-size: 2rem;
+  padding: 0.25rem 1rem;
+  background-color: var(--primary-background);
+  font-size: 1.5rem;
   backdrop-filter: blur(10px);
-  border: 1px solid #fff;
+  border: none;
+  color: var(--text-color);
 
   z-index: 900;
 }

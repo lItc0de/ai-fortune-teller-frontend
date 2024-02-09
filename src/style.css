@@ -1,5 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Federant&family=Titillium+Web:ital@0;1&display=swap");
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Titillium Web", Inter, system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
   line-height: 1.2;
   font-weight: 400;
   font-size: calc(10px + (1vh + 1vw) / 2);
@@ -17,6 +20,16 @@
 
   --primary-color: rgba(55, 31, 54, 1);
   --secondary-color: rgba(175, 165, 174, 1);
+
+  --text-color: #ffffff;
+
+  --primary-background: rgba(86, 124, 143, 0.7);
+  --secondary-background: rgba(69, 111, 133, 0.4);
+  --background-3: rgba(168, 225, 255, 0.3);
+}
+
+input {
+  font-family: "Federant", serif;
 }
 
 @keyframes fadeIn {

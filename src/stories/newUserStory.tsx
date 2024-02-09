@@ -1,13 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext } from "../stateProvider";
-import OutputWrapper, {
-  OutputWrapperRefProps,
-} from "../components/outputWrapper";
-import {
-  AnimationStateId,
-  FORTUNE_TELLER_USER,
-  SessionStateId,
-} from "../constants";
+import Chat, { ChatRefProps } from "../components/chat";
+import { AnimationStateId, SessionStateId } from "../constants";
 import useEventIterator from "../hooks/useEventIterator";
 import { GeneratorState } from "../types";
 
@@ -15,25 +9,13 @@ const NewUserStory: React.FC = () => {
   const { animationStateId, setSessionStateId } = useContext(StateContext);
   const [done, setDone] = useState(false);
   const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
-  const outputWrapperRef = useRef<OutputWrapperRefProps>(null);
+  const chatRef = useRef<ChatRefProps>(null);
   const iterate = useEventIterator();
-
-  const addMessage = async (text: string) => {
-    const user = FORTUNE_TELLER_USER;
-    const timestamp = Date.now();
-
-    await outputWrapperRef.current?.addMessage({ text, user, timestamp });
-  };
 
   const eventGeneratorRef = useRef(
     async function* (): AsyncGenerator<GeneratorState> {
-      await addMessage(
-        "Welcome, welcome. What a pleasure it is to see that fates have crossed our paths as two souls keen on the mystic arts of fortune telling."
-      );
-      yield { done: false };
-
-      await addMessage(
-        "That sparkle in your eyes carries the burden of both curiosity and mockery, so let us embark on a journey across the spiritual realms with the help of some… uh… artificial intelligence."
+      await chatRef.current?.addMessageFortuneTeller(
+        "Welcome to the AI Fortune Teller! I see you want to take a glimpse in your future. Using my AI magic and sprinkling a bit of data from you, my intuitive powers will reveal what  lies ahead of you."
       );
       yield { done: true };
     }
@@ -61,7 +43,7 @@ const NewUserStory: React.FC = () => {
 
   return (
     <>
-      <OutputWrapper ref={outputWrapperRef} />
+      <Chat ref={chatRef} />
     </>
   );
 };

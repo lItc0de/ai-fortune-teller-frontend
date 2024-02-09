@@ -1,42 +1,30 @@
 import { useContext, useEffect, useRef } from "react";
-import OutputWrapper, {
-  OutputWrapperRefProps,
-} from "../components/outputWrapper";
-import Input, { RefProps } from "../components/input";
+import Chat, { ChatRefProps } from "../components/chat";
 import Socket from "../socket";
 import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 import { UserContext } from "../stateProvider";
-import { FORTUNE_TELLER_USER } from "../constants";
 import useEventIterator from "../hooks/useEventIterator";
 import { GeneratorState } from "../types";
 
 const FortuneTellerStory: React.FC = () => {
   const { user } = useContext(UserContext);
-  const inputRef = useRef<RefProps>(null);
-  const outputWrapperRef = useRef<OutputWrapperRefProps>(null);
+  const chatRef = useRef<ChatRefProps>(null);
   const socketRef = useRef<Socket>();
   const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
   const iterate = useEventIterator();
 
-  const addMessage = async (text: string) => {
-    const user = FORTUNE_TELLER_USER;
-    const timestamp = Date.now();
-
-    await outputWrapperRef.current?.addMessage({ text, user, timestamp });
-  };
-
   const eventGeneratorRef = useRef(
     async function* (): AsyncGenerator<GeneratorState> {
-      addMessage(
+      await chatRef.current?.addMessageFortuneTeller(
         "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!"
       );
       yield { done: false };
 
       while (true) {
-        const question = await inputRef.current?.waitForInput();
+        const question = await chatRef.current?.addUserInput();
 
         if (question) {
-          addMessage(question);
+          await chatRef.current?.addMessageFortuneTeller(question);
           const response = await socketRef.current?.send(
             new SocketMessage(SocketMessageType.PROMPT, question, user?.name)
           );
@@ -45,7 +33,7 @@ const FortuneTellerStory: React.FC = () => {
             response.type === SocketMessageType.BOT &&
             response.prompt
           ) {
-            addMessage(response.prompt);
+            await chatRef.current?.addMessageFortuneTeller(response.prompt);
           } else {
             console.log(response);
           }
@@ -72,8 +60,7 @@ const FortuneTellerStory: React.FC = () => {
 
   return (
     <>
-      <OutputWrapper ref={outputWrapperRef} />
-      <Input ref={inputRef} />
+      <Chat ref={chatRef} />
     </>
   );
 };

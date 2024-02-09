@@ -11,7 +11,7 @@ import { AnimationStateId, SessionStateId } from "./constants";
 import { Message } from "./types";
 
 export const SettingsContext = createContext({
-  ttsEnabled: true,
+  ttsEnabled: false,
 });
 
 export const StateContext = createContext<{
@@ -54,7 +54,7 @@ const StateProvider: React.FC<Props> = ({
   getCurrentUser,
   updateUsername,
 }) => {
-  const [ttsEnabled] = useState(true);
+  const [ttsEnabled] = useState(false);
 
   const [sessionStateId, setSessionStateId] = useState<SessionStateId>(
     SessionStateId.NO_SESSION

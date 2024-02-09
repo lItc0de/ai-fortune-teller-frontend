@@ -11,9 +11,11 @@ export type Dimensions = {
 };
 
 export type Message = {
-  user: string;
+  isFortuneTeller: boolean;
   timestamp: number;
-  text: string;
+  isInput: boolean;
+  text?: string;
+  onSubmit?: (value: string) => void;
 };
 
 export type GeneratorState = {

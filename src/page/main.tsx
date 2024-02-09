@@ -12,7 +12,7 @@ const createReactApp = (
   handleStartCallback: () => void
 ) => {
   ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
+    <>
       <StateProvider
         userSubscribe={userSubscribe}
         getCurrentUser={getCurrentUser}
@@ -20,7 +20,7 @@ const createReactApp = (
       >
         <App handleStartCallback={handleStartCallback} />
       </StateProvider>
-    </React.StrictMode>
+    </>
   );
 };
 
