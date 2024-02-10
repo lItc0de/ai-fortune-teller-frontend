@@ -20,12 +20,13 @@
 
   --primary-color: rgba(55, 31, 54, 1);
   --secondary-color: rgba(175, 165, 174, 1);
+  --background-dark: rgba(38, 27, 36);
 
   --text-color: #ffffff;
 
-  --primary-background: rgba(86, 124, 143, 0.7);
-  --secondary-background: rgba(69, 111, 133, 0.4);
-  --background-3: rgba(168, 225, 255, 0.3);
+  --action-background: rgba(86, 124, 143, 0.7);
+  --chat-background: rgba(69, 111, 133, 0.4);
+  --light-background: rgba(168, 225, 255, 0.3);
 }
 
 input {
@@ -54,6 +55,7 @@ a:hover {
 
 body {
   margin: 0;
+  background-color: var(--background-dark);
 }
 
 #root {

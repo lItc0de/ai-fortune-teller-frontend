@@ -68,7 +68,7 @@ class Store {
       await this.db.put("users", newUserParams);
     } catch (error) {
       console.error(error);
-      console.log({
+      console.error({
         oldDBUser,
         newUserParams,
         dbUserParams,

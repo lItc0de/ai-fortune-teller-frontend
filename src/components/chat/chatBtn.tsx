@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import ChatBtnModel from "./chat/chatBtn.model";
+import ChatBtnModel from "./chatBtn.model";
+import style from "./chatBtn.module.css";
 
-const Button: React.FC<ChatBtnModel> = ({ number, label, handleClick }) => {
+const ChatBtn: React.FC<ChatBtnModel> = ({ number, label, handleClick }) => {
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === number) {
@@ -16,8 +17,13 @@ const Button: React.FC<ChatBtnModel> = ({ number, label, handleClick }) => {
   }, [number, handleClick]);
 
   return (
-    <button onClick={() => handleClick && handleClick(number)}>{label}</button>
+    <button
+      className={style.btn}
+      onClick={() => handleClick && handleClick(number)}
+    >
+      [{number}] {label}
+    </button>
   );
 };
 
-export default Button;
+export default ChatBtn;

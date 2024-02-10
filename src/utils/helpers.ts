@@ -17,8 +17,6 @@ export const sleep = (ms: number = 1000) =>
 export const waitForEnter = () =>
   new Promise<void>((resolve) => {
     const handleKeydown = (e: KeyboardEvent) => {
-      console.log("keyPressed", e.key);
-
       if (e.key !== "Enter") return;
       e.preventDefault();
 

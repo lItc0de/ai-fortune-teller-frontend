@@ -11,7 +11,7 @@ abstract class ChatElementModel {
     handleDone?: (value?: string) => void
   ) {
     this.timestamp = Date.now();
-    this.id = this.timestamp.toString();
+    this.id = crypto.randomUUID();
     this.isFortuneTeller = isFortuneTeller;
     this.handleDone = handleDone;
     this.done = done;

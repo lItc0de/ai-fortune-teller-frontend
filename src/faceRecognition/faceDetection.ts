@@ -59,15 +59,12 @@ class FaceDetection {
   };
 
   updateUsername = (name: string) => {
-    console.log("loooool new name:", name);
-
     if (!this.currentUser) return;
     this.currentUser.updateName(name);
     this.emitUserChange();
   };
 
   private emitUserChange() {
-    console.log("emitUserChange", this.currentUser);
     if (!this.currentUser) return;
 
     this.listeners.forEach((listener) => listener());

@@ -1,4 +1,4 @@
-.output {
+.form {
   display: flex;
   flex-direction: column;
   background-color: var(--chat-background);
@@ -18,8 +18,12 @@
     box-sizing: border-box;
   }
 
-  .output {
+  .input {
+    background-color: var(--light-background);
+    border: none;
     padding: 0.5rem;
-    background-color: transparent;
+    margin: 0.5rem;
+    color: #fff;
+    outline: none;
   }
 }

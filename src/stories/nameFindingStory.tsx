@@ -17,14 +17,14 @@ const NameFindingStory: React.FC = () => {
   const eventIteratorRef = useRef<Generator<void>>();
 
   const handleInput = (value?: string) => {
+    console.log("handleInput", value);
+
+    eventIteratorRef.current?.next();
     eventIteratorRef.current?.next(value);
   };
 
   const handleNext = () => {
-    console.log("next called");
-
     const res = eventIteratorRef.current?.next();
-    console.log("res", res);
 
     if (res && res.done) setDone(true);
   };
@@ -44,10 +44,9 @@ const NameFindingStory: React.FC = () => {
     while (findName) {
       let askForName = true;
       while (askForName) {
-        console.log("lol");
-
         yield addChatElement(new ChatInputModel(true, false, handleInput));
         name = yield;
+        console.log("name:", name);
 
         if (typeof name !== "string") continue;
 

@@ -24,8 +24,6 @@ class Main {
   }
 
   private handleStart = () => {
-    console.log("handle start");
-
     this.faceDetection?.start();
   };
 }

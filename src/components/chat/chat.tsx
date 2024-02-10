@@ -15,11 +15,11 @@ const Chat: React.FC = () => {
     <section className={styles.chat}>
       {[...chatElements.values()].map((chatElement) => {
         if (chatElement instanceof ChatMessageModel) {
-          return <ChatMessage {...chatElement} key={chatElement.timestamp} />;
+          return <ChatMessage {...chatElement} key={chatElement.id} />;
         } else if (chatElement instanceof ChatBtnsModel) {
-          return <ChatBtns {...chatElement} key={chatElement.timestamp} />;
+          return <ChatBtns {...chatElement} key={chatElement.id} />;
         } else if (chatElement instanceof ChatInputModel) {
-          return <ChatInput {...chatElement} key={chatElement.timestamp} />;
+          return <ChatInput {...chatElement} key={chatElement.id} />;
         }
       })}
     </section>

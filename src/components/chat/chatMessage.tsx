@@ -31,7 +31,10 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
   }, [innerDone, handleDone]);
 
   useEffect(() => {
-    if (innerDone) return;
+    if (innerDone) {
+      setInnerText(text);
+      return;
+    }
     let unmounted = false;
 
     const addTextPart = async () => {

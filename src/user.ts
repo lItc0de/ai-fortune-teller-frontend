@@ -34,7 +34,7 @@ class User {
   }
 
   async addFaceDescriptor(faceDescriptor: Float32Array) {
-    console.log("add desctiptor");
+    console.debug("add desctiptor");
 
     this.labeledFaceDescriptor.descriptors.push(faceDescriptor);
     // TODO: Check if needed

@@ -7,7 +7,6 @@ class ChatInputModel extends ChatElementModel {
     handleDone?: (value?: string) => void
   ) {
     super(isFortuneTeller, done, handleDone);
-    console.log("input added");
   }
 }
 

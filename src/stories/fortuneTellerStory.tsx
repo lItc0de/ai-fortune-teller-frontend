@@ -51,7 +51,6 @@ const FortuneTellerStory: React.FC = () => {
         // ) {
         //   await chatRef.current?.addFortuneTellerMessage(response.prompt);
         // } else {
-        //   console.log(response);
         // }
       }
     }

@@ -48,7 +48,6 @@ class Socket {
 
   private openHandler = () => {
     this.connected = true;
-    console.log("new connection");
   };
 
   private closeErrorHandler = (event?: Event) => {
@@ -58,8 +57,6 @@ class Socket {
       console.error("Error connecting Websocket");
       return;
     }
-
-    console.log("disconnected");
   };
 }
 

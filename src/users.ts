@@ -21,8 +21,6 @@ class Users {
   }
 
   create(faceDescriptor: Float32Array, faceBox: Box): User {
-    console.log("User created");
-
     const user = new User(this.store, faceDescriptor, faceBox);
     this.users.set(user.id, user);
     this.store.addUser(user);

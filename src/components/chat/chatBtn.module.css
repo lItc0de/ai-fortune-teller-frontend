@@ -1,12 +1,9 @@
-.startBtn {
-  display: block;
-  position: fixed;
-  padding: 0.25rem 1rem;
+.btn {
+  padding: 0.25rem 0.5rem;
   background-color: var(--action-background);
-  font-size: 1.5rem;
+  font-size: 1rem;
   backdrop-filter: blur(10px);
   border: none;
   color: var(--text-color);
-
-  z-index: 900;
+  flex: 1;
 }
