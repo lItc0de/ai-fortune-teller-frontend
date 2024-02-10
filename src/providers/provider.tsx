@@ -21,7 +21,7 @@ const Provider: React.FC<Props> = ({
   getCurrentUser,
   updateUsername,
 }) => {
-  const [ttsEnabled] = useState(false);
+  const [ttsEnabled] = useState(true);
 
   const [sessionStateId, setSessionStateId] = useState<SessionStateId>(
     SessionStateId.NO_SESSION

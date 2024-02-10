@@ -1,11 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import useFetch from "./useFetch";
+import { SettingsContext } from "../providers/settingsProvider";
+import TTSDisabledError from "../errors/ttsDisabledError";
+import TTSNetworkError from "../errors/ttsNetworkError";
 
 const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}`;
 const ctx = new AudioContext();
 
-const useTTS = (ttsEnabled: boolean) => {
+const useTTS = () => {
   const fetchData = useFetch();
+  const { ttsEnabled } = useContext(SettingsContext);
   const audio = useRef<AudioBuffer | null>(null);
   const player = useRef<AudioBufferSourceNode>();
   const abortController = useRef<AbortController>();
@@ -25,7 +29,7 @@ const useTTS = (ttsEnabled: boolean) => {
 
   const playSound = () =>
     new Promise<void>((resolve, reject) => {
-      if (!ttsEnabled) return reject(new Error("TTS disabled"));
+      if (!ttsEnabled) return reject(new TTSDisabledError());
       if (!audio) return reject(new Error("no audio"));
       if (!abortController.current) return reject("no AbortController");
       const currentAbortController = abortController.current;
@@ -58,7 +62,13 @@ const useTTS = (ttsEnabled: boolean) => {
     if (!ttsEnabled) return;
     if (!text) return;
 
-    const res = await fetchAudio(text);
+    let res;
+    try {
+      res = await fetchAudio(text);
+    } catch (error) {
+      throw new TTSNetworkError();
+    }
+
     if (!res) return;
 
     const audioBuffer = await res.arrayBuffer();

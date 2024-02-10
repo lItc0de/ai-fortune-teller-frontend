@@ -5,6 +5,9 @@ import { UserContext } from "../../providers/userProvider";
 import ChatMessageModel from "./chatMessage.model";
 import { sleep } from "../../utils/helpers";
 import { ChatElementsContext } from "../../providers/chatElementsProvider";
+import useTTS from "../../hooks/useTTS";
+import TTSDisabledError from "../../errors/ttsDisabledError";
+import TTSNetworkError from "../../errors/ttsNetworkError";
 
 const ChatMessage: React.FC<ChatMessageModel> = ({
   done,
@@ -18,6 +21,7 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
   const [userName, setUserName] = useState("");
   const [innerDone, setInnerDone] = useState(done);
   const [innerText, setInnerText] = useState("");
+  const { playSound, transcribe } = useTTS();
 
   useEffect(() => {
     let name = user?.name;
@@ -39,21 +43,37 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
 
     const addTextPart = async () => {
       const textParts = text.split(" ");
-      await sleep(1000);
       for (let i = 0; i < textParts.length; i++) {
         if (unmounted) return;
         const part = textParts[i];
         setInnerText((prevText) => [prevText, part].join(" "));
         await sleep(100);
       }
+    };
+
+    const textWithSound = async () => Promise.all([addTextPart(), playSound()]);
+
+    const start = async () => {
+      try {
+        await transcribe(text);
+        await textWithSound();
+      } catch (error) {
+        if (
+          error instanceof TTSDisabledError ||
+          error instanceof TTSNetworkError
+        ) {
+          await addTextPart();
+        }
+      }
+
       setInnerDone(true);
     };
 
-    addTextPart();
+    start();
     return () => {
       unmounted = true;
     };
-  }, [innerDone, text, id]);
+  }, [innerDone, text, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!done && innerDone) {
