@@ -50,6 +50,8 @@ const ProfileQuestionStory: React.FC = () => {
   useEffect(() => {
     if (!done) return;
     if (buttonId === "1") {
+      // setSessionStateId(SessionStateId.FORTUNE_TELLER);
+    } else if (buttonId === "2") {
       setSessionStateId(SessionStateId.FORTUNE_TELLER);
     }
   }, [buttonId, done, setSessionStateId]);

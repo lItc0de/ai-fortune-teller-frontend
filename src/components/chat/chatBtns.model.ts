@@ -12,7 +12,7 @@ class ChatBtnsModel extends ChatElementModel {
   ) {
     super(isFortuneTeller, done, handleDone);
     this.btns = buttonLables.map(
-      (label, i) => new ChatBtnModel(i.toString(), label, handleDone)
+      (label, i) => new ChatBtnModel((i + 1).toString(), label, handleDone)
     );
   }
 }

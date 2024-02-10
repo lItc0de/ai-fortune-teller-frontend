@@ -39,6 +39,7 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
 
     const addTextPart = async () => {
       const textParts = text.split(" ");
+      await sleep(1000);
       for (let i = 0; i < textParts.length; i++) {
         if (unmounted) return;
         const part = textParts[i];
@@ -65,7 +66,8 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
       <label className={styles.label}>
         {isFortuneTeller ? FORTUNE_TELLER_USER : userName}
       </label>
-      <output className={styles.output}>{innerText}</output>
+
+      <output className={styles.output}>{innerText || "Typing..."}</output>
     </div>
   );
 };
