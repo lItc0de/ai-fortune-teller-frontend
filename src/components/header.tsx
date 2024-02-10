@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { UserContext } from "../stateProvider";
 import styles from "./header.module.css";
+import { UserContext } from "../providers/userProvider";
 
 const Header: React.FC = () => {
   const { user } = useContext(UserContext);

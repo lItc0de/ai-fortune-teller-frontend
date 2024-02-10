@@ -1,26 +1,23 @@
 import { useEffect } from "react";
+import ChatBtnModel from "./chat/chatBtn.model";
 
-export type ButtonProps = {
-  number: number;
-  label: string;
-  onClick: (number: number) => void;
-};
-
-const Button: React.FC<ButtonProps> = ({ number, label, onClick }) => {
+const Button: React.FC<ChatBtnModel> = ({ number, label, handleClick }) => {
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key === number.toString()) {
+      if (e.key === number) {
         document.removeEventListener("keydown", handleKeydown);
-        onClick(number);
+        if (handleClick) handleClick(number);
       }
     };
 
     document.addEventListener("keydown", handleKeydown);
 
     return () => document.removeEventListener("keydown", handleKeydown);
-  }, [number, onClick]);
+  }, [number, handleClick]);
 
-  return <button onClick={() => onClick(number)}>{label}</button>;
+  return (
+    <button onClick={() => handleClick && handleClick(number)}>{label}</button>
+  );
 };
 
 export default Button;

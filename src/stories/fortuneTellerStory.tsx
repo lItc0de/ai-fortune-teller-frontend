@@ -1,68 +1,81 @@
-import { useContext, useEffect, useRef } from "react";
-import Chat, { ChatRefProps } from "../components/chat";
+import { useContext, useEffect, useRef, useState } from "react";
 import Socket from "../socket";
-import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
-import { UserContext } from "../stateProvider";
-import useEventIterator from "../hooks/useEventIterator";
-import { GeneratorState } from "../types";
+// import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
+import { ChatElementsContext } from "../providers/chatElementsProvider";
+import ChatMessageModel from "../components/chat/chatMessage.model";
+import ChatInputModel from "../components/chat/chatInput.model";
 
 const FortuneTellerStory: React.FC = () => {
-  const { user } = useContext(UserContext);
-  const chatRef = useRef<ChatRefProps>(null);
+  const { addChatElement } = useContext(ChatElementsContext);
+
+  const [done, setDone] = useState(false);
   const socketRef = useRef<Socket>();
-  const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
-  const iterate = useEventIterator();
+  const eventIteratorRef = useRef<Generator<void>>();
 
-  const eventGeneratorRef = useRef(
-    async function* (): AsyncGenerator<GeneratorState> {
-      await chatRef.current?.addFortuneTellerMessage(
-        "I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!"
-      );
-      yield { done: false };
+  const handleInput = (value?: string) => {
+    eventIteratorRef.current?.next(value);
+  };
 
-      while (true) {
-        const question = await chatRef.current?.addUserInput();
+  const handleNext = () => {
+    const res = eventIteratorRef.current?.next();
+    if (res && res.done) setDone(true);
+  };
 
-        if (question) {
-          await chatRef.current?.addFortuneTellerMessage(question);
-          const response = await socketRef.current?.send(
-            new SocketMessage(SocketMessageType.PROMPT, question, user?.name)
-          );
-          if (
-            response &&
-            response.type === SocketMessageType.BOT &&
-            response.prompt
-          ) {
-            await chatRef.current?.addFortuneTellerMessage(response.prompt);
-          } else {
-            console.log(response);
-          }
-        }
-        yield { done: true };
+  const eventGeneratorRef = useRef(function* (): Generator<void> {
+    yield addChatElement(
+      new ChatMessageModel(
+        true,
+        `I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!`,
+        false,
+        handleNext
+      )
+    );
+
+    while (true) {
+      yield addChatElement(new ChatInputModel(true, false, handleInput));
+      const question = yield;
+
+      if (question && typeof question === "string") {
+        yield addChatElement(
+          new ChatMessageModel(false, question, true, handleNext)
+        );
+
+        // await chatRef.current?.addFortuneTellerMessage(question);
+        // const response = await socketRef.current?.send(
+        //   new SocketMessage(SocketMessageType.PROMPT, question, user?.name)
+        // );
+        // if (
+        //   response &&
+        //   response.type === SocketMessageType.BOT &&
+        //   response.prompt
+        // ) {
+        //   await chatRef.current?.addFortuneTellerMessage(response.prompt);
+        // } else {
+        //   console.log(response);
+        // }
       }
     }
-  );
+  });
 
   useEffect(() => {
     eventIteratorRef.current = eventGeneratorRef.current();
-    iterate(eventIteratorRef.current).catch((error) => {
-      if (error instanceof Error) {
-        if (error.message === "Aborted") return;
-      }
-      throw error;
-    });
-    return () => {};
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const iterator = eventIteratorRef.current;
+    iterator.next();
+
+    return () => {
+      iterator.return(undefined);
+    };
+  }, []);
 
   useEffect(() => {
     socketRef.current = new Socket();
   }, []);
 
-  return (
-    <>
-      <Chat ref={chatRef} />
-    </>
-  );
+  useEffect(() => {
+    if (done) console.log("done");
+  }, [done]);
+
+  return <></>;
 };
 
 export default FortuneTellerStory;

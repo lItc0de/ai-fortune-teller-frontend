@@ -1,5 +1,5 @@
 import SpeechSynthesis from "./speechSynthesis";
-import Message from "./message";
+import Message from "./botMessage";
 import Transcribe from "./transcribe";
 import {
   BACKGROUND_DIMENSIONS,

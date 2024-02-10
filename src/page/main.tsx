@@ -1,9 +1,8 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "../App";
-import StateProvider from "../stateProvider";
 import User from "../user";
 import "../style.css";
+import Provider from "../providers/provider";
 
 const createReactApp = (
   userSubscribe: (onStoreChange: () => void) => () => void,
@@ -13,13 +12,13 @@ const createReactApp = (
 ) => {
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <>
-      <StateProvider
+      <Provider
         userSubscribe={userSubscribe}
         getCurrentUser={getCurrentUser}
         updateUsername={updateUsername}
       >
         <App handleStartCallback={handleStartCallback} />
-      </StateProvider>
+      </Provider>
     </>
   );
 };

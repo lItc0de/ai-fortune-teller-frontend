@@ -1,11 +1,11 @@
 import { useContext, useEffect } from "react";
-import { StateContext } from "../stateProvider";
 import NewUserStory from "../stories/newUserStory";
 import { AnimationStateId, SessionStateId } from "../constants";
 import EndStory from "../stories/endStory";
 import FortuneTellerStory from "../stories/fortuneTellerStory";
 import NameFindingStory from "../stories/nameFindingStory";
 import ProfileQuestionStory from "../stories/profileQuestionStory";
+import { StateContext } from "../providers/stateProvider";
 
 const Stories: React.FC = () => {
   const { sessionStateId, setSessionStateId, setAnimationStateId } =

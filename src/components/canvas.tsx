@@ -2,10 +2,10 @@ import { useContext, useEffect, useRef } from "react";
 import { getDimensions } from "../utils/helpers";
 import BaseDrawer from "../utils/drawers/baseDrawer";
 import IdleDrawer from "../utils/drawers/idleDrawer";
-import { StateContext } from "../stateProvider";
 import NewSessionDrawer from "../utils/drawers/newSessionDrawer";
 import { AnimationStateId } from "../constants";
 import FortuneTellerDrawer from "../utils/drawers/fortuneTellerDrawer";
+import { StateContext } from "../providers/stateProvider";
 
 type Props = {
   shouldAnimate: boolean;

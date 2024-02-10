@@ -1,38 +1,48 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { StateContext } from "../stateProvider";
-import Chat, { ChatRefProps } from "../components/chat";
 import { AnimationStateId, SessionStateId } from "../constants";
-import useEventIterator from "../hooks/useEventIterator";
-import { GeneratorState } from "../types";
+import { StateContext } from "../providers/stateProvider";
+import { ChatElementsContext } from "../providers/chatElementsProvider";
+import ChatMessageModel from "../components/chat/chatMessage.model";
 
 const NewUserStory: React.FC = () => {
   const { animationStateId, setSessionStateId } = useContext(StateContext);
+  const { addChatElement } = useContext(ChatElementsContext);
   const [done, setDone] = useState(false);
-  const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
-  const chatRef = useRef<ChatRefProps>(null);
-  const iterate = useEventIterator();
+  const eventIteratorRef = useRef<Generator<void>>();
 
-  const eventGeneratorRef = useRef(
-    async function* (): AsyncGenerator<GeneratorState> {
-      await chatRef.current?.addFortuneTellerMessage(
-        "Welcome to the AI Fortune Teller! I see you want to take a glimpse in your future. Using my AI magic and sprinkling a bit of data from you, my intuitive powers will reveal what  lies ahead of you."
-      );
-      yield { done: true };
-    }
-  );
+  const handleNext = () => {
+    const res = eventIteratorRef.current?.next();
+    if (res && res.done) setDone(true);
+  };
+
+  const eventGeneratorRef = useRef(function* (): Generator<void> {
+    yield addChatElement(
+      new ChatMessageModel(
+        true,
+        `Welcome to the AI Fortune Teller! I see you want to take a glimpse in your future. Using my AI magic and sprinkling a bit of data from you, my intuitive powers will reveal what  lies ahead of you.`,
+        false,
+        handleNext
+      )
+    );
+
+    yield addChatElement(
+      new ChatMessageModel(true, `lol this works.`, false, handleNext)
+    );
+
+    yield addChatElement(
+      new ChatMessageModel(true, `yayyy lol.`, false, handleNext)
+    );
+  });
 
   useEffect(() => {
     eventIteratorRef.current = eventGeneratorRef.current();
-    iterate(eventIteratorRef.current)
-      .then(() => setDone(true))
-      .catch((error) => {
-        if (error instanceof Error) {
-          if (error.message === "Aborted") return;
-        }
-        throw error;
-      });
-    return () => {};
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const iterator = eventIteratorRef.current;
+    iterator.next();
+
+    return () => {
+      iterator.return(undefined);
+    };
+  }, []);
 
   useEffect(() => {
     if (!done) return;
@@ -41,11 +51,7 @@ const NewUserStory: React.FC = () => {
     setSessionStateId(SessionStateId.NAME_FINDING);
   }, [done, animationStateId, setSessionStateId]);
 
-  return (
-    <>
-      <Chat ref={chatRef} />
-    </>
-  );
+  return <></>;
 };
 
 export default NewUserStory;

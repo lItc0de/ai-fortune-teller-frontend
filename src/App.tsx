@@ -4,6 +4,7 @@ import Canvas from "./components/canvas";
 import styles from "./app.module.css";
 import Player from "./components/player";
 import Stories from "./components/stories";
+import Chat from "./components/chat/chat";
 
 type Props = {
   handleStartCallback: () => void;
@@ -33,6 +34,7 @@ const App: React.FC<Props> = ({ handleStartCallback }) => {
           onClick={handleStartClick}
         />
       )}
+      <Chat />
       <Stories />
     </>
   );

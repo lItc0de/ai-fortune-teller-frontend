@@ -1,4 +1,4 @@
-class Message {
+class BotMessage {
   private text: string;
   private isBot: boolean;
   private _label?: string;
@@ -42,4 +42,4 @@ class Message {
   }
 }
 
-export default Message;
+export default BotMessage;

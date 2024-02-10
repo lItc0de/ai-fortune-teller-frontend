@@ -1,38 +1,36 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { StateContext } from "../stateProvider";
-import Chat, { ChatRefProps } from "../components/chat";
 import { SessionStateId } from "../constants";
-import { GeneratorState } from "../types";
-import useEventIterator from "../hooks/useEventIterator";
+import { StateContext } from "../providers/stateProvider";
+import { ChatElementsContext } from "../providers/chatElementsProvider";
+import ChatMessageModel from "../components/chat/chatMessage.model";
 
 const EndStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
-  const [done, setDone] = useState(false);
-  const chatRef = useRef<ChatRefProps>(null);
-  const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
-  const iterate = useEventIterator();
+  const { addChatElement } = useContext(ChatElementsContext);
 
-  const eventGeneratorRef = useRef(
-    async function* (): AsyncGenerator<GeneratorState> {
-      await chatRef.current?.addFortuneTellerMessage(
-        "Was nice talking to you!"
-      );
-      yield { done: true };
-    }
-  );
+  const [done, setDone] = useState(false);
+  const eventIteratorRef = useRef<Generator<void>>();
+
+  const handleNext = () => {
+    const res = eventIteratorRef.current?.next();
+    if (res && res.done) setDone(true);
+  };
+
+  const eventGeneratorRef = useRef(function* (): Generator<void> {
+    yield addChatElement(
+      new ChatMessageModel(true, `Was nice talking to you!`, false, handleNext)
+    );
+  });
 
   useEffect(() => {
     eventIteratorRef.current = eventGeneratorRef.current();
-    iterate(eventIteratorRef.current)
-      .then(() => setDone(true))
-      .catch((error) => {
-        if (error instanceof Error) {
-          if (error.message === "Aborted") return;
-        }
-        throw error;
-      });
-    return () => {};
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const iterator = eventIteratorRef.current;
+    iterator.next();
+
+    return () => {
+      iterator.return(undefined);
+    };
+  }, []);
 
   useEffect(() => {
     if (!done) return;
@@ -40,11 +38,7 @@ const EndStory: React.FC = () => {
     setSessionStateId(SessionStateId.NO_SESSION);
   }, [done, setSessionStateId]);
 
-  return (
-    <>
-      <Chat ref={chatRef} />
-    </>
-  );
+  return <></>;
 };
 
 export default EndStory;

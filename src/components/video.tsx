@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 import styles from "./video.module.css";
-import { StateContext } from "../stateProvider";
 import { ANIMATION_MAP, AnimationStateId } from "../constants";
+import { StateContext } from "../providers/stateProvider";
 
 type Props = {
   src: string;

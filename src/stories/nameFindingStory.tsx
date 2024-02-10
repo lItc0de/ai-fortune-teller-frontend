@@ -1,95 +1,132 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { StateContext, UserContext } from "../stateProvider";
-import Chat, { ChatRefProps } from "../components/chat";
 import { SessionStateId } from "../constants";
 import { countWords } from "../utils/helpers";
-import useEventIterator from "../hooks/useEventIterator";
-import { GeneratorState } from "../types";
+import { StateContext } from "../providers/stateProvider";
+import { UserContext } from "../providers/userProvider";
+import { ChatElementsContext } from "../providers/chatElementsProvider";
+import ChatMessageModel from "../components/chat/chatMessage.model";
+import ChatInputModel from "../components/chat/chatInput.model";
 
 const NameFindingStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
-  const chatRef = useRef<ChatRefProps>(null);
+  const { updateUsername } = useContext(UserContext);
+  const { addChatElement } = useContext(ChatElementsContext);
+
   const [userName, setUserName] = useState("");
   const [done, setDone] = useState(false);
-  const eventIteratorRef = useRef<AsyncGenerator<GeneratorState>>();
-  const iterate = useEventIterator();
+  const eventIteratorRef = useRef<Generator<void>>();
 
-  const { updateUsername } = useContext(UserContext);
+  const handleInput = (value?: string) => {
+    eventIteratorRef.current?.next(value);
+  };
 
-  const eventGeneratorRef = useRef(
-    async function* (): AsyncGenerator<GeneratorState> {
-      await chatRef.current?.addFortuneTellerMessage(
-        "Before we get into the fortunes your future beholds, tell me your name so we can get to know each other better! You can speak it out loud or type it down."
-      );
-      yield { done: false };
+  const handleNext = () => {
+    console.log("next called");
 
-      let findName = true;
-      let name;
-      while (findName) {
-        let askForName = true;
-        while (askForName) {
-          name = await chatRef.current?.addUserInput();
+    const res = eventIteratorRef.current?.next();
+    console.log("res", res);
 
-          yield { done: false };
+    if (res && res.done) setDone(true);
+  };
 
-          if (!name || countWords(name) !== 1) {
-            await chatRef.current?.addFortuneTellerMessage(
-              "Oh dear, unfortunately your name got lost in the void, repeat it for me please!"
-            );
-          } else {
-            askForName = false;
-          }
-        }
+  const eventGeneratorRef = useRef(function* (): Generator<void> {
+    yield addChatElement(
+      new ChatMessageModel(
+        true,
+        `Before we get into the fortunes your future beholds, tell me your name so we can get to know each other better! You can speak it out loud or type it down.`,
+        false,
+        handleNext
+      )
+    );
 
-        await chatRef.current?.addFortuneTellerMessage(
-          `So your name is ${name}? A short "yes" or "no" is enough.`
-        );
+    let findName = true;
+    let name;
+    while (findName) {
+      let askForName = true;
+      while (askForName) {
+        console.log("lol");
 
-        let checkIfName = true;
-        let answer;
-        while (checkIfName) {
-          answer = await chatRef.current?.addUserInput();
-          yield { done: false };
+        yield addChatElement(new ChatInputModel(true, false, handleInput));
+        name = yield;
 
-          if (answer === "no") {
-            await chatRef.current?.addFortuneTellerMessage(
-              "Ok, well then tell me your name again."
-            );
-            checkIfName = false;
-          } else if (answer === "yes") {
-            checkIfName = false;
-            findName = false;
-          } else {
-            await chatRef.current?.addFortuneTellerMessage(
-              'Please my dear, a short "yes" or "no" is enough.'
-            );
-          }
+        if (typeof name !== "string") continue;
+
+        if (!name || countWords(name) !== 1) {
+          yield addChatElement(
+            new ChatMessageModel(
+              true,
+              `Oh dear, unfortunately your name got lost in the void, repeat it for me please!`,
+              false,
+              handleNext
+            )
+          );
+        } else {
+          askForName = false;
         }
       }
 
-      await chatRef.current?.addFortuneTellerMessage(
-        `Hello my dear ${name}, a beautiful name that is.`
+      yield addChatElement(
+        new ChatMessageModel(
+          true,
+          `So your name is ${name}? A short "yes" or "no" is enough.`,
+          false,
+          handleNext
+        )
       );
 
-      yield { done: true, value: name };
+      let checkIfName = true;
+      let answer;
+      while (checkIfName) {
+        yield addChatElement(new ChatInputModel(true, false, handleInput));
+        answer = yield;
+
+        if (answer === "no") {
+          yield addChatElement(
+            new ChatMessageModel(
+              true,
+              `Ok, well then tell me your name again.`,
+              false,
+              handleNext
+            )
+          );
+          checkIfName = false;
+        } else if (answer === "yes") {
+          checkIfName = false;
+          findName = false;
+        } else {
+          yield addChatElement(
+            new ChatMessageModel(
+              true,
+              `Please my dear, a short "yes" or "no" is enough.`,
+              false,
+              handleNext
+            )
+          );
+        }
+      }
     }
-  );
+
+    if (name && typeof name === "string") setUserName(name);
+
+    yield addChatElement(
+      new ChatMessageModel(
+        true,
+        `Hello my dear ${name}, a beautiful name that is.`,
+        false,
+        handleNext
+      )
+    );
+  });
 
   useEffect(() => {
     eventIteratorRef.current = eventGeneratorRef.current();
-    iterate(eventIteratorRef.current)
-      .then((name) => {
-        if (name) setUserName(name);
-        setDone(true);
-      })
-      .catch((error) => {
-        if (error instanceof Error) {
-          if (error.message === "Aborted") return;
-        }
-        throw error;
-      });
-    return () => {};
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const iterator = eventIteratorRef.current;
+    iterator.next();
+
+    return () => {
+      iterator.return(undefined);
+    };
+  }, []);
 
   useEffect(() => {
     if (!userName || !done) return;
@@ -98,11 +135,7 @@ const NameFindingStory: React.FC = () => {
     setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
   }, [userName, updateUsername, setSessionStateId, done]);
 
-  return (
-    <>
-      <Chat ref={chatRef} />
-    </>
-  );
+  return <></>;
 };
 
 export default NameFindingStory;
