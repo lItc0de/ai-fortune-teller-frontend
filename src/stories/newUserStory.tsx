@@ -24,14 +24,6 @@ const NewUserStory: React.FC = () => {
         handleNext
       )
     );
-
-    yield addChatElement(
-      new ChatMessageModel(true, `lol this works.`, false, handleNext)
-    );
-
-    yield addChatElement(
-      new ChatMessageModel(true, `yayyy lol.`, false, handleNext)
-    );
   });
 
   useEffect(() => {

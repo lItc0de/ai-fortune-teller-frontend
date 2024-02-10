@@ -58,6 +58,17 @@ body {
   background-color: var(--background-dark);
 }
 
+button {
+  padding: 0.25rem 1rem;
+  background-color: var(--action-background);
+  font-size: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: none;
+  color: var(--text-color);
+  font-family: "Federant", serif;
+  cursor: pointer;
+}
+
 #root {
   min-width: 320px;
   min-height: 100vh;

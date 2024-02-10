@@ -6,41 +6,63 @@ import FortuneTellerStory from "../stories/fortuneTellerStory";
 import NameFindingStory from "../stories/nameFindingStory";
 import ProfileQuestionStory from "../stories/profileQuestionStory";
 import { StateContext } from "../providers/stateProvider";
+import ProfileStory from "../stories/profileStory";
+import FortuneSelectStory from "../stories/fortuneSelectStory";
 
 const Stories: React.FC = () => {
-  const { sessionStateId, setSessionStateId, setAnimationStateId } =
-    useContext(StateContext);
+  const {
+    sessionStateId,
+    setSessionStateId,
+    setAnimationStateId,
+    setShowChat,
+  } = useContext(StateContext);
 
   useEffect(() => {
     switch (sessionStateId) {
       case SessionStateId.NEW_SESSION:
         setAnimationStateId(AnimationStateId.NEW_SESSION_1);
+        setShowChat(true);
         break;
       case SessionStateId.WELCOME_OLD_USER:
-        setSessionStateId(SessionStateId.FORTUNE_TELLER);
+        setSessionStateId(SessionStateId.FORTUNE_SELECTION);
         break;
 
       case SessionStateId.FORTUNE_TELLER:
         setAnimationStateId(AnimationStateId.FORTUNE_TELLER);
+        setShowChat(true);
         break;
 
       case SessionStateId.PROFILE_QUESTIONS:
         setAnimationStateId(AnimationStateId.FORTUNE_TELLER);
+        setShowChat(true);
+        break;
+
+      case SessionStateId.PROFILE:
+        setAnimationStateId(AnimationStateId.IDLE);
+        setShowChat(false);
+        break;
+
+      case SessionStateId.FORTUNE_SELECTION:
+        setAnimationStateId(AnimationStateId.IDLE);
+        setShowChat(false);
         break;
 
       case SessionStateId.NAME_FINDING:
         setAnimationStateId(AnimationStateId.FORTUNE_TELLER);
+        setShowChat(true);
         break;
 
       case SessionStateId.END_SESSION:
         setAnimationStateId(AnimationStateId.IDLE);
+        setShowChat(true);
         break;
 
       default:
         setAnimationStateId(AnimationStateId.IDLE);
+        setShowChat(false);
         break;
     }
-  }, [sessionStateId, setSessionStateId, setAnimationStateId]);
+  }, [sessionStateId, setSessionStateId, setAnimationStateId, setShowChat]);
 
   return (
     <>
@@ -51,6 +73,10 @@ const Stories: React.FC = () => {
       )}
       {sessionStateId === SessionStateId.FORTUNE_TELLER && (
         <FortuneTellerStory />
+      )}
+      {sessionStateId === SessionStateId.PROFILE && <ProfileStory />}
+      {sessionStateId === SessionStateId.FORTUNE_SELECTION && (
+        <FortuneSelectStory />
       )}
       {sessionStateId === SessionStateId.END_SESSION && <EndStory />}
     </>

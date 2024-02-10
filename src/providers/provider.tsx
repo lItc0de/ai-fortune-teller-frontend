@@ -30,6 +30,8 @@ const Provider: React.FC<Props> = ({
     AnimationStateId.IDLE
   );
 
+  const [showChat, setShowChat] = useState(false);
+
   const user = useSyncExternalStore(userSubscribe, getCurrentUser);
 
   const [chatElements, setChatElements] = useState(
@@ -79,9 +81,11 @@ const Provider: React.FC<Props> = ({
         <StateContext.Provider
           value={{
             sessionStateId,
-            animationStateId,
             setSessionStateId,
+            animationStateId,
             setAnimationStateId,
+            showChat,
+            setShowChat,
           }}
         >
           <ChatElementsContext.Provider

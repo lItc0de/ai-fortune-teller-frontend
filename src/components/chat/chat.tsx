@@ -7,6 +7,8 @@ import ChatMessageModel from "./chatMessage.model";
 import ChatBtnsModel from "./chatBtns.model";
 import ChatInputModel from "./chatInput.model";
 import ChatInput from "./chatInput";
+import ChatOptionsModel from "./chatOptions.model";
+import ChatOptions from "./chatOptions";
 
 const Chat: React.FC = () => {
   const { chatElements } = useContext(ChatElementsContext);
@@ -20,6 +22,8 @@ const Chat: React.FC = () => {
           return <ChatBtns {...chatElement} key={chatElement.id} />;
         } else if (chatElement instanceof ChatInputModel) {
           return <ChatInput {...chatElement} key={chatElement.id} />;
+        } else if (chatElement instanceof ChatOptionsModel) {
+          return <ChatOptions {...chatElement} key={chatElement.id} />;
         }
       })}
     </section>

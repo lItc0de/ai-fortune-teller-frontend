@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Header from "./components/header";
 import Canvas from "./components/canvas";
 import styles from "./app.module.css";
 import Player from "./components/player";
 import Stories from "./components/stories";
 import Chat from "./components/chat/chat";
+import { StateContext } from "./providers/stateProvider";
 
 type Props = {
   handleStartCallback: () => void;
@@ -13,6 +14,7 @@ type Props = {
 const App: React.FC<Props> = ({ handleStartCallback }) => {
   const [showStartBtn, setShowStartBtn] = useState(true);
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const { showChat } = useContext(StateContext);
 
   const handleStartClick = () => {
     setShowStartBtn(false);
@@ -34,7 +36,7 @@ const App: React.FC<Props> = ({ handleStartCallback }) => {
           onClick={handleStartClick}
         />
       )}
-      <Chat />
+      {showChat && <Chat />}
       <Stories />
     </>
   );

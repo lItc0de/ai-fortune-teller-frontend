@@ -6,14 +6,15 @@ import { UserContext } from "../providers/userProvider";
 import { ChatElementsContext } from "../providers/chatElementsProvider";
 import ChatMessageModel from "../components/chat/chatMessage.model";
 import ChatInputModel from "../components/chat/chatInput.model";
+import ChatBtnsModel from "../components/chat/chatBtns.model";
 
 const NameFindingStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
   const { updateUsername } = useContext(UserContext);
   const { addChatElement } = useContext(ChatElementsContext);
 
-  const [userName, setUserName] = useState("");
   const [done, setDone] = useState(false);
+  const [buttonId, setButtonId] = useState<string>();
   const eventIteratorRef = useRef<Generator<void>>();
 
   const handleInput = (value?: string) => {
@@ -26,6 +27,13 @@ const NameFindingStory: React.FC = () => {
   const handleNext = () => {
     const res = eventIteratorRef.current?.next();
 
+    if (res && res.done) setDone(true);
+  };
+
+  const handleBtn = (value?: string) => {
+    if (value) setButtonId(value);
+
+    const res = eventIteratorRef.current?.next();
     if (res && res.done) setDone(true);
   };
 
@@ -105,15 +113,19 @@ const NameFindingStory: React.FC = () => {
       }
     }
 
-    if (name && typeof name === "string") setUserName(name);
+    if (name && typeof name === "string") updateUsername(name);
 
     yield addChatElement(
       new ChatMessageModel(
         true,
-        `Hello my dear ${name}, a beautiful name that is.`,
+        `Great to meet you ${name}! Now you have the option of creating a profile for more personalised predictions or you can directly go to your fortune.`,
         false,
         handleNext
       )
+    );
+
+    yield addChatElement(
+      new ChatBtnsModel(true, ["customize", "fortune"], false, handleBtn)
     );
   });
 
@@ -128,11 +140,13 @@ const NameFindingStory: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!userName || !done) return;
-
-    updateUsername(userName);
-    setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
-  }, [userName, updateUsername, setSessionStateId, done]);
+    if (!done) return;
+    if (buttonId === "1") {
+      setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
+    } else if (buttonId === "2") {
+      setSessionStateId(SessionStateId.FORTUNE_TELLER);
+    }
+  }, [buttonId, done, setSessionStateId]);
 
   return <></>;
 };

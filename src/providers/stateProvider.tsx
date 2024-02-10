@@ -3,12 +3,20 @@ import { AnimationStateId, SessionStateId } from "../constants";
 
 export const StateContext = createContext<{
   sessionStateId: SessionStateId;
-  animationStateId: AnimationStateId;
   setSessionStateId: (id: SessionStateId) => void;
+
+  animationStateId: AnimationStateId;
   setAnimationStateId: (id: AnimationStateId) => void;
+
+  showChat: boolean;
+  setShowChat: (show: boolean) => void;
 }>({
   sessionStateId: SessionStateId.NO_SESSION,
-  animationStateId: AnimationStateId.IDLE,
   setSessionStateId: () => {},
+
+  animationStateId: AnimationStateId.IDLE,
   setAnimationStateId: () => {},
+
+  showChat: false,
+  setShowChat: () => {},
 });

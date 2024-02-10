@@ -1,0 +1,63 @@
+.optionsWrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--chat-background);
+  animation-name: fadeIn;
+  animation-duration: 200ms;
+  width: 100%;
+  box-sizing: border-box;
+  backdrop-filter: blur(10px);
+  color: var(--text-color);
+
+  > .label {
+    align-self: flex-start;
+    padding: 0.1rem 2rem 0.1rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+    background-color: var(--light-background);
+    box-sizing: border-box;
+  }
+
+  > .descriptionLabel {
+    padding: 0.5rem;
+    background-color: transparent;
+  }
+
+  > .optionsList {
+    margin: 0;
+    padding: 0.5rem;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .listItem {
+      list-style-type: none;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .radio {
+      appearance: none;
+      background-color: transparent;
+      margin: 0;
+      font: inherit;
+      color: var(--text-color);
+      width: 1.15rem;
+      height: 1.15rem;
+      border: 0.15rem solid var(--text-color);
+      border-radius: 50%;
+      display: grid;
+      place-content: center;
+    }
+  }
+}
+
+input[type="radio"]:checked::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  border-radius: 50%;
+  background-color: #fff;
+}
