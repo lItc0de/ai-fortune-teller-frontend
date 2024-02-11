@@ -16,6 +16,7 @@ const Header: React.FC = () => {
       <canvas ref={canvasRef}></canvas>
       <span className={styles.userName}>{user.name}</span>{" "}
       {/* <span className={styles.userId}>{user.id}</span> */}
+      <span className={styles.profileHint}>Press [p] for Profile</span>
     </header>
   );
 };
