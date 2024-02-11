@@ -9,6 +9,8 @@ class User {
   lastDetectionAt: number;
   labeledFaceDescriptor: LabeledFaceDescriptors;
   lastFaceBoxes: Box[] = [];
+  image?: Blob;
+  profileQuestionsSelection: string[] = [];
   name?: string;
 
   constructor(
@@ -19,7 +21,9 @@ class User {
     createdAt?: number,
     lastDetectionAt?: number,
     lastLoginAt?: number,
-    name?: string
+    name?: string,
+    image?: Blob,
+    profileQuestionsSelection?: string[]
   ) {
     this.id = id || crypto.randomUUID();
     this.createdAt = createdAt || Date.now();
@@ -31,6 +35,9 @@ class User {
     this.store = store;
     if (faceBox) this.addFaceBox(faceBox);
     if (name) this.name = name;
+    if (image) this.image = image;
+    if (profileQuestionsSelection)
+      this.profileQuestionsSelection = profileQuestionsSelection;
   }
 
   async addFaceDescriptor(faceDescriptor: Float32Array) {
@@ -71,6 +78,16 @@ class User {
     this.store.updateUser(this.id, { name: newName });
   }
 
+  updateImage(newImage: Blob) {
+    this.image = newImage;
+    this.store.updateUser(this.id, { image: newImage });
+  }
+
+  updateProfileQuestionsSelection(selection: string[]) {
+    this.profileQuestionsSelection = selection;
+    this.store.updateUser(this.id, { profileQuestionsSelection: selection });
+  }
+
   static async fromDBUser(store: Store, dbUser: DBUser): Promise<User> {
     const [firstFaceDescriptor, ...faceDescriptors] = dbUser.faceDescriptors;
     const user = new User(
@@ -81,7 +98,9 @@ class User {
       dbUser.createdAt,
       dbUser.lastDetectionAt,
       dbUser.lastDetectionAt,
-      dbUser.name
+      dbUser.name,
+      dbUser.image,
+      dbUser.profileQuestionsSelection
     );
     for (let i = 0; i < faceDescriptors.length; i++) {
       await user.addFaceDescriptor(faceDescriptors[i]);

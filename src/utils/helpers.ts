@@ -88,3 +88,14 @@ export const getSentences = (str: string) => {
   const regexp = new RegExp("(?!\\s).+?[.?!](?=\\s)?", "g");
   return str.trim().match(regexp);
 };
+
+export const extractUserImage = () =>
+  new Promise<Blob | null>((resolve) => {
+    const faceCanvas = document.getElementById(
+      "faceCanvas"
+    ) as HTMLCanvasElement;
+    const blobCallback = (blob: Blob | null) => {
+      resolve(blob);
+    };
+    faceCanvas.toBlob(blobCallback);
+  });

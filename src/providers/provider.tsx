@@ -12,6 +12,8 @@ type Props = {
   userSubscribe: (onStoreChange: () => void) => () => void;
   getCurrentUser: () => User | undefined;
   updateUsername: (name: string) => void;
+  updateImage: (image: Blob) => void;
+  updateProfileQuestionsSelection: (selection: string[]) => void;
   children: ReactNode;
 };
 
@@ -20,6 +22,8 @@ const Provider: React.FC<Props> = ({
   userSubscribe,
   getCurrentUser,
   updateUsername,
+  updateImage,
+  updateProfileQuestionsSelection,
 }) => {
   const [ttsEnabled] = useState(true);
 
@@ -77,7 +81,14 @@ const Provider: React.FC<Props> = ({
 
   return (
     <SettingsContext.Provider value={{ ttsEnabled }}>
-      <UserContext.Provider value={{ user, updateUsername }}>
+      <UserContext.Provider
+        value={{
+          user,
+          updateUsername,
+          updateImage,
+          updateProfileQuestionsSelection,
+        }}
+      >
         <StateContext.Provider
           value={{
             sessionStateId,

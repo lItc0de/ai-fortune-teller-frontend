@@ -27,6 +27,9 @@
   --action-background: rgba(86, 124, 143, 0.7);
   --chat-background: rgba(69, 111, 133, 0.4);
   --light-background: rgba(168, 225, 255, 0.3);
+  --header-background: rgba(168, 225, 255, 0.1);
+
+  --backdrop-filter: blur(10px);
 }
 
 input {

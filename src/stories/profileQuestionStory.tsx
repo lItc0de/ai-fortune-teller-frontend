@@ -6,10 +6,12 @@ import ChatOptionsModel, {
 } from "../components/chat/chatOptions.model";
 import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
+import { UserContext } from "../providers/userProvider";
 
 const ProfileQuestionStory: React.FC = () => {
   const { addChatElement } = useContext(ChatElementsContext);
   const { setSessionStateId } = useContext(StateContext);
+  const { updateProfileQuestionsSelection } = useContext(UserContext);
 
   const [done, setDone] = useState(false);
   const [selection, setSelection] = useState<string[]>([]);
@@ -163,8 +165,9 @@ const ProfileQuestionStory: React.FC = () => {
 
   useEffect(() => {
     if (!done || selection.length === 0) return;
+    updateProfileQuestionsSelection(selection);
     setSessionStateId(SessionStateId.FORTUNE_SELECTION);
-  }, [done, selection, setSessionStateId]);
+  }, [done, selection, setSessionStateId, updateProfileQuestionsSelection]);
 
   return <></>;
 };

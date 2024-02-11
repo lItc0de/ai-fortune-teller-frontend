@@ -4,7 +4,11 @@ import {
   detectSingleFace,
   nets,
 } from "face-api.js";
-import { WebCamHelper, asyncRequestAnimationFrameMs } from "../utils/helpers";
+import {
+  WebCamHelper,
+  asyncRequestAnimationFrameMs,
+  extractUserImage,
+} from "../utils/helpers";
 import Users from "../users";
 import User from "../user";
 import FaceExtractor from "./faceExtractor";
@@ -61,6 +65,18 @@ class FaceDetection {
   updateUsername = (name: string) => {
     if (!this.currentUser) return;
     this.currentUser.updateName(name);
+    this.emitUserChange();
+  };
+
+  updateUserImage = (image: Blob) => {
+    if (!this.currentUser) return;
+    this.currentUser.updateImage(image);
+    this.emitUserChange();
+  };
+
+  updateProfileQuestionsSelection = (selection: string[]) => {
+    if (!this.currentUser) return;
+    this.currentUser.updateProfileQuestionsSelection(selection);
     this.emitUserChange();
   };
 
@@ -141,6 +157,8 @@ class FaceDetection {
 
     if (averageMatchedUserId === "undefined") {
       this.currentUser = this.users.create(faceDescriptor, faceBox);
+      const userImage = await extractUserImage();
+      if (userImage) this.currentUser.updateImage(userImage);
       if (this.currentUser) {
         this.emitUserChange();
         this.currentUser.handleDetected(faceBox);
@@ -150,6 +168,10 @@ class FaceDetection {
 
     this.currentUser = this.users.find(averageMatchedUserId);
     if (this.currentUser) {
+      if (!this.currentUser.image) {
+        const userImage = await extractUserImage();
+        if (userImage) this.currentUser.updateImage(userImage);
+      }
       this.emitUserChange();
       this.currentUser.handleDetected(faceBox);
     }

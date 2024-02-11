@@ -19,6 +19,8 @@ class Main {
       this.faceDetection.subscribe,
       this.faceDetection.getCurrentUser,
       this.faceDetection.updateUsername,
+      this.faceDetection.updateUserImage,
+      this.faceDetection.updateProfileQuestionsSelection,
       this.handleStart
     );
   }

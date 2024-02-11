@@ -8,6 +8,8 @@ const createReactApp = (
   userSubscribe: (onStoreChange: () => void) => () => void,
   getCurrentUser: () => User | undefined,
   updateUsername: (name: string) => void,
+  updateImage: (image: Blob) => void,
+  updateProfileQuestionsSelection: (selection: string[]) => void,
   handleStartCallback: () => void
 ) => {
   ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -16,6 +18,8 @@ const createReactApp = (
         userSubscribe={userSubscribe}
         getCurrentUser={getCurrentUser}
         updateUsername={updateUsername}
+        updateImage={updateImage}
+        updateProfileQuestionsSelection={updateProfileQuestionsSelection}
       >
         <App handleStartCallback={handleStartCallback} />
       </Provider>

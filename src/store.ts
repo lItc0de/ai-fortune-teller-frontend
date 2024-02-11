@@ -9,8 +9,10 @@ export interface DBUser {
   createdAt: number;
   lastLoginAt: number;
   lastDetectionAt: number;
-  name?: string;
   faceDescriptors: Float32Array[];
+  name?: string;
+  image?: Blob;
+  profileQuestionsSelection?: string[];
 }
 
 interface FortuneTeller extends DBSchema {
@@ -49,8 +51,10 @@ class Store {
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt,
       lastDetectionAt: user.lastDetectionAt,
-      name: user.name,
       faceDescriptors: user.labeledFaceDescriptor.descriptors,
+      name: user.name,
+      image: user.image,
+      profileQuestionsSelection: user.profileQuestionsSelection,
     };
 
     await this.db.add("users", dbUser);
@@ -58,6 +62,8 @@ class Store {
 
   async updateUser(userId: string, dbUserParams: Partial<DBUser>) {
     if (!this.db) return;
+    // TODO: this removes the image because it is called at the same time
+    if (dbUserParams.lastDetectionAt) return;
 
     const oldDBUser = await this.db.get("users", userId);
     if (!oldDBUser) return;

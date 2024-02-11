@@ -4,4 +4,11 @@ import User from "../user";
 export const UserContext = createContext<{
   user: User | undefined;
   updateUsername: (name: string) => void;
-}>({ user: undefined, updateUsername: () => {} });
+  updateImage: (image: Blob) => void;
+  updateProfileQuestionsSelection: (selection: string[]) => void;
+}>({
+  user: undefined,
+  updateUsername: () => {},
+  updateImage: () => {},
+  updateProfileQuestionsSelection: () => {},
+});
