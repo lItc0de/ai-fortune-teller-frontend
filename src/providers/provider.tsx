@@ -7,6 +7,7 @@ import { UserContext } from "./userProvider";
 import { StateContext } from "./stateProvider";
 import { ChatElementsContext } from "./chatElementsProvider";
 import ChatElementModel from "../components/chat/chatElement.model";
+import KeyboardProvider from "./keyboardProvider";
 
 type Props = {
   userSubscribe: (onStoreChange: () => void) => () => void;
@@ -108,7 +109,7 @@ const Provider: React.FC<Props> = ({
               removeChatElement,
             }}
           >
-            {children}
+            <KeyboardProvider>{children}</KeyboardProvider>
           </ChatElementsContext.Provider>
         </StateContext.Provider>
       </UserContext.Provider>
