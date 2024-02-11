@@ -1,44 +1,42 @@
+export enum BotMessageType {
+  BOT,
+  PROMPT,
+  NEW_SESSION,
+  OLD_SESSION,
+  USERNAME,
+  ABORT,
+  END_SESSION,
+}
+
+export interface RawBotMessage {
+  type: BotMessageType;
+  prompt?: string;
+  userName?: string;
+}
+
 class BotMessage {
-  private text: string;
-  private isBot: boolean;
-  private _label?: string;
+  type: BotMessageType;
+  prompt?: string;
+  userName?: string;
 
-  constructor(text: string, isBot: boolean = true, label?: string) {
-    this.text = text;
-    this._label = label;
-    this.isBot = isBot;
+  constructor(type: BotMessageType, prompt?: string, userName?: string) {
+    this.type = type;
+    this.prompt = prompt;
+    this.userName = userName;
   }
 
-  toString(): string {
-    return [this.label, this.text, "<br>"].join("");
+  toJSONString(): string {
+    const rawMessage: RawBotMessage = {
+      type: this.type,
+      prompt: this.prompt,
+      userName: this.userName,
+    };
+    return JSON.stringify(rawMessage);
   }
 
-  toHtml(): HTMLDivElement {
-    const wrapper = document.createElement("div");
-    wrapper.className = "outputWrapper";
-
-    if (this.label) {
-      const label = document.createElement("label");
-      label.className = "outputLabel";
-      label.textContent = this.label;
-      wrapper.appendChild(label);
-    }
-
-    const output = document.createElement("output");
-    output.className = "output";
-    output.textContent = this.text;
-
-    wrapper.appendChild(output);
-
-    return wrapper;
-  }
-
-  private get label(): string {
-    if (this.isBot) {
-      return this._label || "Fortune Teller";
-    }
-
-    return this._label || "You";
+  static createfromJSON(json: string) {
+    const { type, prompt, userName } = JSON.parse(json) as RawBotMessage;
+    return new BotMessage(type, prompt, userName);
   }
 }
 

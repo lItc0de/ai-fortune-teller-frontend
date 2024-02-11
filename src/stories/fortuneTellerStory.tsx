@@ -1,16 +1,14 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import Socket from "../socket";
-// import SocketMessage, { SocketMessageType } from "../utils/socketMessage";
 import { ChatElementsContext } from "../providers/chatElementsProvider";
 import ChatMessageModel from "../components/chat/chatMessage.model";
 import ChatInputModel from "../components/chat/chatInput.model";
-import { sleep } from "../utils/helpers";
+import useChatBot from "../hooks/useChatBot";
 
 const FortuneTellerStory: React.FC = () => {
   const { addChatElement } = useContext(ChatElementsContext);
+  const { sendMessage } = useChatBot();
 
   const [done, setDone] = useState(false);
-  const socketRef = useRef<Socket>();
   const eventIteratorRef = useRef<Generator<void>>();
 
   const handleInput = (value?: string) => {
@@ -24,9 +22,8 @@ const FortuneTellerStory: React.FC = () => {
   };
 
   const sendPrompt = async (prompt: string) => {
-    await sleep(1000);
-    // eventIteratorRef.current?.next();
-    eventIteratorRef.current?.next(`--> ${prompt}`);
+    const res = await sendMessage(prompt);
+    eventIteratorRef.current?.next(res.answer);
   };
 
   const eventGeneratorRef = useRef(function* (): Generator<void> {
@@ -51,18 +48,6 @@ const FortuneTellerStory: React.FC = () => {
             new ChatMessageModel(true, answer, false, handleNext)
           );
         }
-        // await chatRef.current?.addFortuneTellerMessage(question);
-        // const response = await socketRef.current?.send(
-        //   new SocketMessage(SocketMessageType.PROMPT, question, user?.name)
-        // );
-        // if (
-        //   response &&
-        //   response.type === SocketMessageType.BOT &&
-        //   response.prompt
-        // ) {
-        //   await chatRef.current?.addFortuneTellerMessage(response.prompt);
-        // } else {
-        // }
       }
     }
   });
@@ -75,10 +60,6 @@ const FortuneTellerStory: React.FC = () => {
     return () => {
       iterator.return(undefined);
     };
-  }, []);
-
-  useEffect(() => {
-    socketRef.current = new Socket();
   }, []);
 
   useEffect(() => {
