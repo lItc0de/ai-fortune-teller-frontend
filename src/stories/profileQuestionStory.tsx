@@ -166,7 +166,7 @@ const ProfileQuestionStory: React.FC = () => {
   useEffect(() => {
     if (!done || selection.length === 0) return;
     updateProfileQuestionsSelection(selection);
-    setSessionStateId(SessionStateId.FORTUNE_SELECTION);
+    setSessionStateId(SessionStateId.TOPIC_SELECTION);
   }, [done, selection, setSessionStateId, updateProfileQuestionsSelection]);
 
   return <></>;

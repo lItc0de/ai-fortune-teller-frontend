@@ -7,7 +7,7 @@ import NameFindingStory from "../stories/nameFindingStory";
 import ProfileQuestionStory from "../stories/profileQuestionStory";
 import { StateContext } from "../providers/stateProvider";
 import ProfileStory from "../stories/profileStory";
-import FortuneSelectStory from "../stories/fortuneSelectStory";
+import FortuneSelectStory from "../stories/topicSelectStory";
 
 const Stories: React.FC = () => {
   const {
@@ -24,7 +24,7 @@ const Stories: React.FC = () => {
         setShowChat(true);
         break;
       case SessionStateId.WELCOME_OLD_USER:
-        setSessionStateId(SessionStateId.FORTUNE_SELECTION);
+        setSessionStateId(SessionStateId.TOPIC_SELECTION);
         break;
 
       case SessionStateId.FORTUNE_TELLER:
@@ -42,7 +42,7 @@ const Stories: React.FC = () => {
         setShowChat(false);
         break;
 
-      case SessionStateId.FORTUNE_SELECTION:
+      case SessionStateId.TOPIC_SELECTION:
         setAnimationStateId(AnimationStateId.IDLE);
         setShowChat(false);
         break;
@@ -75,7 +75,7 @@ const Stories: React.FC = () => {
         <FortuneTellerStory />
       )}
       {sessionStateId === SessionStateId.PROFILE && <ProfileStory />}
-      {sessionStateId === SessionStateId.FORTUNE_SELECTION && (
+      {sessionStateId === SessionStateId.TOPIC_SELECTION && (
         <FortuneSelectStory />
       )}
       {sessionStateId === SessionStateId.END_SESSION && <EndStory />}

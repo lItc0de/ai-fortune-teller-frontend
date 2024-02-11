@@ -144,7 +144,7 @@ const NameFindingStory: React.FC = () => {
     if (buttonId === "1") {
       setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
     } else if (buttonId === "2") {
-      setSessionStateId(SessionStateId.FORTUNE_TELLER);
+      setSessionStateId(SessionStateId.TOPIC_SELECTION);
     }
   }, [buttonId, done, setSessionStateId]);
 
