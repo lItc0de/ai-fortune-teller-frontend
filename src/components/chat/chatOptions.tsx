@@ -40,14 +40,11 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
   );
 
   useEffect(() => {
-    console.log("calllllllllllllllllll");
-
     if (!labelDone) return;
     if (Number.isNaN(Number(key))) return;
 
     const optionNumber = Number(key) - 1;
     const optionSelected = options[optionNumber];
-    console.log({ optionSelected });
 
     if (optionSelected) handleSelect(optionSelected.id);
   }, [key, handleSelect, options, labelDone]);
