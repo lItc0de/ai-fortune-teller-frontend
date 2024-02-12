@@ -2,7 +2,8 @@ const DATABASE = "fortune-teller";
 const DB_VERSION = 1;
 
 import { openDB, IDBPDatabase, DBSchema } from "idb";
-import User from "./detectionUser";
+import User from "./utils/user";
+import DetectionUser from "./faceRecognition/detectionUser";
 
 export interface DBUser {
   id: string;
@@ -11,7 +12,6 @@ export interface DBUser {
   lastDetectionAt: number;
   faceDescriptors: Float32Array[];
   name?: string;
-  image?: Blob;
   profileQuestionsSelection?: string[];
 }
 
@@ -32,43 +32,50 @@ class Store {
     });
   }
 
-  async getUsers(): Promise<User[]> {
+  getUsers = async (): Promise<User[]> => {
     if (!this.db) return [];
 
     const dbUsers = await this.db.getAll("users");
     const users: User[] = [];
     for (let i = 0; i < dbUsers.length; i++) {
-      users.push(await User.fromDBUser(this, dbUsers[i]));
+      users.push(new User(dbUsers[i]));
     }
     return users;
-  }
+  };
 
-  async addUser(user: User) {
+  getDetectionUsers = async (): Promise<DetectionUser[]> => {
+    if (!this.db) return [];
+
+    const dbUsers = await this.db.getAll("users");
+    const users: DetectionUser[] = [];
+    for (let i = 0; i < dbUsers.length; i++) {
+      users.push(new DetectionUser(dbUsers[i]));
+    }
+    return users;
+  };
+
+  addUser = async (detectionUser: DetectionUser) => {
     if (!this.db) return;
+    const createdAt = Date.now();
 
     const dbUser: DBUser = {
-      id: user.id,
-      createdAt: user.createdAt,
-      lastLoginAt: user.lastLoginAt,
-      lastDetectionAt: user.lastDetectionAt,
-      faceDescriptors: user.labeledFaceDescriptor.descriptors,
-      name: user.name,
-      image: user.image,
-      profileQuestionsSelection: user.profileQuestionsSelection,
+      id: detectionUser.id,
+      faceDescriptors: detectionUser.labeledFaceDescriptor.descriptors,
+      lastDetectionAt: detectionUser.lastDetectionAt,
+      createdAt,
+      lastLoginAt: createdAt,
     };
 
     await this.db.add("users", dbUser);
-  }
+  };
 
-  async updateUser(userId: string, dbUserParams: Partial<DBUser>) {
+  updateUser = async (dbUserParams: Partial<DBUser> & { id: string }) => {
     if (!this.db) return;
-    // TODO: this removes the image because it is called at the same time
-    if (dbUserParams.lastDetectionAt) return;
 
-    const oldDBUser = await this.db.get("users", userId);
+    const oldDBUser = await this.db.get("users", dbUserParams.id);
     if (!oldDBUser) return;
 
-    const newUserParams: DBUser = { ...oldDBUser, ...dbUserParams, id: userId };
+    const newUserParams: DBUser = { ...oldDBUser, ...dbUserParams };
 
     try {
       await this.db.put("users", newUserParams);
@@ -80,7 +87,7 @@ class Store {
         dbUserParams,
       });
     }
-  }
+  };
 
   private upgrade(db: IDBPDatabase<FortuneTeller>, oldVersion: number) {
     if (oldVersion < 1) {

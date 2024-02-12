@@ -24,13 +24,19 @@ class FaceDetection {
   private listeners: (() => void)[] = [];
   private faceExtractor: FaceExtractor;
 
+  private addDbUser: (dbUser: DetectionUser) => Promise<void>;
   private started = false;
 
-  constructor() {
+  constructor(
+    initialDetectionUsers: DetectionUser[],
+    addDbUser: (dbUser: DetectionUser) => Promise<void>
+  ) {
+    this.detectionUsers = initialDetectionUsers;
     this.detectionOptions = new TinyFaceDetectorOptions();
     this.webcamHelper = new WebCamHelper();
     this.video = this.webcamHelper.video;
     this.faceExtractor = new FaceExtractor();
+    this.addDbUser = addDbUser;
   }
 
   async init() {
@@ -77,9 +83,10 @@ class FaceDetection {
   private createDetectionUser(faceDescriptor: Float32Array, faceBox: Box) {
     const newDetectionUser = new DetectionUser({
       faceBox,
-      faceDescriptor,
+      faceDescriptors: [faceDescriptor],
     });
     this.detectionUsers.push(newDetectionUser);
+    this.addDbUser(newDetectionUser);
     this.updateDetectionUserId(newDetectionUser.id);
     this.clearDetectedUserIds();
   }

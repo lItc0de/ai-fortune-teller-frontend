@@ -15,10 +15,11 @@ export const UsersContext = createContext<{
 
 type Props = {
   children: ReactNode;
+  initialUsers: User[];
 };
 
-const UsersProvider: React.FC<Props> = ({ children }) => {
-  const [users, setUsers] = useState<User[]>([]);
+const UsersProvider: React.FC<Props> = ({ children, initialUsers }) => {
+  const [users, setUsers] = useState<User[]>(initialUsers);
 
   const addUser = useCallback((newUser: User) => {
     setUsers((oldUsers) => {

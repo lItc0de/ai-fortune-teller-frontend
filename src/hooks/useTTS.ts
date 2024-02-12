@@ -59,7 +59,7 @@ const useTTS = () => {
     });
 
   const transcribe = async (text?: string) => {
-    if (!ttsEnabled) return;
+    if (!ttsEnabled) throw new TTSDisabledError();
     if (!text) return;
 
     let res;

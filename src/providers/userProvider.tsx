@@ -9,6 +9,7 @@ import {
 } from "react";
 import { UsersContext } from "./usersProvider";
 import User from "../utils/user";
+import { DBUser } from "../store";
 
 export const UserContext = createContext<{
   user: User | undefined;
@@ -36,12 +37,16 @@ type Props = {
   children: ReactNode;
   detectionIdSubscribe: (onStoreChange: () => void) => () => void;
   getDetectionId: () => string | undefined;
+  updateUserInStore: (
+    dbUser: Partial<DBUser> & { id: string }
+  ) => Promise<void>;
 };
 
 const UserProvider: React.FC<Props> = ({
   children,
   detectionIdSubscribe,
   getDetectionId,
+  updateUserInStore,
 }) => {
   const [user, setUser] = useState<User>();
   const [userId, setUserId] = useState<string>();
@@ -74,6 +79,7 @@ const UserProvider: React.FC<Props> = ({
     if (!user) return;
     const updatedUser = user.updateName(name);
     updateUser(updatedUser);
+    updateUserInStore(updatedUser);
     setUser(updatedUser);
   };
 
@@ -81,6 +87,7 @@ const UserProvider: React.FC<Props> = ({
     if (!user) return;
     const updatedUser = user.updateProfileQuestionsSelection(selection);
     updateUser(updatedUser);
+    updateUserInStore(updatedUser);
     setUser(updatedUser);
   };
 

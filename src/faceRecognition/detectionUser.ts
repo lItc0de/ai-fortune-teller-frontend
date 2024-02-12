@@ -4,8 +4,8 @@ import UserCreateError from "../errors/userCreateError";
 type DetectionUserParams = Partial<
   Omit<DetectionUser, "lastFaceBoxes" | "labeledFaceDescriptor">
 > & {
-  faceBox: Box;
-  faceDescriptor: Float32Array;
+  faceBox?: Box;
+  faceDescriptors: Float32Array[];
 };
 
 class DetectionUser {
@@ -15,14 +15,15 @@ class DetectionUser {
   lastFaceBoxes: Box[] = [];
 
   constructor(params: DetectionUserParams) {
-    if (!params.faceDescriptor || !params.faceBox) throw new UserCreateError();
+    if (!params.faceDescriptors) throw new UserCreateError();
 
     this.id = params?.id || crypto.randomUUID();
     this.lastDetectionAt = params?.lastDetectionAt || Date.now();
-    this.labeledFaceDescriptor = new LabeledFaceDescriptors(this.id, [
-      params.faceDescriptor,
-    ]);
-    this.addFaceBox(params.faceBox);
+    this.labeledFaceDescriptor = new LabeledFaceDescriptors(
+      this.id,
+      params.faceDescriptors
+    );
+    if (params.faceBox) this.addFaceBox(params.faceBox);
   }
 
   // async addFaceDescriptor(faceDescriptor: Float32Array) {
