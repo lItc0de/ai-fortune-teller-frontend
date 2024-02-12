@@ -11,15 +11,13 @@ import ChatBtnsModel from "../components/chat/chatBtns.model";
 const NameFindingStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
   const { updateUsername } = useContext(UserContext);
-  const { addChatElement } = useContext(ChatElementsContext);
+  const { addChatElement, clearChatElements } = useContext(ChatElementsContext);
 
   const [done, setDone] = useState(false);
   const [buttonId, setButtonId] = useState<string>();
   const eventIteratorRef = useRef<Generator<void>>();
 
   const handleInput = (value?: string) => {
-    console.log("handleInput", value);
-
     eventIteratorRef.current?.next();
     eventIteratorRef.current?.next(value);
   };
@@ -54,7 +52,6 @@ const NameFindingStory: React.FC = () => {
       while (askForName) {
         yield addChatElement(new ChatInputModel(true, false, handleInput));
         name = yield;
-        console.log("name:", name);
 
         if (typeof name !== "string") continue;
 
@@ -141,12 +138,13 @@ const NameFindingStory: React.FC = () => {
 
   useEffect(() => {
     if (!done) return;
+    clearChatElements();
     if (buttonId === "1") {
       setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
     } else if (buttonId === "2") {
       setSessionStateId(SessionStateId.TOPIC_SELECTION);
     }
-  }, [buttonId, done, setSessionStateId]);
+  }, [buttonId, done, setSessionStateId, clearChatElements]);
 
   return <></>;
 };

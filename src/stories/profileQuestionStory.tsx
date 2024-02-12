@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { ChatElementsContext } from "../providers/chatElementsProvider";
 import ChatMessageModel from "../components/chat/chatMessage.model";
 import ChatOptionsModel, {
@@ -9,7 +9,7 @@ import { SessionStateId } from "../constants";
 import { UserContext } from "../providers/userProvider";
 
 const ProfileQuestionStory: React.FC = () => {
-  const { addChatElement } = useContext(ChatElementsContext);
+  const { addChatElement, clearChatElements } = useContext(ChatElementsContext);
   const { setSessionStateId } = useContext(StateContext);
   const { updateProfileQuestionsSelection } = useContext(UserContext);
 
@@ -59,17 +59,17 @@ const ProfileQuestionStory: React.FC = () => {
     { id: "telekinesis", text: "Telekinesis" },
   ];
 
-  const handleSelect = (id?: string) => {
-    if (id) setSelection([...selection, id]);
+  const handleSelect = useCallback((id?: string) => {
+    if (id) setSelection((currSelection) => [...currSelection, id]);
 
     const res = eventIteratorRef.current?.next();
     if (res && res.done) setDone(true);
-  };
+  }, []);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const res = eventIteratorRef.current?.next();
     if (res && res.done) setDone(true);
-  };
+  }, []);
 
   const eventGeneratorRef = useRef(function* (): Generator<void> {
     yield addChatElement(
@@ -151,6 +151,16 @@ const ProfileQuestionStory: React.FC = () => {
         handleSelect
       )
     );
+
+    yield addChatElement(
+      new ChatMessageModel(
+        true,
+        `Thanks for your answers, let's begin!`,
+        false,
+        handleNext,
+        true
+      )
+    );
   });
 
   useEffect(() => {
@@ -166,8 +176,15 @@ const ProfileQuestionStory: React.FC = () => {
   useEffect(() => {
     if (!done || selection.length === 0) return;
     updateProfileQuestionsSelection(selection);
+    clearChatElements();
     setSessionStateId(SessionStateId.TOPIC_SELECTION);
-  }, [done, selection, setSessionStateId, updateProfileQuestionsSelection]);
+  }, [
+    done,
+    selection,
+    setSessionStateId,
+    updateProfileQuestionsSelection,
+    clearChatElements,
+  ]);
 
   return <></>;
 };

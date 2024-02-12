@@ -1,9 +1,11 @@
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import styles from "./chatOptions.module.css";
 import { ChatElementsContext } from "../../providers/chatElementsProvider";
 import ChatOptionsModel from "./chatOptions.model";
 import { FORTUNE_TELLER_USER } from "../../constants";
 import ChatMessageModel from "./chatMessage.model";
+import { KeyboardProviderContext } from "../../providers/keyboardProvider";
+import useTyping from "../../hooks/useTyping";
 
 const ChatOptions: React.FC<ChatOptionsModel> = ({
   label,
@@ -12,6 +14,9 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
   handleDone,
 }) => {
   const { addChatElement, removeChatElement } = useContext(ChatElementsContext);
+  const { key } = useContext(KeyboardProviderContext);
+  const [startLabelTyping, labelPart, labelDone] = useTyping(label);
+  const [showOptions, setShowOptions] = useState(false);
 
   const handleSelect = useCallback(
     (optionId: string) => {
@@ -35,46 +40,53 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
   );
 
   useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => {
-      const key = Number(e.key);
-      if (Number.isNaN(key)) return;
+    console.log("calllllllllllllllllll");
 
-      const optionSelected = options[key - 1];
-      if (optionSelected) {
-        document.removeEventListener("keydown", handleKeydown);
-        handleSelect(optionSelected.id);
-      }
-    };
+    if (!labelDone) return;
+    if (Number.isNaN(Number(key))) return;
 
-    document.addEventListener("keydown", handleKeydown);
+    const optionNumber = Number(key) - 1;
+    const optionSelected = options[optionNumber];
+    console.log({ optionSelected });
 
-    return () => document.removeEventListener("keydown", handleKeydown);
-  }, [handleSelect, options]);
+    if (optionSelected) handleSelect(optionSelected.id);
+  }, [key, handleSelect, options, labelDone]);
+
+  useEffect(() => {
+    startLabelTyping();
+  }, [startLabelTyping]);
+
+  useEffect(() => {
+    if (!labelDone) return;
+    setShowOptions(true);
+  }, [labelDone]);
 
   return (
     <div className={styles.optionsWrapper}>
       <label className={styles.label}>{FORTUNE_TELLER_USER}</label>
-      <label className={styles.descriptionLabel}>{label}</label>
-      <ul className={styles.optionsList}>
-        {options.map(({ id, imgSrc, text }, i) => {
-          const optionId = `option-${id}`;
-          const selectKey = i + 1;
-          return (
-            <li className={styles.listItem} key={optionId}>
-              <input
-                className={styles.radio}
-                type="radio"
-                id={optionId}
-                onInput={() => handleSelect(id)}
-              />
-              <label htmlFor={optionId} className={styles.optionLabel}>
-                [{selectKey}]{" "}
-                {text || <img className={styles.image} src={imgSrc}></img>}
-              </label>
-            </li>
-          );
-        })}
-      </ul>
+      <label className={styles.descriptionLabel}>{labelPart}</label>
+      {showOptions && (
+        <ul className={styles.optionsList}>
+          {options.map(({ id, imgSrc, text }, i) => {
+            const optionId = `option-${id}`;
+            const selectKey = i + 1;
+            return (
+              <li className={styles.listItem} key={optionId}>
+                <input
+                  className={styles.radio}
+                  type="radio"
+                  id={optionId}
+                  onInput={() => handleSelect(id)}
+                />
+                <label htmlFor={optionId} className={styles.optionLabel}>
+                  <span className="key-hint">[{selectKey}]</span>{" "}
+                  {text || <img className={styles.image} src={imgSrc}></img>}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { Box } from "face-api.js";
-import User from "../user";
+import User from "../detectionUser";
 
 const FACE_CANVAS_WIDTH = 250;
 const FACE_CANVAS_HEIGHT = 250;

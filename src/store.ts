@@ -2,7 +2,7 @@ const DATABASE = "fortune-teller";
 const DB_VERSION = 1;
 
 import { openDB, IDBPDatabase, DBSchema } from "idb";
-import User from "./user";
+import User from "./detectionUser";
 
 export interface DBUser {
   id: string;

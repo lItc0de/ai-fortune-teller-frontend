@@ -8,6 +8,7 @@ import { ChatElementsContext } from "../../providers/chatElementsProvider";
 import useTTS from "../../hooks/useTTS";
 import TTSDisabledError from "../../errors/ttsDisabledError";
 import TTSNetworkError from "../../errors/ttsNetworkError";
+import { KeyboardProviderContext } from "../../providers/keyboardProvider";
 
 const ChatMessage: React.FC<ChatMessageModel> = ({
   done,
@@ -15,9 +16,11 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
   text,
   handleDone,
   id,
+  awaitsEnter,
 }) => {
   const { user } = useContext(UserContext);
   const { setChatElementDone } = useContext(ChatElementsContext);
+  const { key } = useContext(KeyboardProviderContext);
   const [userName, setUserName] = useState("");
   const [innerDone, setInnerDone] = useState(done);
   const [innerText, setInnerText] = useState("");
@@ -29,10 +32,6 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
 
     setUserName(name);
   }, [user?.name]);
-
-  useEffect(() => {
-    if (innerDone && handleDone) handleDone();
-  }, [innerDone, handleDone]);
 
   useEffect(() => {
     if (innerDone) {
@@ -76,10 +75,18 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
   }, [innerDone, text, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!done && innerDone) {
-      setChatElementDone(id);
-    }
+    if (!done && innerDone) setChatElementDone(id);
   }, [done, innerDone, setChatElementDone, id]);
+
+  useEffect(() => {
+    if (!innerDone || !handleDone) return;
+    if (awaitsEnter && key === "Enter") handleDone();
+  }, [innerDone, handleDone, awaitsEnter, key]);
+
+  useEffect(() => {
+    if (awaitsEnter) return;
+    if (innerDone && handleDone) handleDone();
+  }, [innerDone, handleDone, awaitsEnter]);
 
   return (
     <div className={styles.output}>
@@ -87,7 +94,10 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
         {isFortuneTeller ? FORTUNE_TELLER_USER : userName}
       </label>
 
-      <output className={styles.output}>{innerText || "Typing..."}</output>
+      <output className={styles.output}>
+        {innerText || "Typing..."}&nbsp;
+        {innerDone && awaitsEnter && <span className="key-hint">[Enter]</span>}
+      </output>
     </div>
   );
 };

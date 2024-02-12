@@ -13,36 +13,38 @@ type Props = {
 };
 
 const App: React.FC<Props> = ({ handleStartCallback }) => {
-  const [showStartBtn, setShowStartBtn] = useState(true);
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const { started, setStarted } = useContext(StateContext);
   const { showChat } = useContext(StateContext);
   const { key } = useContext(KeyboardProviderContext);
 
   const handleStartClick = useCallback(() => {
-    setShowStartBtn(false);
+    setStarted(true);
     setShouldAnimate(true);
     handleStartCallback();
-  }, [handleStartCallback]);
+  }, [handleStartCallback, setStarted]);
 
   useEffect(() => {
-    if (!showStartBtn) return;
-    if (key !== "s") return;
+    if (started) return;
+    if (key !== "Enter") return;
     handleStartClick();
-  }, [key, handleStartClick, showStartBtn]);
+  }, [key, handleStartClick, started]);
 
   return (
     <>
       <Header />
       <Player />
       <Canvas shouldAnimate={shouldAnimate} />
-      {showStartBtn && (
-        <input
+      {!started && (
+        <button
           type="button"
           id="startBtn"
-          value="Start"
           className={styles.startBtn}
           onClick={handleStartClick}
-        />
+        >
+          <span className="key-hint">[Enter]</span>
+          Start
+        </button>
       )}
       {showChat && <Chat />}
       <Stories />

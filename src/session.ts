@@ -7,7 +7,7 @@
 // import FortuneTellingEvent from "./events/fortuneTellingEvent";
 // import EndSessionEvent from "./events/endSessionEvent";
 // import Socket from "./socket";
-import User from "./user";
+import User from "./detectionUser";
 import { SessionStateId } from "./constants";
 
 class Session {

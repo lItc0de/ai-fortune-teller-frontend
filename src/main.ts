@@ -1,26 +1,16 @@
 import FaceDetection from "./faceRecognition/faceDetection";
 import createReactApp from "./page/main";
-import Users from "./users";
 
 class Main {
-  private users: Users;
   private faceDetection?: FaceDetection;
 
-  constructor() {
-    this.users = new Users();
-  }
-
   async init() {
-    await this.users.init();
-    this.faceDetection = new FaceDetection(this.users);
+    this.faceDetection = new FaceDetection();
     await this.faceDetection.init();
 
     createReactApp(
-      this.faceDetection.subscribe,
-      this.faceDetection.getCurrentUser,
-      this.faceDetection.updateUsername,
-      this.faceDetection.updateUserImage,
-      this.faceDetection.updateProfileQuestionsSelection,
+      this.faceDetection.detectionIdSubscribe,
+      this.faceDetection.getDetectionId,
       this.handleStart
     );
   }

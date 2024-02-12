@@ -1,35 +1,35 @@
 import {
+  Box,
   FaceMatcher,
   TinyFaceDetectorOptions,
   detectSingleFace,
   nets,
 } from "face-api.js";
-import {
-  WebCamHelper,
-  asyncRequestAnimationFrameMs,
-  extractUserImage,
-} from "../utils/helpers";
-import Users from "../users";
-import User from "../user";
+import { WebCamHelper, asyncRequestAnimationFrameMs } from "../utils/helpers";
 import FaceExtractor from "./faceExtractor";
+import DetectionUser from "./detectionUser";
+
+const LOGOUT_TIME = 10000;
 
 class FaceDetection {
   private video: HTMLVideoElement;
   private detectionOptions: TinyFaceDetectorOptions;
   private webcamHelper: WebCamHelper;
-  private users: Users;
+
+  private detectionUsers: DetectionUser[] = [];
+  private detectionUserId?: string;
+  private detectionUser?: DetectionUser;
+
   private detectedUserIds: string[] = [];
-  private currentUser?: User;
   private listeners: (() => void)[] = [];
   private faceExtractor: FaceExtractor;
 
   private started = false;
 
-  constructor(users: Users) {
+  constructor() {
     this.detectionOptions = new TinyFaceDetectorOptions();
     this.webcamHelper = new WebCamHelper();
     this.video = this.webcamHelper.video;
-    this.users = users;
     this.faceExtractor = new FaceExtractor();
   }
 
@@ -49,7 +49,7 @@ class FaceDetection {
     this.started = false;
   }
 
-  subscribe = (listener: () => void) => {
+  detectionIdSubscribe = (listener: () => void) => {
     this.listeners.push(listener);
     this.listeners = [...this.listeners, listener];
 
@@ -58,33 +58,36 @@ class FaceDetection {
     };
   };
 
-  getCurrentUser = (): User | undefined => {
-    return this.currentUser;
+  getDetectionId = (): string | undefined => {
+    return this.detectionUserId;
   };
 
-  updateUsername = (name: string) => {
-    if (!this.currentUser) return;
-    this.currentUser.updateName(name);
-    this.emitUserChange();
-  };
+  private updateDetectionUserId(newDetectionUserId?: string) {
+    if (this.detectionUserId === newDetectionUserId) return;
 
-  updateUserImage = (image: Blob) => {
-    if (!this.currentUser) return;
-    this.currentUser.updateImage(image);
-    this.emitUserChange();
-  };
+    this.detectionUserId = newDetectionUserId;
+    this.detectionUser = this.findDetectionUser(this.detectionUserId);
+    this.emitDetectionIdChange();
+  }
 
-  updateProfileQuestionsSelection = (selection: string[]) => {
-    if (!this.currentUser) return;
-    this.currentUser.updateProfileQuestionsSelection(selection);
-    this.emitUserChange();
-  };
-
-  private emitUserChange() {
-    if (!this.currentUser) return;
-
+  private emitDetectionIdChange() {
     this.listeners.forEach((listener) => listener());
   }
+
+  private createDetectionUser(faceDescriptor: Float32Array, faceBox: Box) {
+    const newDetectionUser = new DetectionUser({
+      faceBox,
+      faceDescriptor,
+    });
+    this.detectionUsers.push(newDetectionUser);
+    this.updateDetectionUserId(newDetectionUser.id);
+    this.clearDetectedUserIds();
+  }
+
+  private findDetectionUser = (
+    detectionUserId?: string
+  ): DetectionUser | undefined =>
+    this.detectionUsers.find(({ id }) => id === detectionUserId);
 
   private async detect(): Promise<void> {
     const detection = await detectSingleFace(this.video, this.detectionOptions)
@@ -94,11 +97,10 @@ class FaceDetection {
     // no detection
     if (!detection) {
       if (
-        this.currentUser &&
-        Date.now() - this.currentUser.lastDetectionAt >= 5000
+        this.detectionUser &&
+        Date.now() - this.detectionUser.lastDetectionAt >= LOGOUT_TIME
       ) {
-        this.currentUser = undefined;
-        this.emitUserChange();
+        this.updateDetectionUserId(undefined);
       }
       return;
     }
@@ -106,75 +108,41 @@ class FaceDetection {
     const faceDescriptor = detection.descriptor;
     const faceBox = detection.detection.box;
 
-    if (this.users.length === 0) {
-      this.users.create(faceDescriptor, faceBox);
+    if (this.detectionUsers.length === 0) {
+      this.createDetectionUser(faceDescriptor, faceBox);
     }
 
-    const faceMatcher = new FaceMatcher(this.users.labeledFaceDescriptors);
+    const labeledFaceDescriptors = this.detectionUsers.map(
+      ({ labeledFaceDescriptor }) => labeledFaceDescriptor
+    );
+    const faceMatcher = new FaceMatcher(labeledFaceDescriptors);
     const matchedUserId = faceMatcher
       .findBestMatch(faceDescriptor)
       .toString(false);
 
     const averageMatchedUserId = this.getAverageUserId(matchedUserId);
 
-    // handle previous session
-    if (this.currentUser) {
-      switch (averageMatchedUserId) {
-        case this.currentUser.id:
-          this.currentUser.handleDetected(faceBox);
-          if (averageMatchedUserId !== matchedUserId) {
-            this.currentUser.addFaceDescriptor(faceDescriptor);
-          }
-          break;
-
-        case "undefined":
-          if (Date.now() - this.currentUser.lastDetectionAt < 5000) {
-            this.currentUser.addFaceDescriptor(faceDescriptor);
-            this.currentUser.handleDetected(faceBox);
-          } else {
-            this.currentUser = undefined;
-            this.emitUserChange();
-            const newUser = this.users.create(faceDescriptor, faceBox);
-            this.currentUser = newUser;
-            this.currentUser.handleDetected(faceBox);
-            this.emitUserChange();
-          }
-          break;
-
-        default:
-          this.currentUser = undefined;
-          this.emitUserChange();
-          this.currentUser = this.users.find(averageMatchedUserId);
-          if (this.currentUser) {
-            this.emitUserChange();
-            this.currentUser.handleDetected(faceBox);
-          }
-          break;
+    if (!this.detectionUserId || !this.detectionUser) {
+      if (averageMatchedUserId === "unknown") {
+        this.createDetectionUser(faceDescriptor, faceBox);
+      } else {
+        this.updateDetectionUserId(averageMatchedUserId);
       }
+    } else if (this.detectionUserId === averageMatchedUserId) {
+      this.detectionUser.handleDetected(faceBox);
+    } else {
+      if (this.detectionUser.lastDetectionAt <= LOGOUT_TIME) return;
 
-      return;
-    }
-
-    if (averageMatchedUserId === "undefined") {
-      this.currentUser = this.users.create(faceDescriptor, faceBox);
-      const userImage = await extractUserImage();
-      if (userImage) this.currentUser.updateImage(userImage);
-      if (this.currentUser) {
-        this.emitUserChange();
-        this.currentUser.handleDetected(faceBox);
+      if (averageMatchedUserId === "unknown") {
+        this.createDetectionUser(faceDescriptor, faceBox);
+      } else {
+        this.updateDetectionUserId(averageMatchedUserId);
       }
-      return;
     }
+  }
 
-    this.currentUser = this.users.find(averageMatchedUserId);
-    if (this.currentUser) {
-      if (!this.currentUser.image) {
-        const userImage = await extractUserImage();
-        if (userImage) this.currentUser.updateImage(userImage);
-      }
-      this.emitUserChange();
-      this.currentUser.handleDetected(faceBox);
-    }
+  private clearDetectedUserIds() {
+    this.detectedUserIds = [];
   }
 
   private getAverageUserId(matchedUserId: string): string {
@@ -191,13 +159,13 @@ class FaceDetection {
 
     return Object.keys(weightedIds).reduce((prev, curr) => {
       return weightedIds[curr] > (weightedIds[prev] || 0) ? curr : prev;
-    }, "undefined");
+    }, "unknown");
   }
 
   private async loop() {
     do {
       await this.detect();
-      if (this.currentUser) this.faceExtractor.draw(this.currentUser);
+      if (this.detectionUser) this.faceExtractor.draw(this.detectionUser);
 
       await asyncRequestAnimationFrameMs(100);
     } while (this.started);

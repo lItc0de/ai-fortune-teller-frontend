@@ -3,6 +3,7 @@ import { SessionStateId } from "../constants";
 import { StateContext } from "../providers/stateProvider";
 import { ChatElementsContext } from "../providers/chatElementsProvider";
 import ChatMessageModel from "../components/chat/chatMessage.model";
+import { sleep } from "../utils/helpers";
 
 const EndStory: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
@@ -11,9 +12,12 @@ const EndStory: React.FC = () => {
   const [done, setDone] = useState(false);
   const eventIteratorRef = useRef<Generator<void>>();
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const res = eventIteratorRef.current?.next();
-    if (res && res.done) setDone(true);
+    if (res && res.done) {
+      await sleep(3000);
+      setDone(true);
+    }
   };
 
   const eventGeneratorRef = useRef(function* (): Generator<void> {

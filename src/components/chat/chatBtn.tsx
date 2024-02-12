@@ -1,8 +1,17 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import ChatBtnModel from "./chatBtn.model";
 import style from "./chatBtn.module.css";
+import { KeyboardProviderContext } from "../../providers/keyboardProvider";
 
 const ChatBtn: React.FC<ChatBtnModel> = ({ number, label, handleClick }) => {
+  const { key } = useContext(KeyboardProviderContext);
+
+  useEffect(() => {
+    if (key !== number) return;
+
+    if (handleClick) handleClick(number);
+  }, [key, handleClick, number]);
+
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === number) {
@@ -14,14 +23,14 @@ const ChatBtn: React.FC<ChatBtnModel> = ({ number, label, handleClick }) => {
     document.addEventListener("keydown", handleKeydown);
 
     return () => document.removeEventListener("keydown", handleKeydown);
-  }, [number, handleClick]);
+  }, [number, handleClick, key]);
 
   return (
     <button
       className={style.btn}
       onClick={() => handleClick && handleClick(number)}
     >
-      [{number}] {label}
+      <span className="key-hint">[{number}]</span> {label}
     </button>
   );
 };

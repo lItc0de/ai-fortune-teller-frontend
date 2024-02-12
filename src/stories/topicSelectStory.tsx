@@ -8,6 +8,7 @@ const FortuneSelectStory: React.FC = () => {
 
   const handleClick = useCallback(
     (topic: string) => {
+      // TODO: add topics
       console.log(topic);
 
       setSessionStateId(SessionStateId.FORTUNE_TELLER);
@@ -51,25 +52,25 @@ const FortuneSelectStory: React.FC = () => {
         className={[styles.selectBtn, styles.love].join(" ")}
         onClick={() => handleClick("love")}
       >
-        [1] Love
+        <span className="key-hint">[1]</span> Love
       </button>
       <button
         className={[styles.selectBtn, styles.career].join(" ")}
         onClick={() => handleClick("career")}
       >
-        [2] Career
+        <span className="key-hint">[2]</span> Career
       </button>
       <button
         className={[styles.selectBtn, styles.general].join(" ")}
         onClick={() => handleClick("general")}
       >
-        [3] General
+        <span className="key-hint">[3]</span> General
       </button>
       <button
         className={styles.selectBtn}
         onClick={() => handleClick("question")}
       >
-        [4] Ask a question
+        <span className="key-hint">[4]</span> Ask a question
       </button>
     </section>
   );

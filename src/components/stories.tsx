@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import NewUserStory from "../stories/newUserStory";
 import { AnimationStateId, SessionStateId } from "../constants";
 import EndStory from "../stories/endStory";
@@ -8,6 +8,8 @@ import ProfileQuestionStory from "../stories/profileQuestionStory";
 import { StateContext } from "../providers/stateProvider";
 import ProfileStory from "../stories/profileStory";
 import FortuneSelectStory from "../stories/topicSelectStory";
+import { UserContext } from "../providers/userProvider";
+import LogInOutScreen from "./logInOutScreen";
 
 const Stories: React.FC = () => {
   const {
@@ -15,7 +17,10 @@ const Stories: React.FC = () => {
     setSessionStateId,
     setAnimationStateId,
     setShowChat,
+    started,
   } = useContext(StateContext);
+  const { detectionId, userId, user } = useContext(UserContext);
+  const [showLogInOutScreen, setShowLogInOutScreen] = useState(false);
 
   useEffect(() => {
     switch (sessionStateId) {
@@ -64,6 +69,38 @@ const Stories: React.FC = () => {
     }
   }, [sessionStateId, setSessionStateId, setAnimationStateId, setShowChat]);
 
+  useEffect(() => {
+    if (!userId) return;
+    if (sessionStateId !== SessionStateId.NO_SESSION) return;
+
+    if (user?.name) setSessionStateId(SessionStateId.WELCOME_OLD_USER);
+    else setSessionStateId(SessionStateId.NEW_SESSION);
+  }, [userId, user?.name, setSessionStateId, sessionStateId]);
+
+  useEffect(() => {
+    if (!started) {
+      setShowLogInOutScreen(false);
+      return;
+    }
+
+    if ((userId === detectionId) === undefined) {
+      setShowLogInOutScreen(false);
+      return;
+    }
+
+    if (userId === detectionId) {
+      setShowLogInOutScreen(false);
+      return;
+    }
+
+    if (!userId || !detectionId || userId !== detectionId) {
+      setShowLogInOutScreen(true);
+      return;
+    }
+
+    setShowLogInOutScreen(false);
+  }, [userId, detectionId, started]);
+
   return (
     <>
       {sessionStateId === SessionStateId.NEW_SESSION && <NewUserStory />}
@@ -79,6 +116,7 @@ const Stories: React.FC = () => {
         <FortuneSelectStory />
       )}
       {sessionStateId === SessionStateId.END_SESSION && <EndStory />}
+      {showLogInOutScreen && <LogInOutScreen />}
     </>
   );
 };

@@ -6,13 +6,12 @@ import {
   useState,
 } from "react";
 import { StateContext } from "./stateProvider";
-import { SessionStateId } from "../constants";
 
 export const KeyboardProviderContext = createContext<{
-  key: string;
+  key?: string;
   setCapture: (capture: boolean) => void;
 }>({
-  key: "",
+  key: undefined,
   setCapture: () => {},
 });
 
@@ -21,7 +20,7 @@ type Props = {
 };
 
 const KeyboardProvider: React.FC<Props> = ({ children }) => {
-  const [key, setKey] = useState("");
+  const [key, setKey] = useState<string>();
   const [capture, setCapture] = useState(true);
   const { setSessionStateId } = useContext(StateContext);
 
@@ -30,18 +29,21 @@ const KeyboardProvider: React.FC<Props> = ({ children }) => {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!e.key) return;
-      // e.preventDefault();
-      console.log(e.key);
-
       setKey(e.key);
-
-      if (e.key === "p") {
-        setSessionStateId(SessionStateId.PROFILE);
-      }
     };
-    document.addEventListener("keydown", handleKeyDown);
 
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    const handleKeyUp = () => {
+      setKey(undefined);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+      setKey(undefined);
+    };
   }, [capture, setSessionStateId]);
 
   return (

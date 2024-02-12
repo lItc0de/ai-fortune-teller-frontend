@@ -36,10 +36,12 @@
       display: flex;
       gap: 0.5rem;
       align-items: center;
+      cursor: pointer;
     }
 
     .radio {
-      appearance: none;
+      display: none;
+      /* appearance: none;
       background-color: transparent;
       margin: 0;
       font: inherit;
@@ -49,15 +51,15 @@
       border: 0.15rem solid var(--text-color);
       border-radius: 50%;
       display: grid;
-      place-content: center;
+      place-content: center; */
     }
   }
 }
 
-input[type="radio"]:checked::before {
+/* input[type="radio"]:checked::before {
   content: "";
   width: 0.65em;
   height: 0.65em;
   border-radius: 50%;
   background-color: #fff;
-}
+} */

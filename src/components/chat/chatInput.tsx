@@ -32,10 +32,21 @@ const ChatInput: React.FC<ChatInputModel> = ({ handleDone, id }) => {
   };
 
   useEffect(() => {
-    setCapture(false);
-    inputRef.current?.focus();
+    const input = inputRef.current;
+    if (!input) return;
 
-    return () => setCapture(true);
+    const handleFocusin = () => setCapture(false);
+    input.addEventListener("focusin", handleFocusin);
+
+    const handleFocusout = () => setCapture(true);
+    input.addEventListener("focusout", handleFocusout);
+
+    input.focus();
+
+    return () => {
+      input.removeEventListener("focusin", handleFocusin);
+      setCapture(true);
+    };
   }, [setCapture]);
 
   return (

@@ -23,6 +23,7 @@
   --background-dark: rgba(38, 27, 36);
 
   --text-color: #ffffff;
+  --text-color-muted: rgba(255, 255, 255, 0.7);
 
   --action-background: rgba(86, 124, 143, 0.7);
   --chat-background: rgba(69, 111, 133, 0.4);
@@ -34,6 +35,14 @@
 
 input {
   font-family: "Federant", serif;
+}
+
+.key-hint {
+  font-family: "Titillium Web", sans-serif;
+  font-style: italic;
+  color: var(--text-color-muted);
+  margin-right: 0.25rem;
+  margin-left: 0.25rem;
 }
 
 @keyframes fadeIn {
@@ -70,6 +79,7 @@ button {
   color: var(--text-color);
   font-family: "Federant", serif;
   cursor: pointer;
+  outline: none;
 }
 
 #root {
