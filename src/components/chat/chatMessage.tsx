@@ -9,6 +9,7 @@ import useTTS from "../../hooks/useTTS";
 import TTSDisabledError from "../../errors/ttsDisabledError";
 import TTSNetworkError from "../../errors/ttsNetworkError";
 import { KeyboardContext } from "../../providers/keyboardProvider";
+import { Topic } from "../../utils/serverMessage";
 
 const ChatMessage: React.FC<ChatMessageModel> = ({
   done,
@@ -17,6 +18,7 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
   handleDone,
   id,
   awaitsEnter,
+  topic,
 }) => {
   const { user } = useContext(UserContext);
   const { setChatElementDone } = useContext(ChatElementsContext);
@@ -88,8 +90,13 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
     if (innerDone && handleDone) handleDone();
   }, [innerDone, handleDone, awaitsEnter]);
 
+  const chatStyle =
+    topic !== undefined
+      ? [styles.outputWrapper, styles[Topic[topic].toLowerCase()]].join(" ")
+      : styles.outputWrapper;
+
   return (
-    <div className={styles.output}>
+    <div className={chatStyle}>
       <label className={styles.label}>
         {isFortuneTeller ? FORTUNE_TELLER_USER : userName}
       </label>

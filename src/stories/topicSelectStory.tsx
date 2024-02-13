@@ -1,38 +1,38 @@
 import { useCallback, useContext, useEffect } from "react";
-import styles from "./fortuneSelectStory.module.css";
+import styles from "./topicSelectStory.module.css";
 import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
+import { Topic } from "../utils/serverMessage";
 
 const FortuneSelectStory: React.FC = () => {
-  const { setSessionStateId } = useContext(StateContext);
+  const { setSessionStateId, setTopic } = useContext(StateContext);
 
   const handleClick = useCallback(
-    (topic: string) => {
-      // TODO: add topics
-      console.log(topic);
+    (topic: Topic) => {
+      setTopic(topic);
 
       setSessionStateId(SessionStateId.FORTUNE_TELLER);
     },
-    [setSessionStateId]
+    [setSessionStateId, setTopic]
   );
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
       switch (e.key) {
         case "1":
-          handleClick("love");
+          handleClick(Topic.LOVE);
           break;
 
         case "2":
-          handleClick("career");
+          handleClick(Topic.CAREER);
           break;
 
         case "3":
-          handleClick("general");
+          handleClick(Topic.GENERAL);
           break;
 
         case "4":
-          handleClick("question");
+          handleClick(Topic.QUESTION);
           break;
 
         default:
@@ -50,25 +50,25 @@ const FortuneSelectStory: React.FC = () => {
     <section className={styles.fortuneSelect}>
       <button
         className={[styles.selectBtn, styles.love].join(" ")}
-        onClick={() => handleClick("love")}
+        onClick={() => handleClick(Topic.LOVE)}
       >
         <span className="key-hint">[1]</span> Love
       </button>
       <button
         className={[styles.selectBtn, styles.career].join(" ")}
-        onClick={() => handleClick("career")}
+        onClick={() => handleClick(Topic.CAREER)}
       >
         <span className="key-hint">[2]</span> Career
       </button>
       <button
         className={[styles.selectBtn, styles.general].join(" ")}
-        onClick={() => handleClick("general")}
+        onClick={() => handleClick(Topic.GENERAL)}
       >
         <span className="key-hint">[3]</span> General
       </button>
       <button
         className={styles.selectBtn}
-        onClick={() => handleClick("question")}
+        onClick={() => handleClick(Topic.QUESTION)}
       >
         <span className="key-hint">[4]</span> Ask a question
       </button>

@@ -1,3 +1,4 @@
+import { Topic } from "../../utils/serverMessage";
 import ChatElementModel from "./chatElement.model";
 
 class ChatMessageModel extends ChatElementModel {
@@ -9,9 +10,10 @@ class ChatMessageModel extends ChatElementModel {
     text: string,
     done = false,
     handleDone?: (value?: string) => void,
-    awaitsEnter = false
+    awaitsEnter = false,
+    topic?: Topic
   ) {
-    super(isFortuneTeller, done, handleDone);
+    super(isFortuneTeller, done, handleDone, topic);
     this.text = text;
     this.awaitsEnter = awaitsEnter;
   }

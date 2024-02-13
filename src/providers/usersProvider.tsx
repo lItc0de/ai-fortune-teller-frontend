@@ -1,5 +1,14 @@
-import { ReactNode, createContext, useCallback, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import User from "../utils/user";
+import useFetch from "../hooks/useFetch";
+
+const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}/users`;
 
 export const UsersContext = createContext<{
   users: User[];
@@ -20,6 +29,7 @@ type Props = {
 
 const UsersProvider: React.FC<Props> = ({ children, initialUsers }) => {
   const [users, setUsers] = useState<User[]>(initialUsers);
+  const fetchData = useFetch();
 
   const addUser = useCallback((newUser: User) => {
     setUsers((oldUsers) => {
@@ -42,6 +52,21 @@ const UsersProvider: React.FC<Props> = ({ children, initialUsers }) => {
     },
     [users]
   );
+
+  useEffect(() => {
+    const deleteOldUsersInBackend = async () => {
+      await fetchData(BACKEND_URL, {
+        method: "DELETE",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(initialUsers.map(({ id }) => id)),
+      });
+    };
+
+    deleteOldUsersInBackend();
+  }, [initialUsers]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <UsersContext.Provider

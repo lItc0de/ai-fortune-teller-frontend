@@ -18,45 +18,48 @@ const ProfileQuestionStory: React.FC = () => {
   const eventIteratorRef = useRef<Generator<void>>();
 
   const options1: ChatOption[] = [
-    { id: "surise", text: "Sunrise" },
-    { id: "midnight", text: "Midnight" },
-    { id: "sunset", text: "Sunset" },
+    { id: "optimistic", text: "Sunrise" },
+    { id: "mysterious", text: "Midnight" },
+    { id: "reflective", text: "Sunset" },
   ];
 
   const options2: ChatOption[] = [
-    { id: "ocean", text: "Ocean" },
-    { id: "forest", text: "Forest" },
-    { id: "desert", text: "Desert" },
+    { id: "free-spirited", text: "Ocean" },
+    { id: "grounded", text: "Forest" },
+    { id: "independent", text: "Desert" },
   ];
 
   const options3: ChatOption[] = [
-    { id: "img1", text: "Img 1" },
-    { id: "img2", text: "Img 2" },
-    { id: "img3", text: "Img 3" },
+    { id: "peaceful", text: "Img 1" },
+    { id: "creative", text: "Img 2" },
+    { id: "intriguing", text: "Img 3" },
   ];
 
   const options4: ChatOption[] = [
-    { id: "freeFall", text: "Experiencing free fall" },
-    { id: "naked", text: "Being naked infront of other people" },
-    { id: "deceasedLoved", text: "Meeting deceased loved ones" },
+    { id: "fear-of-loosing-control", text: "Experiencing free fall" },
+    { id: "need-for-scceptance", text: "Being naked infront of other people" },
+    {
+      id: "emotional-connection-to-the-past",
+      text: "Meeting deceased loved ones",
+    },
   ];
 
   const options5: ChatOption[] = [
-    { id: "classical", text: "Classical" },
-    { id: "electronic", text: "Electronic" },
-    { id: "pop", text: "Pop" },
+    { id: "traditional", text: "Classical" },
+    { id: "energetic", text: "Electronic" },
+    { id: "extroverted", text: "Pop" },
   ];
 
   const options6: ChatOption[] = [
-    { id: "sun", text: "Sun" },
-    { id: "moon", text: "Moon" },
-    { id: "star", text: "Star" },
+    { id: "forward-looking", text: "Sun" },
+    { id: "intuitive", text: "Moon" },
+    { id: "ambitious", text: "Star" },
   ];
 
   const options7: ChatOption[] = [
-    { id: "flying", text: "Flying" },
-    { id: "time", text: "Time manipulation" },
-    { id: "telekinesis", text: "Telekinesis" },
+    { id: "adventurous", text: "Flying" },
+    { id: "controlling", text: "Time manipulation" },
+    { id: "very-mysterious", text: "Telekinesis" },
   ];
 
   const handleSelect = useCallback((id?: string) => {

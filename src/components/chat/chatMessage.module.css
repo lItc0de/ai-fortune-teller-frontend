@@ -1,4 +1,4 @@
-.output {
+.outputWrapper {
   display: flex;
   flex-direction: column;
   background-color: var(--chat-background);
@@ -22,4 +22,16 @@
     padding: 0.5rem;
     background-color: transparent;
   }
+}
+
+.outputWrapper.love {
+  background-color: var(--love-background);
+}
+
+.outputWrapper.career {
+  background-color: var(--career-background);
+}
+
+.outputWrapper.general {
+  background-color: var(--general-background);
 }

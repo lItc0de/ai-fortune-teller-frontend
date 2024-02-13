@@ -30,6 +30,10 @@
   --light-background: rgba(168, 225, 255, 0.3);
   --header-background: rgba(168, 225, 255, 0.1);
 
+  --love-background: rgba(255, 192, 203, 0.7);
+  --career-background: rgba(144, 238, 144, 0.7);
+  --general-background: rgba(238, 130, 238, 0.7);
+
   --backdrop-filter: blur(10px);
 }
 

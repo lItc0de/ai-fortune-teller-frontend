@@ -3,10 +3,12 @@ import { ChatElementsContext } from "../providers/chatElementsProvider";
 import ChatMessageModel from "../components/chat/chatMessage.model";
 import ChatInputModel from "../components/chat/chatInput.model";
 import useChatBot from "../hooks/useChatBot";
+import { StateContext } from "../providers/stateProvider";
 
 const FortuneTellerStory: React.FC = () => {
   const { addChatElement } = useContext(ChatElementsContext);
-  const { sendMessage } = useChatBot();
+  const { topic } = useContext(StateContext);
+  const { sendUserMessage } = useChatBot();
 
   const [done, setDone] = useState(false);
   const eventIteratorRef = useRef<Generator<void>>();
@@ -22,8 +24,9 @@ const FortuneTellerStory: React.FC = () => {
   };
 
   const sendPrompt = async (prompt: string) => {
-    const res = await sendMessage(prompt);
-    eventIteratorRef.current?.next(res.answer);
+    const serverMessage = await sendUserMessage(prompt);
+
+    eventIteratorRef.current?.next(serverMessage.content);
   };
 
   const eventGeneratorRef = useRef(function* (): Generator<void> {
@@ -32,7 +35,9 @@ const FortuneTellerStory: React.FC = () => {
         true,
         `I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!`,
         false,
-        handleNext
+        handleNext,
+        false,
+        topic
       )
     );
 
@@ -45,7 +50,7 @@ const FortuneTellerStory: React.FC = () => {
         const answer = yield;
         if (answer && typeof answer === "string") {
           yield addChatElement(
-            new ChatMessageModel(true, answer, false, handleNext)
+            new ChatMessageModel(true, answer, false, handleNext, false, topic)
           );
         }
       }

@@ -10,6 +10,9 @@ import {
 import { UsersContext } from "./usersProvider";
 import User from "../utils/user";
 import { DBUser } from "../store";
+import useFetch from "../hooks/useFetch";
+
+const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}/user`;
 
 export const UserContext = createContext<{
   user: User | undefined;
@@ -51,6 +54,37 @@ const UserProvider: React.FC<Props> = ({
   const [user, setUser] = useState<User>();
   const [userId, setUserId] = useState<string>();
   const { findUser, addUser, updateUser } = useContext(UsersContext);
+  const fetchData = useFetch();
+
+  const createUserInBackend = async (user: User) => {
+    await fetchData(BACKEND_URL, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: user.id,
+        createdAt: user.createdAt,
+        name: user.name,
+      }),
+    });
+  };
+
+  const updateUserInBackend = async (user: User) => {
+    await fetchData(BACKEND_URL, {
+      method: "PATCH",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: user.id,
+        name: user.name,
+        characterTraits: user.profileQuestionsSelection,
+      }),
+    });
+  };
 
   const login = useCallback(
     (newUserId: string) => {
@@ -80,6 +114,7 @@ const UserProvider: React.FC<Props> = ({
     const updatedUser = user.updateName(name);
     updateUser(updatedUser);
     updateUserInStore(updatedUser);
+    createUserInBackend(updatedUser);
     setUser(updatedUser);
   };
 
@@ -88,6 +123,7 @@ const UserProvider: React.FC<Props> = ({
     const updatedUser = user.updateProfileQuestionsSelection(selection);
     updateUser(updatedUser);
     updateUserInStore(updatedUser);
+    updateUserInBackend(updatedUser);
     setUser(updatedUser);
   };
 

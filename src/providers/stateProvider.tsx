@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useState } from "react";
 import { AnimationStateId, SessionStateId } from "../constants";
+import { Topic } from "../utils/serverMessage";
 
 export const StateContext = createContext<{
   sessionStateId: SessionStateId;
@@ -13,6 +14,9 @@ export const StateContext = createContext<{
 
   started: boolean;
   setStarted: (show: boolean) => void;
+
+  topic?: Topic;
+  setTopic: (topic: Topic) => void;
 }>({
   sessionStateId: SessionStateId.NO_SESSION,
   setSessionStateId: () => {},
@@ -25,6 +29,9 @@ export const StateContext = createContext<{
 
   started: false,
   setStarted: () => {},
+
+  topic: undefined,
+  setTopic: () => {},
 });
 
 type Props = {
@@ -43,6 +50,8 @@ const StateProvider: React.FC<Props> = ({ children }) => {
 
   const [started, setStarted] = useState(false);
 
+  const [topic, setTopic] = useState<Topic>();
+
   return (
     <StateContext.Provider
       value={{
@@ -54,6 +63,8 @@ const StateProvider: React.FC<Props> = ({ children }) => {
         setShowChat,
         started,
         setStarted,
+        topic,
+        setTopic,
       }}
     >
       {children}
