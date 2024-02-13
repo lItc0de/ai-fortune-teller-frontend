@@ -4,7 +4,7 @@ import { ChatElementsContext } from "../../providers/chatElementsProvider";
 import ChatOptionsModel from "./chatOptions.model";
 import { FORTUNE_TELLER_USER } from "../../constants";
 import ChatMessageModel from "./chatMessage.model";
-import { KeyboardProviderContext } from "../../providers/keyboardProvider";
+import { KeyboardContext } from "../../providers/keyboardProvider";
 import useTyping from "../../hooks/useTyping";
 
 const ChatOptions: React.FC<ChatOptionsModel> = ({
@@ -14,7 +14,7 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
   handleDone,
 }) => {
   const { addChatElement, removeChatElement } = useContext(ChatElementsContext);
-  const { key } = useContext(KeyboardProviderContext);
+  const { key } = useContext(KeyboardContext);
   const [startLabelTyping, labelPart, labelDone] = useTyping(label);
   const [showOptions, setShowOptions] = useState(false);
 

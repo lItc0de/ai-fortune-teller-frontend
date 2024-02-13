@@ -2,14 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import useFaceVideo from "../hooks/useFaceVideo";
 import styles from "./profileStory.module.css";
 import { UserContext } from "../providers/userProvider";
-import { KeyboardProviderContext } from "../providers/keyboardProvider";
+import { KeyboardContext } from "../providers/keyboardProvider";
 import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
 import { ChatElementsContext } from "../providers/chatElementsProvider";
 
 const ProfileStory: React.FC = () => {
   const { user } = useContext(UserContext);
-  const { key } = useContext(KeyboardProviderContext);
+  const { key } = useContext(KeyboardContext);
   const { clearChatElements } = useContext(ChatElementsContext);
   const { setSessionStateId } = useContext(StateContext);
   const { canvasRef } = useFaceVideo(150);

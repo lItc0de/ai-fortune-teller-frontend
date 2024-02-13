@@ -6,8 +6,9 @@ import {
   useState,
 } from "react";
 import { StateContext } from "./stateProvider";
+import { SettingsContext } from "./settingsProvider";
 
-export const KeyboardProviderContext = createContext<{
+export const KeyboardContext = createContext<{
   key?: string;
   setCapture: (capture: boolean) => void;
 }>({
@@ -23,13 +24,18 @@ const KeyboardProvider: React.FC<Props> = ({ children }) => {
   const [key, setKey] = useState<string>();
   const [capture, setCapture] = useState(true);
   const { setSessionStateId } = useContext(StateContext);
+  const { setTtsEnabled } = useContext(SettingsContext);
 
   useEffect(() => {
     if (!capture) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      console.log(e.key);
+
       if (!e.key) return;
       setKey(e.key);
+
+      if (e.key === "#") setTtsEnabled((ttsEnabled) => !ttsEnabled);
     };
 
     const handleKeyUp = () => {
@@ -44,12 +50,12 @@ const KeyboardProvider: React.FC<Props> = ({ children }) => {
       document.removeEventListener("keyup", handleKeyUp);
       setKey(undefined);
     };
-  }, [capture, setSessionStateId]);
+  }, [capture, setSessionStateId, setTtsEnabled]);
 
   return (
-    <KeyboardProviderContext.Provider value={{ key, setCapture }}>
+    <KeyboardContext.Provider value={{ key, setCapture }}>
       {children}
-    </KeyboardProviderContext.Provider>
+    </KeyboardContext.Provider>
   );
 };
 

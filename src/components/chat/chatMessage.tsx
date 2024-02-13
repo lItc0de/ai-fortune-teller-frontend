@@ -8,7 +8,7 @@ import { ChatElementsContext } from "../../providers/chatElementsProvider";
 import useTTS from "../../hooks/useTTS";
 import TTSDisabledError from "../../errors/ttsDisabledError";
 import TTSNetworkError from "../../errors/ttsNetworkError";
-import { KeyboardProviderContext } from "../../providers/keyboardProvider";
+import { KeyboardContext } from "../../providers/keyboardProvider";
 
 const ChatMessage: React.FC<ChatMessageModel> = ({
   done,
@@ -20,7 +20,7 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
 }) => {
   const { user } = useContext(UserContext);
   const { setChatElementDone } = useContext(ChatElementsContext);
-  const { key } = useContext(KeyboardProviderContext);
+  const { key } = useContext(KeyboardContext);
   const [userName, setUserName] = useState("");
   const [innerDone, setInnerDone] = useState(done);
   const [innerText, setInnerText] = useState("");

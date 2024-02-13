@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import styles from "./header.module.css";
 import { UserContext } from "../providers/userProvider";
 import useFaceVideo from "../hooks/useFaceVideo";
-import { KeyboardProviderContext } from "../providers/keyboardProvider";
+import { KeyboardContext } from "../providers/keyboardProvider";
 import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
 
@@ -11,7 +11,7 @@ const SIZE = 60;
 const Header: React.FC = () => {
   const { user } = useContext(UserContext);
   const { canvasRef } = useFaceVideo(SIZE);
-  const { key } = useContext(KeyboardProviderContext);
+  const { key } = useContext(KeyboardContext);
   const { setSessionStateId, sessionStateId } = useContext(StateContext);
   const [showProfileBtn, setShowProfileBtn] = useState(false);
 

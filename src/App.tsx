@@ -6,7 +6,7 @@ import Player from "./components/player";
 import Stories from "./components/stories";
 import Chat from "./components/chat/chat";
 import { StateContext } from "./providers/stateProvider";
-import { KeyboardProviderContext } from "./providers/keyboardProvider";
+import { KeyboardContext } from "./providers/keyboardProvider";
 
 type Props = {
   handleStartCallback: () => void;
@@ -16,7 +16,7 @@ const App: React.FC<Props> = ({ handleStartCallback }) => {
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const { started, setStarted } = useContext(StateContext);
   const { showChat } = useContext(StateContext);
-  const { key } = useContext(KeyboardProviderContext);
+  const { key } = useContext(KeyboardContext);
 
   const handleStartClick = useCallback(() => {
     setStarted(true);

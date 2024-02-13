@@ -1,5 +1,5 @@
-import { ReactNode, useState } from "react";
-import { SettingsContext } from "./settingsProvider";
+import { ReactNode } from "react";
+import SettingsProvider from "./settingsProvider";
 import UsersProvider from "./usersProvider";
 import UserProvider from "./userProvider";
 import StateProvider from "./stateProvider";
@@ -25,10 +25,8 @@ const Provider: React.FC<Props> = ({
   initialUsers,
   updateUserInStore,
 }) => {
-  const [ttsEnabled] = useState(false);
-
   return (
-    <SettingsContext.Provider value={{ ttsEnabled }}>
+    <SettingsProvider>
       <UsersProvider initialUsers={initialUsers}>
         <UserProvider
           detectionIdSubscribe={detectionIdSubscribe}
@@ -42,7 +40,7 @@ const Provider: React.FC<Props> = ({
           </StateProvider>
         </UserProvider>
       </UsersProvider>
-    </SettingsContext.Provider>
+    </SettingsProvider>
   );
 };
 

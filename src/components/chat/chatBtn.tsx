@@ -1,10 +1,10 @@
 import { useContext, useEffect } from "react";
 import ChatBtnModel from "./chatBtn.model";
 import style from "./chatBtn.module.css";
-import { KeyboardProviderContext } from "../../providers/keyboardProvider";
+import { KeyboardContext } from "../../providers/keyboardProvider";
 
 const ChatBtn: React.FC<ChatBtnModel> = ({ number, label, handleClick }) => {
-  const { key } = useContext(KeyboardProviderContext);
+  const { key } = useContext(KeyboardContext);
 
   useEffect(() => {
     if (key !== number) return;

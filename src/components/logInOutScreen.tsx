@@ -4,14 +4,14 @@ import { ChatElementsContext } from "../providers/chatElementsProvider";
 import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
 import { UserContext } from "../providers/userProvider";
-import { KeyboardProviderContext } from "../providers/keyboardProvider";
+import { KeyboardContext } from "../providers/keyboardProvider";
 
 const LogInOutScreen: React.FC = () => {
   const { clearChatElements } = useContext(ChatElementsContext);
   const { setSessionStateId } = useContext(StateContext);
   const { user, logout, login, userId, detectionId, findUser } =
     useContext(UserContext);
-  const { key } = useContext(KeyboardProviderContext);
+  const { key } = useContext(KeyboardContext);
 
   const [showLogin, setShowLogin] = useState(false);
   const [labelText, setLabelText] = useState("");
