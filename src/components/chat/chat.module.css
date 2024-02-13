@@ -1,16 +1,28 @@
 .chat {
-  display: flex;
   position: fixed;
-  right: 2vw;
+  left: 50vw;
   top: 0;
-  padding: 2rem;
-  width: 300px;
   height: 100vw;
+  padding: 5rem 2rem;
+  width: 50vw;
+
   color: #fff;
   overflow-y: hidden;
-  flex-direction: column;
-  gap: 1rem;
-  padding-top: 5rem;
+  box-sizing: border-box;
+
+  display: grid;
+  align-items: top;
+  justify-content: center;
 
   z-index: 400;
+
+  .chatElements {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    width: 20vw;
+    min-width: 300px;
+  }
 }

@@ -30,12 +30,8 @@ const KeyboardProvider: React.FC<Props> = ({ children }) => {
     if (!capture) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      console.log(e.key);
-
       if (!e.key) return;
       setKey(e.key);
-
-      if (e.key === "#") setTtsEnabled((ttsEnabled) => !ttsEnabled);
     };
 
     const handleKeyUp = () => {
@@ -50,7 +46,20 @@ const KeyboardProvider: React.FC<Props> = ({ children }) => {
       document.removeEventListener("keyup", handleKeyUp);
       setKey(undefined);
     };
-  }, [capture, setSessionStateId, setTtsEnabled]);
+  }, [capture, setSessionStateId]);
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  };
+
+  useEffect(() => {
+    if (key === "#") setTtsEnabled((ttsEnabled) => !ttsEnabled);
+    if (key === "+") toggleFullScreen();
+  }, [key, setTtsEnabled]);
 
   return (
     <KeyboardContext.Provider value={{ key, setCapture }}>
