@@ -39,6 +39,20 @@
       cursor: pointer;
     }
 
+    .optionLabel {
+      display: grid;
+      grid-template-columns: min-content auto;
+      width: 100%;
+      gap: 1rem;
+      align-items: center;
+      box-sizing: border-box;
+
+      .image {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
     .radio {
       display: none;
       /* appearance: none;

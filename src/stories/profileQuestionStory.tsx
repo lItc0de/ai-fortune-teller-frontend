@@ -8,6 +8,10 @@ import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
 import { UserContext } from "../providers/userProvider";
 
+import img1 from "../media/img-1.jpeg";
+import img2 from "../media/img-2.jpeg";
+import img3 from "../media/img-3.jpeg";
+
 const ProfileQuestionStory: React.FC = () => {
   const { addChatElement, clearChatElements } = useContext(ChatElementsContext);
   const { setSessionStateId } = useContext(StateContext);
@@ -30,9 +34,9 @@ const ProfileQuestionStory: React.FC = () => {
   ];
 
   const options3: ChatOption[] = [
-    { id: "peaceful", text: "Img 1" },
-    { id: "creative", text: "Img 2" },
-    { id: "intriguing", text: "Img 3" },
+    { id: "peaceful", imgSrc: img1 },
+    { id: "creative", imgSrc: img2 },
+    { id: "intriguing", imgSrc: img3 },
   ];
 
   const options4: ChatOption[] = [

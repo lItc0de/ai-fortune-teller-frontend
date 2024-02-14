@@ -15,7 +15,7 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
 }) => {
   const { addChatElement, removeChatElement } = useContext(ChatElementsContext);
   const { key } = useContext(KeyboardContext);
-  const [startLabelTyping, labelPart, labelDone] = useTyping(label);
+  const { startTypingWithTTS, textPart, typingDone } = useTyping(label);
   const [showOptions, setShowOptions] = useState(false);
 
   const handleSelect = useCallback(
@@ -28,7 +28,7 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
             false,
             `
           ${label}
-          --> ${optionSelected.text}
+          --> ${optionSelected.text || optionSelected.id}
           `,
             true
           )
@@ -40,28 +40,28 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
   );
 
   useEffect(() => {
-    if (!labelDone) return;
+    if (!typingDone) return;
     if (Number.isNaN(Number(key))) return;
 
     const optionNumber = Number(key) - 1;
     const optionSelected = options[optionNumber];
 
     if (optionSelected) handleSelect(optionSelected.id);
-  }, [key, handleSelect, options, labelDone]);
+  }, [key, handleSelect, options, typingDone]);
 
   useEffect(() => {
-    startLabelTyping();
-  }, [startLabelTyping]);
+    startTypingWithTTS();
+  }, [startTypingWithTTS]);
 
   useEffect(() => {
-    if (!labelDone) return;
+    if (!typingDone) return;
     setShowOptions(true);
-  }, [labelDone]);
+  }, [typingDone]);
 
   return (
     <div className={styles.optionsWrapper}>
       <label className={styles.label}>{FORTUNE_TELLER_USER}</label>
-      <label className={styles.descriptionLabel}>{labelPart}</label>
+      <label className={styles.descriptionLabel}>{textPart}</label>
       {showOptions && (
         <ul className={styles.optionsList}>
           {options.map(({ id, imgSrc, text }, i) => {

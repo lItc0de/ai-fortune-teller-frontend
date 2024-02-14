@@ -1,23 +1,45 @@
 import { useCallback, useState } from "react";
 import { sleep } from "../utils/helpers";
+import useTTS from "./useTTS";
+import TTSDisabledError from "../errors/ttsDisabledError";
+import TTSNetworkError from "../errors/ttsNetworkError";
 
-const useTyping = (
-  text: string
-): [startTyping: () => Promise<void>, text: string, done: boolean] => {
-  const [innerText, setInnerText] = useState("");
-  const [done, setDone] = useState(false);
+const useTyping = (text: string) => {
+  const [textPart, setTextPart] = useState("Typing...");
+  const [typingDone, setTypingDone] = useState(false);
+  const { playSound, transcribe } = useTTS();
 
-  const startTyping = useCallback(async () => {
+  const type = useCallback(async () => {
     const textParts = text.split(" ");
+    setTextPart("");
     for (let i = 0; i < textParts.length; i++) {
       const part = textParts[i];
-      setInnerText((prevText) => [prevText, part].join(" "));
+      setTextPart((prevText) => [prevText, part].join(" "));
       await sleep(100);
     }
-    setDone(true);
   }, [text]);
 
-  return [startTyping, innerText, done];
+  const startTyping = useCallback(async () => {
+    await type();
+    setTypingDone(true);
+  }, [type]);
+
+  const startTypingWithTTS = useCallback(async () => {
+    try {
+      await transcribe(text);
+      await Promise.all([type(), playSound()]);
+    } catch (error) {
+      if (
+        error instanceof TTSDisabledError ||
+        error instanceof TTSNetworkError
+      ) {
+        await type();
+      }
+    }
+    setTypingDone(true);
+  }, [type, text]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return { startTyping, startTypingWithTTS, textPart, typingDone };
 };
 
 export default useTyping;
