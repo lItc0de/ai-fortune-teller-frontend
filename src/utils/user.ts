@@ -7,6 +7,7 @@ class User {
   readonly createdAt: number;
   lastLoginAt: number;
   profileQuestionsSelection: string[] = [];
+  profileText = "";
   name?: string;
 
   constructor(params: UserParams) {
@@ -17,17 +18,20 @@ class User {
     this.lastLoginAt = params?.lastLoginAt || this.createdAt;
     this.name = params?.name;
     this.profileQuestionsSelection = params?.profileQuestionsSelection || [];
+    this.profileText = params?.profileText || "";
   }
 
   updateName(newName: string): User {
     this.name = newName;
-    // this.store.updateUser(this.id, { name: newName });
     return User.clone(this);
   }
 
-  updateProfileQuestionsSelection(selection: string[]): User {
+  updateProfileQuestionsSelection(
+    selection: string[],
+    profileText: string
+  ): User {
     this.profileQuestionsSelection = selection;
-    // this.store.updateUser(this.id, { profileQuestionsSelection: selection });
+    this.profileText = profileText;
     return User.clone(this);
   }
 

@@ -13,6 +13,7 @@ export interface DBUser {
   faceDescriptors: Float32Array[];
   name?: string;
   profileQuestionsSelection?: string[];
+  profileText: string;
 }
 
 interface FortuneTeller extends DBSchema {
@@ -64,6 +65,7 @@ class Store {
       lastDetectionAt: detectionUser.lastDetectionAt,
       createdAt,
       lastLoginAt: createdAt,
+      profileText: "",
     };
 
     await this.db.add("users", dbUser);

@@ -11,8 +11,10 @@ import { UsersContext } from "./usersProvider";
 import User from "../utils/user";
 import { DBUser } from "../store";
 import useFetch from "../hooks/useFetch";
+import ServerMessage, { Role, Topic } from "../utils/serverMessage";
 
-const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}/user`;
+const USER_URL = `http://${import.meta.env.VITE_BACKEND_URL}/user`;
+const PROFILE_URL = `http://${import.meta.env.VITE_BACKEND_URL}/profile`;
 
 export const UserContext = createContext<{
   user: User | undefined;
@@ -57,7 +59,7 @@ const UserProvider: React.FC<Props> = ({
   const fetchData = useFetch();
 
   const createUserInBackend = async (user: User) => {
-    await fetchData(BACKEND_URL, {
+    await fetchData(USER_URL, {
       method: "POST",
       mode: "cors",
       headers: {
@@ -72,7 +74,7 @@ const UserProvider: React.FC<Props> = ({
   };
 
   const updateUserInBackend = async (user: User) => {
-    await fetchData(BACKEND_URL, {
+    await fetchData(USER_URL, {
       method: "PATCH",
       mode: "cors",
       headers: {
@@ -85,6 +87,38 @@ const UserProvider: React.FC<Props> = ({
       }),
     });
   };
+
+  const sendProfileUpdate = useCallback(
+    async (selection: string[]) => {
+      if (!userId || !user?.name) throw new Error("Wrong context");
+
+      const message = new ServerMessage({
+        userId,
+        role: Role.user,
+        content: `My name is ${
+          user.name
+        }, and I have the following character traits:
+        ${selection.join(", ")}.
+        Please give me a short text about my personality.`,
+        topic: Topic.GENERAL,
+      });
+
+      const res = await fetchData(PROFILE_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: message.toJSONString(),
+      });
+
+      if (!res) throw new Error("No Server response");
+      const data = await res.json();
+
+      return new ServerMessage(data);
+    },
+    [userId, fetchData, user?.name]
+  );
 
   const login = useCallback(
     (newUserId: string) => {
@@ -118,9 +152,13 @@ const UserProvider: React.FC<Props> = ({
     setUser(updatedUser);
   };
 
-  const updateProfileQuestionsSelection = (selection: string[]) => {
-    if (!user) return;
-    const updatedUser = user.updateProfileQuestionsSelection(selection);
+  const updateProfileQuestionsSelection = async (selection: string[]) => {
+    if (!user || !user.name) return;
+    const response = await sendProfileUpdate(selection);
+    const updatedUser = user.updateProfileQuestionsSelection(
+      selection,
+      response.content
+    );
     updateUser(updatedUser);
     updateUserInStore(updatedUser);
     updateUserInBackend(updatedUser);

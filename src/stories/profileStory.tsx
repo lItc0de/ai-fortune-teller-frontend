@@ -43,13 +43,7 @@ const ProfileStory: React.FC = () => {
       </div>
       <div className={styles.userInfo}>
         <p>Name: {user?.name || "User"}</p>
-        {user && (
-          <ul>
-            {user.profileQuestionsSelection.map((question) => (
-              <li key={`key-${question}`}>{question}</li>
-            ))}
-          </ul>
-        )}
+        {user && <p>{user.profileText}</p>}
       </div>
       <div className={styles.actionBtns}>
         {showProfileQuestionBtn && (
