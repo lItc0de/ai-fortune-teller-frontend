@@ -9,7 +9,7 @@ import { ChatElementsContext } from "../providers/chatElementsProvider";
 
 const ProfileStory: React.FC = () => {
   const { user } = useContext(UserContext);
-  const { key } = useContext(KeyboardContext);
+  const { keyPressed } = useContext(KeyboardContext);
   const { clearChatElements } = useContext(ChatElementsContext);
   const { setSessionStateId } = useContext(StateContext);
   const { canvasRef } = useFaceVideo(150);
@@ -21,10 +21,10 @@ const ProfileStory: React.FC = () => {
     setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
 
   useEffect(() => {
-    if (key === "b") setSessionStateId(SessionStateId.TOPIC_SELECTION);
-    if (key === "q" && showProfileQuestionBtn)
+    if (keyPressed("b")) setSessionStateId(SessionStateId.TOPIC_SELECTION);
+    if (keyPressed("q") && showProfileQuestionBtn)
       setSessionStateId(SessionStateId.PROFILE_QUESTIONS);
-  }, [key, setSessionStateId, showProfileQuestionBtn]);
+  }, [keyPressed, setSessionStateId, showProfileQuestionBtn]);
 
   useEffect(() => {
     clearChatElements();

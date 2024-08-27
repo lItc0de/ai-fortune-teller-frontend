@@ -19,7 +19,7 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
 }) => {
   const { user } = useContext(UserContext);
   const { setChatElementDone } = useContext(ChatElementsContext);
-  const { key } = useContext(KeyboardContext);
+  const { keyPressed } = useContext(KeyboardContext);
   const [userName, setUserName] = useState("");
   const { startTypingWithTTS, textPart, typingDone } = useTyping(text);
 
@@ -42,8 +42,8 @@ const ChatMessage: React.FC<ChatMessageModel> = ({
 
   useEffect(() => {
     if (!typingDone || !handleDone) return;
-    if (awaitsEnter && key === "Enter") handleDone();
-  }, [typingDone, handleDone, awaitsEnter, key]);
+    if (awaitsEnter && keyPressed("Enter")) handleDone();
+  }, [typingDone, handleDone, awaitsEnter, keyPressed]);
 
   useEffect(() => {
     if (awaitsEnter) return;

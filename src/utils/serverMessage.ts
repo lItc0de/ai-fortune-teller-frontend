@@ -21,12 +21,14 @@ class ServerMessage {
   role: Role;
   content: string;
   topic: Topic;
+  userName?: string;
 
   constructor(params: ServerMessageParams) {
     this.userId = params.userId;
     this.role = params.role;
     this.content = params.content;
     this.topic = params.topic;
+    this.userName = params.userName;
   }
 
   toJSONString(): string {
@@ -35,6 +37,7 @@ class ServerMessage {
       role: this.role,
       content: this.content,
       topic: this.topic,
+      userName: this.userName,
     });
   }
 }

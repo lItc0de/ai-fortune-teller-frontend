@@ -16,7 +16,7 @@ const App: React.FC<Props> = ({ handleStartCallback }) => {
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const { started, setStarted } = useContext(StateContext);
   const { showChat } = useContext(StateContext);
-  const { key } = useContext(KeyboardContext);
+  const { keyPressed } = useContext(KeyboardContext);
 
   const handleStartClick = useCallback(() => {
     setStarted(true);
@@ -26,9 +26,9 @@ const App: React.FC<Props> = ({ handleStartCallback }) => {
 
   useEffect(() => {
     if (started) return;
-    if (key !== "Enter") return;
+    if (!keyPressed("Enter")) return;
     handleStartClick();
-  }, [key, handleStartClick, started]);
+  }, [keyPressed, handleStartClick, started]);
 
   return (
     <>

@@ -41,7 +41,7 @@ const ProfileQuestionStory: React.FC = () => {
 
   const options4: ChatOption[] = [
     { id: "fear-of-loosing-control", text: "Experiencing free fall" },
-    { id: "need-for-scceptance", text: "Being naked infront of other people" },
+    { id: "need-for-acceptance", text: "Being naked infront of other people" },
     {
       id: "emotional-connection-to-the-past",
       text: "Meeting deceased loved ones",

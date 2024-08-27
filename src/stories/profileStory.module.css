@@ -18,8 +18,9 @@
     background-color: var(--chat-background);
     backdrop-filter: var(--backdrop-filter);
     padding: 1rem;
-    min-width: 300px;
     min-height: 200px;
+    max-width: 30vw;
+    min-width: 400px;
   }
 
   .actionBtns {

@@ -11,7 +11,7 @@ const LogInOutScreen: React.FC = () => {
   const { setSessionStateId } = useContext(StateContext);
   const { user, logout, login, userId, detectionId, findUser } =
     useContext(UserContext);
-  const { key } = useContext(KeyboardContext);
+  const { keyPressed } = useContext(KeyboardContext);
 
   const [showLogin, setShowLogin] = useState(false);
   const [labelText, setLabelText] = useState("");
@@ -77,9 +77,9 @@ const LogInOutScreen: React.FC = () => {
   }, [showLogin, user?.name, findUser, detectionId]);
 
   useEffect(() => {
-    if (key !== "Enter") return;
+    if (!keyPressed("Enter")) return;
     handleClick();
-  }, [key, handleClick]);
+  }, [keyPressed, handleClick]);
 
   return (
     <div className={styles.logInOutScreen}>

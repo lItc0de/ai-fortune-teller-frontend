@@ -15,7 +15,9 @@
   display: grid;
   grid-template-columns: auto auto 1fr;
 
-  .profileHint {
-    justify-self: flex-end;
+  .actions {
+    justify-self: end;
+    display: flex;
+    flex-direction: column;
   }
 }

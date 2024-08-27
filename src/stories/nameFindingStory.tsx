@@ -39,7 +39,7 @@ const NameFindingStory: React.FC = () => {
     yield addChatElement(
       new ChatMessageModel(
         true,
-        `Before we get into the fortunes your future beholds, tell me your name so we can get to know each other better! You can speak it out loud or type it down.`,
+        `Before we get into the fortunes your future beholds, tell me your name so we can get to know each other better!`,
         false,
         handleNext
       )

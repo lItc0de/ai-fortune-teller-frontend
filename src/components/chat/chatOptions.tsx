@@ -14,7 +14,7 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
   handleDone,
 }) => {
   const { addChatElement, removeChatElement } = useContext(ChatElementsContext);
-  const { key } = useContext(KeyboardContext);
+  const { keys } = useContext(KeyboardContext);
   const { startTypingWithTTS, textPart, typingDone } = useTyping(label);
   const [showOptions, setShowOptions] = useState(false);
 
@@ -41,13 +41,17 @@ const ChatOptions: React.FC<ChatOptionsModel> = ({
 
   useEffect(() => {
     if (!typingDone) return;
-    if (Number.isNaN(Number(key))) return;
 
-    const optionNumber = Number(key) - 1;
-    const optionSelected = options[optionNumber];
+    const matchedOptions = options.filter((_, i) =>
+      keys.get((Number(i) + 1).toString())
+    );
+    console.log(matchedOptions, keys);
+
+    if (matchedOptions.length === 0) return;
+    const optionSelected = matchedOptions[0];
 
     if (optionSelected) handleSelect(optionSelected.id);
-  }, [key, handleSelect, options, typingDone]);
+  }, [keys, handleSelect, options, typingDone]);
 
   useEffect(() => {
     startTypingWithTTS();
