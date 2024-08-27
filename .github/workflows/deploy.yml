@@ -37,8 +37,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          node-version: "1.0.36"
-          cache: bun
+          bun-version: "1.0.36"
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Restore cache
