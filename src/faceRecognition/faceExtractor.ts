@@ -1,5 +1,5 @@
 import { Box } from "face-api.js";
-import User from "../detectionUser";
+import DetectionUser from "./detectionUser";
 
 const FACE_CANVAS_WIDTH = 250;
 const FACE_CANVAS_HEIGHT = 250;
@@ -20,7 +20,7 @@ class FaceExtractor {
     this.faceCanvas.height = FACE_CANVAS_HEIGHT;
   }
 
-  draw(user: User) {
+  draw(user: DetectionUser) {
     const averageFaceBox = this.getAverageFaceBox(user);
     if (!averageFaceBox) return;
 
@@ -46,7 +46,7 @@ class FaceExtractor {
     this.faceCtx.restore();
   }
 
-  private getAverageFaceBox(user: User): Box | undefined {
+  private getAverageFaceBox(user: DetectionUser): Box | undefined {
     if (!user.lastFaceBoxes) return;
 
     const lastFaceBoxes = user.lastFaceBoxes;
