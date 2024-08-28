@@ -21,6 +21,9 @@ concurrency:
 
 env:
   VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
+  VITE_MEDIA_LINK: ${{ vars.VITE_MEDIA_LINK }}
+  VITE_VIDEO_LINK: ${{ vars.VITE_VIDEO_LINK }}
+  VITE_FACE_DETECTION_LINK: ${{ vars.VITE_FACE_DETECTION_LINK }}
 
 jobs:
   build:
