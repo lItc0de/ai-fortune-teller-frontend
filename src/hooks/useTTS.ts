@@ -4,7 +4,7 @@ import { SettingsContext } from "../providers/settingsProvider";
 import TTSDisabledError from "../errors/ttsDisabledError";
 import TTSNetworkError from "../errors/ttsNetworkError";
 
-const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}`;
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`;
 const ctx = new AudioContext();
 
 const useTTS = () => {

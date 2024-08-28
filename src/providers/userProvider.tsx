@@ -13,8 +13,8 @@ import { DBUser } from "../store";
 import useFetch from "../hooks/useFetch";
 import ServerMessage, { Role, Topic } from "../utils/serverMessage";
 
-const USER_URL = `http://${import.meta.env.VITE_BACKEND_URL}/user`;
-const PROFILE_URL = `http://${import.meta.env.VITE_BACKEND_URL}/profile`;
+const USER_URL = `${import.meta.env.VITE_BACKEND_URL}/user`;
+const PROFILE_URL = `${import.meta.env.VITE_BACKEND_URL}/profile`;
 
 export const UserContext = createContext<{
   user: User | undefined;

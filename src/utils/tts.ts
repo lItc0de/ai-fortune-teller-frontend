@@ -1,4 +1,4 @@
-const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}`;
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`;
 
 class TTS {
   private ctx: AudioContext;

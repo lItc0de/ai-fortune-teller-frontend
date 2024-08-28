@@ -4,7 +4,7 @@ import useFetch from "./useFetch";
 import { UserContext } from "../providers/userProvider";
 import { StateContext } from "../providers/stateProvider";
 
-const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}/chat`;
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/chat`;
 
 const useChatBot = () => {
   const { user } = useContext(UserContext);

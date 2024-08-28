@@ -8,7 +8,7 @@ import {
 import User from "../utils/user";
 import useFetch from "../hooks/useFetch";
 
-const BACKEND_URL = `http://${import.meta.env.VITE_BACKEND_URL}/users`;
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}/users`;
 
 export const UsersContext = createContext<{
   users: User[];
