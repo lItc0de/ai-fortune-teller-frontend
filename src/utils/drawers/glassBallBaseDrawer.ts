@@ -1,5 +1,6 @@
-import glassBall from "../../media/glassBall.webp";
 import BaseDrawer from "./baseDrawer";
+
+const GLASSBALL_IMAGE_URL = `${import.meta.env.VITE_MEDIA_LINK}/glassBall.webp`;
 
 export const BALL_SIZE = 184;
 
@@ -20,7 +21,7 @@ abstract class GlassBallBaseDrawer extends BaseDrawer {
     new Promise((resolve) => {
       this.image.addEventListener("load", resolve);
 
-      this.image.src = glassBall;
+      this.image.src = GLASSBALL_IMAGE_URL;
     });
 
   protected drawXY(

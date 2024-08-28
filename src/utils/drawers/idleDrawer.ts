@@ -1,7 +1,10 @@
-import fortuneTellerIdleImage from "../../media/fortunetellerIdle.webp";
 import Clock from "../clock";
 import BaseDrawer from "./baseDrawer";
 import { getDimensions } from "../helpers";
+
+const FORTUNE_TELLER_IDLE_IMAGE_URL = `${
+  import.meta.env.VITE_MEDIA_LINK
+}/fortunetellerIdle.webp`;
 
 class IdleDrawer extends BaseDrawer {
   private fortuneTellerIdleImage = new Image();
@@ -10,7 +13,7 @@ class IdleDrawer extends BaseDrawer {
   init = () =>
     new Promise((resolve) => {
       this.fortuneTellerIdleImage.addEventListener("load", resolve);
-      this.fortuneTellerIdleImage.src = fortuneTellerIdleImage;
+      this.fortuneTellerIdleImage.src = FORTUNE_TELLER_IDLE_IMAGE_URL;
     });
 
   draw(ctx: CanvasRenderingContext2D) {

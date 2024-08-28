@@ -1,30 +1,18 @@
 import Video from "./video";
-
-import newSession1Video from "../media/newSession1.webm";
-import newSession2Video from "../media/newSession2.webm";
-import newSession3Video from "../media/newSession3.webm";
-import newSession4Video from "../media/newSession4.webm";
 import { AnimationStateId } from "../constants";
+
+const VIDEO1 = `${import.meta.env.VITE_VIDEO_LINK}newSession1.webm`;
+const VIDEO2 = `${import.meta.env.VITE_VIDEO_LINK}newSession2.webm`;
+const VIDEO3 = `${import.meta.env.VITE_VIDEO_LINK}newSession3.webm`;
+const VIDEO4 = `${import.meta.env.VITE_VIDEO_LINK}newSession4.webm`;
 
 const Player: React.FC = () => {
   return (
     <>
-      <Video
-        src={newSession1Video}
-        videoStateId={AnimationStateId.NEW_SESSION_1}
-      />
-      <Video
-        src={newSession2Video}
-        videoStateId={AnimationStateId.NEW_SESSION_2}
-      />
-      <Video
-        src={newSession3Video}
-        videoStateId={AnimationStateId.NEW_SESSION_3}
-      />
-      <Video
-        src={newSession4Video}
-        videoStateId={AnimationStateId.NEW_SESSION_4}
-      />
+      <Video src={VIDEO1} videoStateId={AnimationStateId.NEW_SESSION_1} />
+      <Video src={VIDEO2} videoStateId={AnimationStateId.NEW_SESSION_2} />
+      <Video src={VIDEO3} videoStateId={AnimationStateId.NEW_SESSION_3} />
+      <Video src={VIDEO4} videoStateId={AnimationStateId.NEW_SESSION_4} />
     </>
   );
 };

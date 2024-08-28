@@ -1,6 +1,9 @@
-import fortuneTellerGlassballImage from "../../media/fortuneTellerGlassball.webp";
 import { getDimensions } from "../helpers";
 import GlassBallBaseDrawer from "./glassBallBaseDrawer";
+
+const FORTUNE_TELLER_GLASSBALL_IMAGE_URL = `${
+  import.meta.env.VITE_MEDIA_LINK
+}/fortuneTellerGlassball.webp`;
 
 class FortuneTellerDrawer extends GlassBallBaseDrawer {
   private fortuneTellerGlassballImage = new Image();
@@ -13,7 +16,7 @@ class FortuneTellerDrawer extends GlassBallBaseDrawer {
   private loadFortuneTellerGlassballImage = () =>
     new Promise((resolve) => {
       this.fortuneTellerGlassballImage.addEventListener("load", resolve);
-      this.fortuneTellerGlassballImage.src = fortuneTellerGlassballImage;
+      this.fortuneTellerGlassballImage.src = FORTUNE_TELLER_GLASSBALL_IMAGE_URL;
     });
 
   draw(ctx: CanvasRenderingContext2D) {

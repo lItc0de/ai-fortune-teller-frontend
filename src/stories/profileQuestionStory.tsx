@@ -8,9 +8,9 @@ import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
 import { UserContext } from "../providers/userProvider";
 
-import img1 from "../media/img-1.jpeg";
-import img2 from "../media/img-2.jpeg";
-import img3 from "../media/img-3.jpeg";
+const IMG1 = `${import.meta.env.VITE_MEDIA_LINK}/img-1.jpeg`;
+const IMG2 = `${import.meta.env.VITE_MEDIA_LINK}/img-2.jpeg`;
+const IMG3 = `${import.meta.env.VITE_MEDIA_LINK}/img-3.jpeg`;
 
 const ProfileQuestionStory: React.FC = () => {
   const { addChatElement, clearChatElements } = useContext(ChatElementsContext);
@@ -34,9 +34,9 @@ const ProfileQuestionStory: React.FC = () => {
   ];
 
   const options3: ChatOption[] = [
-    { id: "peaceful", imgSrc: img1 },
-    { id: "creative", imgSrc: img2 },
-    { id: "intriguing", imgSrc: img3 },
+    { id: "peaceful", imgSrc: IMG1 },
+    { id: "creative", imgSrc: IMG2 },
+    { id: "intriguing", imgSrc: IMG3 },
   ];
 
   const options4: ChatOption[] = [
