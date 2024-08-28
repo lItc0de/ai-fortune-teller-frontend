@@ -24,7 +24,7 @@ dist-ssr
 *.sw?
 
 # Models
-public/models
+# public/models
 *params.*
 
 .env
