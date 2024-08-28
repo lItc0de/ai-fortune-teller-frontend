@@ -49,6 +49,8 @@ jobs:
         run: bun install
       - name: Build with Bun
         run: bun run build
+        run: ls -la dist
+        run: ls -la dist/models
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
