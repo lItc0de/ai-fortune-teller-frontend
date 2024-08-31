@@ -1,10 +1,10 @@
 import Clock from "../clock";
 import BaseDrawer from "./baseDrawer";
-import { getDimensions } from "../helpers";
+import { BACKGROUND_DIMENSIONS, getDimensions } from "../helpers";
 
-const FORTUNE_TELLER_IDLE_IMAGE_URL = `${
-  import.meta.env.VITE_MEDIA_LINK
-}/fortunetellerIdle.webp`;
+const FORTUNE_TELLER_IDLE_IMAGE_URL = `${import.meta.env.VITE_MEDIA_LINK}?x=${
+  BACKGROUND_DIMENSIONS.width
+}&y=${BACKGROUND_DIMENSIONS.height}&file=/fortunetellerIdle.webp`;
 
 class IdleDrawer extends BaseDrawer {
   private fortuneTellerIdleImage = new Image();

@@ -8,9 +8,15 @@ import { StateContext } from "../providers/stateProvider";
 import { SessionStateId } from "../constants";
 import { UserContext } from "../providers/userProvider";
 
-const IMG1 = `${import.meta.env.VITE_MEDIA_LINK}/img-1.jpeg`;
-const IMG2 = `${import.meta.env.VITE_MEDIA_LINK}/img-2.jpeg`;
-const IMG3 = `${import.meta.env.VITE_MEDIA_LINK}/img-3.jpeg`;
+const IMG1 = `${
+  import.meta.env.VITE_MEDIA_LINK
+}?x=3024&y=1964&file=/img-1.jpeg`;
+const IMG2 = `${
+  import.meta.env.VITE_MEDIA_LINK
+}?x=3024&y=1964&file=/img-2.jpeg`;
+const IMG3 = `${
+  import.meta.env.VITE_MEDIA_LINK
+}?x=3024&y=1964&file=/img-3.jpeg`;
 
 const ProfileQuestionStory: React.FC = () => {
   const { addChatElement, clearChatElements } = useContext(ChatElementsContext);

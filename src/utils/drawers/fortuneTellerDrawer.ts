@@ -1,9 +1,11 @@
-import { getDimensions } from "../helpers";
+import { BACKGROUND_DIMENSIONS, getDimensions } from "../helpers";
 import GlassBallBaseDrawer from "./glassBallBaseDrawer";
 
 const FORTUNE_TELLER_GLASSBALL_IMAGE_URL = `${
   import.meta.env.VITE_MEDIA_LINK
-}/fortuneTellerGlassball.webp`;
+}?x=${BACKGROUND_DIMENSIONS.width}&y=${
+  BACKGROUND_DIMENSIONS.height
+}&file=/fortuneTellerGlassball.webp`;
 
 class FortuneTellerDrawer extends GlassBallBaseDrawer {
   private fortuneTellerGlassballImage = new Image();

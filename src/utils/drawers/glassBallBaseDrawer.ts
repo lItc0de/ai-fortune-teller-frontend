@@ -1,8 +1,10 @@
 import BaseDrawer from "./baseDrawer";
 
-const GLASSBALL_IMAGE_URL = `${import.meta.env.VITE_MEDIA_LINK}/glassBall.webp`;
-
 export const BALL_SIZE = 184;
+
+const GLASSBALL_IMAGE_URL = `${
+  import.meta.env.VITE_MEDIA_LINK
+}?x=${BALL_SIZE}&y=${BALL_SIZE}&file=/glassBall.webp`;
 
 abstract class GlassBallBaseDrawer extends BaseDrawer {
   private faceCanvas: HTMLCanvasElement;
