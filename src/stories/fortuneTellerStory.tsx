@@ -33,7 +33,7 @@ const FortuneTellerStory: React.FC = () => {
     yield addChatElement(
       new ChatMessageModel(
         true,
-        `I'm ready to to look into my glassball to tell you everything you wish to know. So go ahead!`,
+        `I'm ready to look into my glassball to tell you everything you wish to know. So go ahead!`,
         false,
         handleNext,
         false,
