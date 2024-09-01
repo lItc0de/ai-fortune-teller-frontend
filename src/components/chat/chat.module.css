@@ -24,5 +24,7 @@
     padding: 0;
     width: 20vw;
     min-width: 300px;
+    height: calc(100vh - 180px);
+    overflow-y: auto;
   }
 }

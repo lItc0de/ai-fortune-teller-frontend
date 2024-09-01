@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 import styles from "./chat.module.css";
 import ChatMessage from "./chatMessage";
 import ChatBtns from "./chatBtns";
@@ -12,10 +12,15 @@ import ChatOptions from "./chatOptions";
 
 const Chat: React.FC = () => {
   const { chatElements } = useContext(ChatElementsContext);
+  const chatListEl = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    chatListEl.current?.scrollTo(0, chatListEl.current.scrollHeight);
+  }, [chatElements]);
 
   return (
     <section className={styles.chat}>
-      <ul className={styles.chatElements}>
+      <ul className={styles.chatElements} ref={chatListEl}>
         {[...chatElements.values()].map((chatElement) => {
           if (chatElement instanceof ChatMessageModel) {
             return <ChatMessage {...chatElement} key={chatElement.id} />;
