@@ -71,7 +71,7 @@ const Header: React.FC = () => {
         )}
         {showHomeBtn && (
           <span className={styles.homeBtn}>
-            Press <span className="key-hint">[command] + [backspace]</span> for
+            Press <span className="key-hint">[STRG] + [backspace]</span> for
             Home
           </span>
         )}
