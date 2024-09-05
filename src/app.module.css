@@ -1,12 +1,26 @@
-.startBtn {
-  display: block;
+.startBackground {
   position: fixed;
-  padding: 0.25rem 1rem;
-  background-color: var(--action-background);
-  font-size: 1.5rem;
-  backdrop-filter: blur(10px);
-  border: none;
-  color: var(--text-color);
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: var(--backdrop-filter);
+  padding: 3rem;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  z-index: 800;
 
-  z-index: 900;
+  .startBtn {
+    display: block;
+    padding: 0.25rem 1rem;
+    background-color: var(--action-background);
+    font-size: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: none;
+    color: var(--text-color);
+
+    z-index: 900;
+  }
 }

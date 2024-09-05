@@ -36,15 +36,17 @@ const App: React.FC<Props> = ({ handleStartCallback }) => {
       <Player />
       <Canvas shouldAnimate={shouldAnimate} />
       {!started && (
-        <button
-          type="button"
-          id="startBtn"
-          className={styles.startBtn}
-          onClick={handleStartClick}
-        >
-          <span className="key-hint">[Enter]</span>
-          Start
-        </button>
+        <div className={styles.startBackground}>
+          <button
+            type="button"
+            id="startBtn"
+            className={styles.startBtn}
+            onClick={handleStartClick}
+          >
+            <span className="key-hint">[Enter]</span>
+            Start
+          </button>
+        </div>
       )}
       {showChat && <Chat />}
       <Stories />

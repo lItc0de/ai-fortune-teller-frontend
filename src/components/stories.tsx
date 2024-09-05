@@ -10,6 +10,7 @@ import ProfileStory from "../stories/profileStory";
 import FortuneSelectStory from "../stories/topicSelectStory";
 import { UserContext } from "../providers/userProvider";
 import LogInOutScreen from "./logInOutScreen";
+import IdleStory from "../stories/idleStory";
 
 const Stories: React.FC = () => {
   const {
@@ -104,6 +105,7 @@ const Stories: React.FC = () => {
   return (
     <>
       {sessionStateId === SessionStateId.NEW_SESSION && <NewUserStory />}
+      {sessionStateId === SessionStateId.NO_SESSION && <IdleStory />}
       {sessionStateId === SessionStateId.NAME_FINDING && <NameFindingStory />}
       {sessionStateId === SessionStateId.PROFILE_QUESTIONS && (
         <ProfileQuestionStory />

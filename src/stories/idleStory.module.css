@@ -1,0 +1,13 @@
+.idleText {
+  /* color: white; */
+  position: absolute;
+  text-align: center;
+
+  > h1 {
+    font-size: 4rem;
+  }
+
+  > p {
+    font-size: 2rem;
+  }
+}

@@ -6,6 +6,9 @@ import { SessionStateId } from "../constants";
 import { UserContext } from "../providers/userProvider";
 import { KeyboardContext } from "../providers/keyboardProvider";
 
+const LOGOUT_TIMEOUT = 2 * 60 * 1000;
+// const LOGOUT_TIMEOUT = 2000;
+
 const LogInOutScreen: React.FC = () => {
   const { clearChatElements } = useContext(ChatElementsContext);
   const { setSessionStateId } = useContext(StateContext);
@@ -15,6 +18,7 @@ const LogInOutScreen: React.FC = () => {
 
   const [showLogin, setShowLogin] = useState(false);
   const [labelText, setLabelText] = useState("");
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -80,6 +84,22 @@ const LogInOutScreen: React.FC = () => {
     if (!keyPressed("Enter")) return;
     handleClick();
   }, [keyPressed, handleClick]);
+
+  // set timeout for logout
+  useEffect(() => {
+    if (showLogin) return;
+    if (!userId) return;
+    if (timeoutRef.current) return;
+
+    timeoutRef.current = setTimeout(handleClick, LOGOUT_TIMEOUT);
+
+    return () => {
+      if (!timeoutRef.current) return;
+
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = undefined;
+    };
+  }, [showLogin, userId, handleClick]);
 
   return (
     <div className={styles.logInOutScreen}>

@@ -108,6 +108,7 @@ class FaceDetection {
         Date.now() - this.detectionUser.lastDetectionAt >= LOGOUT_TIME
       ) {
         this.updateDetectionUserId(undefined);
+        this.clearDetectedUserIds();
       }
       return;
     }
