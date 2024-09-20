@@ -18,7 +18,7 @@ const LogInOutScreen: React.FC = () => {
 
   const [showLogin, setShowLogin] = useState(false);
   const [labelText, setLabelText] = useState("");
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const btnRef = useRef<HTMLButtonElement>(null);
 
